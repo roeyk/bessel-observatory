@@ -1,0 +1,825 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="00597442ac4e2996f1f1df24e64abbca5c92526bda8f4e69f0a45506b2674d40">
+<title>RPG — bessel.sqlrpgle — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="Bessel.Mod.html">← Oberon-2</a><a href="bessel.sh.html">Bash →</a></nav>
+<h1>RPG <code>bessel.sqlrpgle</code></h1>
+<p>IBM i 7.5, ILE RPG + Db2 SQL + QC2LE; see rpg_setup.txt · Fully free RPG, MONITOR/ON-ERROR, prototyped calls, embedded SQL, native job messages.</p>
+<p><strong>Memory:</strong> POINTER, %ADDR, BASED aliases, by-reference parameters, and byte-wise pointer advancement by %SIZE.<br><strong>Strings:</strong> %TRIM, %CHECK, %SUBST, %SCANRPL, %CHAR, concatenation and CCSID-aware IFS services.</p>
+<div class="actions"><a href="../bessel.sqlrpgle">Open raw source</a>
+<a href="../bessel.sqlrpgle" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span>
+<span class="normal"><a href="#L-172">172</a></span>
+<span class="normal"><a href="#L-173">173</a></span>
+<span class="normal"><a href="#L-174">174</a></span>
+<span class="normal"><a href="#L-175">175</a></span>
+<span class="normal"><a href="#L-176">176</a></span>
+<span class="normal"><a href="#L-177">177</a></span>
+<span class="normal"><a href="#L-178">178</a></span>
+<span class="normal"><a href="#L-179">179</a></span>
+<span class="normal"><a href="#L-180">180</a></span>
+<span class="normal"><a href="#L-181">181</a></span>
+<span class="normal"><a href="#L-182">182</a></span>
+<span class="normal"><a href="#L-183">183</a></span>
+<span class="normal"><a href="#L-184">184</a></span>
+<span class="normal"><a href="#L-185">185</a></span>
+<span class="normal"><a href="#L-186">186</a></span>
+<span class="normal"><a href="#L-187">187</a></span>
+<span class="normal"><a href="#L-188">188</a></span>
+<span class="normal"><a href="#L-189">189</a></span>
+<span class="normal"><a href="#L-190">190</a></span>
+<span class="normal"><a href="#L-191">191</a></span>
+<span class="normal"><a href="#L-192">192</a></span>
+<span class="normal"><a href="#L-193">193</a></span>
+<span class="normal"><a href="#L-194">194</a></span>
+<span class="normal"><a href="#L-195">195</a></span>
+<span class="normal"><a href="#L-196">196</a></span>
+<span class="normal"><a href="#L-197">197</a></span>
+<span class="normal"><a href="#L-198">198</a></span>
+<span class="normal"><a href="#L-199">199</a></span>
+<span class="normal"><a href="#L-200">200</a></span>
+<span class="normal"><a href="#L-201">201</a></span>
+<span class="normal"><a href="#L-202">202</a></span>
+<span class="normal"><a href="#L-203">203</a></span>
+<span class="normal"><a href="#L-204">204</a></span>
+<span class="normal"><a href="#L-205">205</a></span>
+<span class="normal"><a href="#L-206">206</a></span>
+<span class="normal"><a href="#L-207">207</a></span>
+<span class="normal"><a href="#L-208">208</a></span>
+<span class="normal"><a href="#L-209">209</a></span>
+<span class="normal"><a href="#L-210">210</a></span>
+<span class="normal"><a href="#L-211">211</a></span>
+<span class="normal"><a href="#L-212">212</a></span>
+<span class="normal"><a href="#L-213">213</a></span>
+<span class="normal"><a href="#L-214">214</a></span>
+<span class="normal"><a href="#L-215">215</a></span>
+<span class="normal"><a href="#L-216">216</a></span>
+<span class="normal"><a href="#L-217">217</a></span>
+<span class="normal"><a href="#L-218">218</a></span>
+<span class="normal"><a href="#L-219">219</a></span>
+<span class="normal"><a href="#L-220">220</a></span>
+<span class="normal"><a href="#L-221">221</a></span>
+<span class="normal"><a href="#L-222">222</a></span>
+<span class="normal"><a href="#L-223">223</a></span>
+<span class="normal"><a href="#L-224">224</a></span>
+<span class="normal"><a href="#L-225">225</a></span>
+<span class="normal"><a href="#L-226">226</a></span>
+<span class="normal"><a href="#L-227">227</a></span>
+<span class="normal"><a href="#L-228">228</a></span>
+<span class="normal"><a href="#L-229">229</a></span>
+<span class="normal"><a href="#L-230">230</a></span>
+<span class="normal"><a href="#L-231">231</a></span>
+<span class="normal"><a href="#L-232">232</a></span>
+<span class="normal"><a href="#L-233">233</a></span>
+<span class="normal"><a href="#L-234">234</a></span>
+<span class="normal"><a href="#L-235">235</a></span>
+<span class="normal"><a href="#L-236">236</a></span>
+<span class="normal"><a href="#L-237">237</a></span>
+<span class="normal"><a href="#L-238">238</a></span>
+<span class="normal"><a href="#L-239">239</a></span>
+<span class="normal"><a href="#L-240">240</a></span>
+<span class="normal"><a href="#L-241">241</a></span>
+<span class="normal"><a href="#L-242">242</a></span>
+<span class="normal"><a href="#L-243">243</a></span>
+<span class="normal"><a href="#L-244">244</a></span>
+<span class="normal"><a href="#L-245">245</a></span>
+<span class="normal"><a href="#L-246">246</a></span>
+<span class="normal"><a href="#L-247">247</a></span>
+<span class="normal"><a href="#L-248">248</a></span>
+<span class="normal"><a href="#L-249">249</a></span>
+<span class="normal"><a href="#L-250">250</a></span>
+<span class="normal"><a href="#L-251">251</a></span>
+<span class="normal"><a href="#L-252">252</a></span>
+<span class="normal"><a href="#L-253">253</a></span>
+<span class="normal"><a href="#L-254">254</a></span>
+<span class="normal"><a href="#L-255">255</a></span>
+<span class="normal"><a href="#L-256">256</a></span>
+<span class="normal"><a href="#L-257">257</a></span>
+<span class="normal"><a href="#L-258">258</a></span>
+<span class="normal"><a href="#L-259">259</a></span>
+<span class="normal"><a href="#L-260">260</a></span>
+<span class="normal"><a href="#L-261">261</a></span>
+<span class="normal"><a href="#L-262">262</a></span>
+<span class="normal"><a href="#L-263">263</a></span>
+<span class="normal"><a href="#L-264">264</a></span>
+<span class="normal"><a href="#L-265">265</a></span>
+<span class="normal"><a href="#L-266">266</a></span>
+<span class="normal"><a href="#L-267">267</a></span>
+<span class="normal"><a href="#L-268">268</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cp">**free</span>
+<a id="L-2" name="L-2"></a><span class="c1">// Bessel Observatory for IBM i 7.5, fully free ILE RPG with embedded Db2 SQL.</span>
+<a id="L-3" name="L-3"></a><span class="c1">// Compile and queue setup are in rpg_setup.txt. This edition uses native CALL</span>
+<a id="L-4" name="L-4"></a><span class="c1">// parameters, DSPLY input, IFS files, and separate SBMJOB batch jobs.</span>
+<a id="L-5" name="L-5"></a><span class="c1">// RPG has no block-comment delimiter; consecutive // lines are its convention.</span>
+<a id="L-6" name="L-6"></a><span class="k">ctl-opt</span> <span class="n">dftactgrp</span><span class="p">(</span><span class="kc">*no</span><span class="p">)</span> <span class="n">actgrp</span><span class="p">(</span><span class="kc">*new</span><span class="p">)</span> <span class="n">bnddir</span><span class="p">(</span><span class="s">&#39;QC2LE&#39;</span><span class="p">)</span> <span class="n">option</span><span class="p">(</span><span class="kc">*srcstmt</span><span class="p">);</span>
+<a id="L-7" name="L-7"></a>
+<a id="L-8" name="L-8"></a><span class="c1">// Program entry: optional 32-character CL parameters select input/output/jobs.</span>
+<a id="L-9" name="L-9"></a><span class="c1">// Inputs: input path or &#39;-&#39;, output path, worker count; &#39;*WORKER&#39; is internal.</span>
+<a id="L-10" name="L-10"></a><span class="c1">// Outputs: IFS CSV or an escape message. Called by a user or submitted batch job.</span>
+<a id="L-11" name="L-11"></a><span class="k">dcl-pi</span> <span class="kc">*n</span><span class="p">;</span>
+<a id="L-12" name="L-12"></a>  <span class="n">argInput</span> <span class="kt">char</span><span class="p">(</span><span class="m">32</span><span class="p">)</span> <span class="kt">const</span> <span class="kt">options</span><span class="p">(</span><span class="kc">*nopass</span><span class="p">);</span>
+<a id="L-13" name="L-13"></a>  <span class="n">argOutput</span> <span class="kt">char</span><span class="p">(</span><span class="m">32</span><span class="p">)</span> <span class="kt">const</span> <span class="kt">options</span><span class="p">(</span><span class="kc">*nopass</span><span class="p">);</span>
+<a id="L-14" name="L-14"></a>  <span class="n">argWorkers</span> <span class="kt">char</span><span class="p">(</span><span class="m">32</span><span class="p">)</span> <span class="kt">const</span> <span class="kt">options</span><span class="p">(</span><span class="kc">*nopass</span><span class="p">);</span>
+<a id="L-15" name="L-15"></a><span class="k">end-pi</span><span class="p">;</span>
+<a id="L-16" name="L-16"></a>
+<a id="L-17" name="L-17"></a><span class="c1">// Call the ILE C trigonometric functions by value.</span>
+<a id="L-18" name="L-18"></a><span class="c1">// Input: angle in radians. Output: double result. Used by Observe&#39;s quadrature.</span>
+<a id="L-19" name="L-19"></a><span class="k">dcl-pr</span> <span class="n">Cosine</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">extproc</span><span class="p">(</span><span class="s">&#39;cos&#39;</span><span class="p">);</span> <span class="n">angle</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">value</span><span class="p">;</span> <span class="k">end-pr</span><span class="p">;</span>
+<a id="L-20" name="L-20"></a><span class="k">dcl-pr</span> <span class="n">Sine</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">extproc</span><span class="p">(</span><span class="s">&#39;sin&#39;</span><span class="p">);</span> <span class="n">angle</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">value</span><span class="p">;</span> <span class="k">end-pr</span><span class="p">;</span>
+<a id="L-21" name="L-21"></a><span class="c1">// Obtain an OS process identifier for the worker CSV column.</span>
+<a id="L-22" name="L-22"></a><span class="c1">// Input: none. Output: PID. Used by the &#39;*WORKER&#39; entry path.</span>
+<a id="L-23" name="L-23"></a><span class="k">dcl-pr</span> <span class="n">GetPid</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">)</span> <span class="kt">extproc</span><span class="p">(</span><span class="s">&#39;getpid&#39;</span><span class="p">);</span> <span class="k">end-pr</span><span class="p">;</span>
+<a id="L-24" name="L-24"></a><span class="c1">// Pause polling without consuming a CPU continuously.</span>
+<a id="L-25" name="L-25"></a><span class="c1">// Input: seconds. Output: remaining seconds. Used by the parent&#39;s wait loop.</span>
+<a id="L-26" name="L-26"></a><span class="k">dcl-pr</span> <span class="n">SleepSeconds</span> <span class="kt">uns</span><span class="p">(</span><span class="m">10</span><span class="p">)</span> <span class="kt">extproc</span><span class="p">(</span><span class="s">&#39;sleep&#39;</span><span class="p">);</span> <span class="n">seconds</span> <span class="kt">uns</span><span class="p">(</span><span class="m">10</span><span class="p">)</span> <span class="kt">value</span><span class="p">;</span> <span class="k">end-pr</span><span class="p">;</span>
+<a id="L-27" name="L-27"></a><span class="c1">// Execute one CL command through the IBM program-call ABI.</span>
+<a id="L-28" name="L-28"></a><span class="c1">// Inputs: command bytes and packed length. Output: normal return or escape.</span>
+<a id="L-29" name="L-29"></a><span class="c1">// Used by Command for SBMJOB and readable failure messages.</span>
+<a id="L-30" name="L-30"></a><span class="k">dcl-pr</span> <span class="n">Execute</span> <span class="kt">extpgm</span><span class="p">(</span><span class="s">&#39;QCMDEXC&#39;</span><span class="p">);</span>
+<a id="L-31" name="L-31"></a>  <span class="n">command</span> <span class="kt">char</span><span class="p">(</span><span class="m">32702</span><span class="p">)</span> <span class="kt">const</span> <span class="kt">options</span><span class="p">(</span><span class="kc">*varsize</span><span class="p">);</span>
+<a id="L-32" name="L-32"></a>  <span class="n">length</span> <span class="kt">packed</span><span class="p">(</span><span class="m">15</span><span class="o">:</span><span class="m">5</span><span class="p">)</span> <span class="kt">const</span><span class="p">;</span>
+<a id="L-33" name="L-33"></a><span class="k">end-pr</span><span class="p">;</span>
+<a id="L-34" name="L-34"></a>
+<a id="L-35" name="L-35"></a><span class="k">dcl-s</span> <span class="n">source</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">32</span><span class="p">)</span> <span class="kt">inz</span><span class="p">(</span><span class="s">&#39;-&#39;</span><span class="p">);</span>
+<a id="L-36" name="L-36"></a><span class="k">dcl-s</span> <span class="n">target</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">32</span><span class="p">)</span> <span class="kt">inz</span><span class="p">(</span><span class="s">&#39;results.csv&#39;</span><span class="p">);</span>
+<a id="L-37" name="L-37"></a><span class="k">dcl-s</span> <span class="n">runId</span> <span class="kt">char</span><span class="p">(</span><span class="m">32</span><span class="p">);</span>
+<a id="L-38" name="L-38"></a><span class="k">dcl-s</span> <span class="n">text</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">4096</span><span class="p">);</span>
+<a id="L-39" name="L-39"></a><span class="k">dcl-s</span> <span class="n">response</span> <span class="kt">char</span><span class="p">(</span><span class="m">52</span><span class="p">);</span>
+<a id="L-40" name="L-40"></a><span class="k">dcl-s</span> <span class="n">row</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">256</span><span class="p">);</span>
+<a id="L-41" name="L-41"></a><span class="k">dcl-s</span> <span class="n">commandText</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">1024</span><span class="p">);</span>
+<a id="L-42" name="L-42"></a><span class="k">dcl-s</span> <span class="n">total</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">)</span> <span class="kt">inz</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+<a id="L-43" name="L-43"></a><span class="k">dcl-s</span> <span class="n">workers</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">)</span> <span class="kt">inz</span><span class="p">(</span><span class="m">2</span><span class="p">);</span>
+<a id="L-44" name="L-44"></a><span class="k">dcl-s</span> <span class="n">first</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-45" name="L-45"></a><span class="k">dcl-s</span> <span class="n">last</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-46" name="L-46"></a><span class="k">dcl-s</span> <span class="n">ordinal</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-47" name="L-47"></a><span class="k">dcl-s</span> <span class="n">completed</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-48" name="L-48"></a><span class="k">dcl-s</span> <span class="n">errors</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-49" name="L-49"></a><span class="k">dcl-s</span> <span class="n">elapsed</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-50" name="L-50"></a><span class="k">dcl-s</span> <span class="n">unused</span> <span class="kt">uns</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-51" name="L-51"></a><span class="k">dcl-s</span> <span class="n">pid</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-52" name="L-52"></a><span class="k">dcl-s</span> <span class="n">x</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">);</span>
+<a id="L-53" name="L-53"></a><span class="k">dcl-s</span> <span class="n">y</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">);</span>
+<a id="L-54" name="L-54"></a><span class="k">dcl-s</span> <span class="n">worker</span> <span class="kt">ind</span> <span class="kt">inz</span><span class="p">(</span><span class="kc">*off</span><span class="p">);</span>
+<a id="L-55" name="L-55"></a><span class="k">dcl-s</span> <span class="n">failed</span> <span class="kt">ind</span> <span class="kt">inz</span><span class="p">(</span><span class="kc">*off</span><span class="p">);</span>
+<a id="L-56" name="L-56"></a><span class="k">dcl-s</span> <span class="n">stopInput</span> <span class="kt">ind</span> <span class="kt">inz</span><span class="p">(</span><span class="kc">*off</span><span class="p">);</span>
+<a id="L-57" name="L-57"></a>
+<a id="L-58" name="L-58"></a><span class="c1">// Autocommit makes newly inserted work visible to independently submitted jobs.</span>
+<a id="L-59" name="L-59"></a><span class="k">exec</span> <span class="k">sql</span> <span class="k">set</span> <span class="n">option</span> <span class="n">commit</span><span class="o">=*</span><span class="n">none</span><span class="p">,</span> <span class="n">closqlcsr</span><span class="o">=*</span><span class="n">endmod</span><span class="p">,</span> <span class="n">naming</span><span class="o">=*</span><span class="k">sql</span><span class="p">;</span>
+<a id="L-60" name="L-60"></a>
+<a id="L-61" name="L-61"></a><span class="c1">// Capture ordinary RPG and CL exceptions, then report one application failure.</span>
+<a id="L-62" name="L-62"></a><span class="k">monitor</span><span class="p">;</span>
+<a id="L-63" name="L-63"></a>  <span class="k">if</span> <span class="nb">%parms</span><span class="p">()</span> <span class="o">&gt;</span> <span class="m">3</span><span class="p">;</span>
+<a id="L-64" name="L-64"></a>    <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Expected at most three parameters&#39;</span><span class="p">);</span>
+<a id="L-65" name="L-65"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-66" name="L-66"></a>  <span class="k">if</span> <span class="nb">%parms</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="m">1</span><span class="p">;</span>
+<a id="L-67" name="L-67"></a>    <span class="n">source</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">argInput</span><span class="p">);</span>
+<a id="L-68" name="L-68"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-69" name="L-69"></a>  <span class="k">if</span> <span class="n">source</span> <span class="o">=</span> <span class="s">&#39;--help&#39;</span><span class="p">;</span>
+<a id="L-70" name="L-70"></a>    <span class="k">dsply</span> <span class="s">&#39;CALL BESSELAB/BESSEL (input output workers)&#39;</span><span class="p">;</span>
+<a id="L-71" name="L-71"></a>    <span class="kc">*inlr</span> <span class="o">=</span> <span class="kc">*on</span><span class="p">;</span>
+<a id="L-72" name="L-72"></a>    <span class="k">return</span><span class="p">;</span>
+<a id="L-73" name="L-73"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-74" name="L-74"></a>  <span class="n">worker</span> <span class="o">=</span> <span class="n">source</span> <span class="o">=</span> <span class="s">&#39;*WORKER&#39;</span><span class="p">;</span>
+<a id="L-75" name="L-75"></a>  <span class="k">if</span> <span class="n">worker</span><span class="p">;</span>
+<a id="L-76" name="L-76"></a>    <span class="k">if</span> <span class="nb">%parms</span><span class="p">()</span> <span class="o">&lt;&gt;</span> <span class="m">3</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Worker requires run and ordinal&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-77" name="L-77"></a>    <span class="n">runId</span> <span class="o">=</span> <span class="n">argOutput</span><span class="p">;</span>
+<a id="L-78" name="L-78"></a>    <span class="n">ordinal</span> <span class="o">=</span> <span class="nb">%int</span><span class="p">(</span><span class="n">argWorkers</span><span class="p">);</span>
+<a id="L-79" name="L-79"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">select</span> <span class="n">x</span> <span class="k">into</span> <span class="o">:</span><span class="n">x</span> <span class="k">from</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span>
+<a id="L-80" name="L-80"></a>      <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span><span class="o">=:</span><span class="n">ordinal</span> <span class="k">and</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;Q&#39;</span><span class="p">;</span>
+<a id="L-81" name="L-81"></a>    <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-82" name="L-82"></a>    <span class="n">y</span> <span class="o">=</span> <span class="n">Observe</span><span class="p">(</span><span class="n">x</span><span class="p">);</span>
+<a id="L-83" name="L-83"></a>    <span class="n">pid</span> <span class="o">=</span> <span class="n">GetPid</span><span class="p">();</span>
+<a id="L-84" name="L-84"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">update</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span> <span class="k">set</span> <span class="n">y</span><span class="o">=:</span><span class="n">y</span><span class="p">,</span> <span class="n">pid</span><span class="o">=:</span><span class="n">pid</span><span class="p">,</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;D&#39;</span>
+<a id="L-85" name="L-85"></a>      <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span><span class="o">=:</span><span class="n">ordinal</span><span class="p">;</span>
+<a id="L-86" name="L-86"></a>    <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-87" name="L-87"></a>  <span class="k">else</span><span class="p">;</span>
+<a id="L-88" name="L-88"></a>    <span class="k">if</span> <span class="nb">%parms</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="m">2</span><span class="p">;</span> <span class="n">target</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">argOutput</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-89" name="L-89"></a>    <span class="k">if</span> <span class="nb">%parms</span><span class="p">()</span> <span class="o">&gt;=</span> <span class="m">3</span><span class="p">;</span>
+<a id="L-90" name="L-90"></a>      <span class="n">text</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">argWorkers</span><span class="p">);</span>
+<a id="L-91" name="L-91"></a>      <span class="k">if</span> <span class="n">text</span> <span class="o">=</span> <span class="s">&#39;&#39;</span> <span class="k">or</span> <span class="nb">%check</span><span class="p">(</span><span class="s">&#39;0123456789&#39;</span><span class="o">:</span><span class="n">text</span><span class="p">)</span> <span class="o">&lt;&gt;</span> <span class="m">0</span><span class="p">;</span>
+<a id="L-92" name="L-92"></a>        <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Workers must be an integer from 1 to 16&#39;</span><span class="p">);</span>
+<a id="L-93" name="L-93"></a>      <span class="k">endif</span><span class="p">;</span>
+<a id="L-94" name="L-94"></a>      <span class="n">workers</span> <span class="o">=</span> <span class="nb">%int</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+<a id="L-95" name="L-95"></a>    <span class="k">endif</span><span class="p">;</span>
+<a id="L-96" name="L-96"></a>    <span class="k">if</span> <span class="n">workers</span> <span class="o">&lt;</span> <span class="m">1</span> <span class="k">or</span> <span class="n">workers</span> <span class="o">&gt;</span> <span class="m">16</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Workers must be 1..16&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-97" name="L-97"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">values</span> <span class="n">hex</span><span class="p">(</span><span class="n">generate_unique</span><span class="p">())</span> <span class="k">into</span> <span class="o">:</span><span class="n">runId</span><span class="p">;</span>
+<a id="L-98" name="L-98"></a>    <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-99" name="L-99"></a>
+<a id="L-100" name="L-100"></a>    <span class="c1">// DSPLY is the native workstation input path; blank input completes it.</span>
+<a id="L-101" name="L-101"></a>    <span class="k">if</span> <span class="n">source</span> <span class="o">=</span> <span class="s">&#39;-&#39;</span><span class="p">;</span>
+<a id="L-102" name="L-102"></a>      <span class="k">dou</span> <span class="n">stopInput</span><span class="p">;</span>
+<a id="L-103" name="L-103"></a>        <span class="k">clear</span> <span class="n">response</span><span class="p">;</span>
+<a id="L-104" name="L-104"></a>        <span class="k">dsply</span> <span class="s">&#39;Enter x; blank finishes:&#39;</span> <span class="s">&#39;&#39;</span> <span class="n">response</span><span class="p">;</span>
+<a id="L-105" name="L-105"></a>        <span class="n">text</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">response</span><span class="p">);</span>
+<a id="L-106" name="L-106"></a>        <span class="n">Accept</span><span class="p">();</span>
+<a id="L-107" name="L-107"></a>      <span class="k">enddo</span><span class="p">;</span>
+<a id="L-108" name="L-108"></a>    <span class="k">else</span><span class="p">;</span>
+<a id="L-109" name="L-109"></a>      <span class="c1">// IFS_READ performs CCSID conversion, preserving line order explicitly.</span>
+<a id="L-110" name="L-110"></a>      <span class="k">exec</span> <span class="k">sql</span> <span class="k">declare</span> <span class="n">inputRows</span> <span class="k">cursor</span> <span class="k">for</span>
+<a id="L-111" name="L-111"></a>        <span class="k">select</span> <span class="n">cast</span><span class="p">(</span><span class="n">line</span> <span class="k">as</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">4096</span><span class="p">))</span>
+<a id="L-112" name="L-112"></a>        <span class="k">from</span> <span class="n">table</span><span class="p">(</span><span class="n">QSYS2</span><span class="p">.</span><span class="n">IFS_READ</span><span class="p">(</span><span class="n">path_name</span><span class="o">=&gt;:</span><span class="n">source</span><span class="p">,</span>
+<a id="L-113" name="L-113"></a>          <span class="n">maximum_line_length</span><span class="o">=&gt;</span><span class="m">4096</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=&gt;</span><span class="s">&#39;NO&#39;</span><span class="p">))</span>
+<a id="L-114" name="L-114"></a>        <span class="k">order</span> <span class="k">by</span> <span class="n">line_number</span><span class="p">;</span>
+<a id="L-115" name="L-115"></a>      <span class="k">exec</span> <span class="k">sql</span> <span class="k">open</span> <span class="n">inputRows</span><span class="p">;</span>
+<a id="L-116" name="L-116"></a>      <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-117" name="L-117"></a>      <span class="k">dou</span> <span class="n">stopInput</span><span class="p">;</span>
+<a id="L-118" name="L-118"></a>        <span class="k">exec</span> <span class="k">sql</span> <span class="k">fetch</span> <span class="n">inputRows</span> <span class="k">into</span> <span class="o">:</span><span class="n">text</span><span class="p">;</span>
+<a id="L-119" name="L-119"></a>        <span class="k">if</span> <span class="n">sqlcod</span> <span class="o">=</span> <span class="m">100</span><span class="p">;</span> <span class="k">leave</span><span class="p">;</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-120" name="L-120"></a>        <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-121" name="L-121"></a>        <span class="n">Accept</span><span class="p">();</span>
+<a id="L-122" name="L-122"></a>      <span class="k">enddo</span><span class="p">;</span>
+<a id="L-123" name="L-123"></a>      <span class="k">exec</span> <span class="k">sql</span> <span class="k">close</span> <span class="n">inputRows</span><span class="p">;</span>
+<a id="L-124" name="L-124"></a>      <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-125" name="L-125"></a>    <span class="k">endif</span><span class="p">;</span>
+<a id="L-126" name="L-126"></a>    <span class="k">if</span> <span class="n">total</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;No valid observations&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-127" name="L-127"></a>
+<a id="L-128" name="L-128"></a>    <span class="c1">// Submit at most workers jobs, then wait for that batch&#39;s database results.</span>
+<a id="L-129" name="L-129"></a>    <span class="n">first</span> <span class="o">=</span> <span class="m">1</span><span class="p">;</span>
+<a id="L-130" name="L-130"></a>    <span class="k">dow</span> <span class="n">first</span> <span class="o">&lt;=</span> <span class="n">total</span><span class="p">;</span>
+<a id="L-131" name="L-131"></a>      <span class="n">last</span> <span class="o">=</span> <span class="nb">%min</span><span class="p">(</span><span class="n">total</span><span class="o">:</span><span class="n">first</span><span class="o">+</span><span class="n">workers</span><span class="o">-</span><span class="m">1</span><span class="p">);</span>
+<a id="L-132" name="L-132"></a>      <span class="k">for</span> <span class="n">ordinal</span> <span class="o">=</span> <span class="n">first</span> <span class="n">to</span> <span class="n">last</span><span class="p">;</span>
+<a id="L-133" name="L-133"></a>        <span class="n">commandText</span> <span class="o">=</span> <span class="s">&#39;SBMJOB CMD(CALL PGM(BESSELAB/BESSEL) PARM(&#39;</span> <span class="o">+</span>
+<a id="L-134" name="L-134"></a>          <span class="s">&#39;&#39;&#39;*WORKER&#39;&#39; &#39;&#39;&#39;</span> <span class="o">+</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">runId</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&#39;&#39; &#39;&#39;&#39;</span> <span class="o">+</span>
+<a id="L-135" name="L-135"></a>          <span class="nb">%trim</span><span class="p">(</span><span class="nb">%char</span><span class="p">(</span><span class="n">ordinal</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;&#39;&#39;)) JOB(BESSEL) &#39;</span> <span class="o">+</span>
+<a id="L-136" name="L-136"></a>          <span class="s">&#39;JOBQ(BESSELAB/BESSELQ)&#39;</span><span class="p">;</span>
+<a id="L-137" name="L-137"></a>        <span class="n">Command</span><span class="p">(</span><span class="n">commandText</span><span class="p">);</span>
+<a id="L-138" name="L-138"></a>      <span class="k">endfor</span><span class="p">;</span>
+<a id="L-139" name="L-139"></a>      <span class="n">elapsed</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
+<a id="L-140" name="L-140"></a>      <span class="k">dou</span> <span class="n">completed</span> <span class="o">=</span> <span class="n">last</span><span class="o">-</span><span class="n">first</span><span class="o">+</span><span class="m">1</span><span class="p">;</span>
+<a id="L-141" name="L-141"></a>        <span class="k">exec</span> <span class="k">sql</span> <span class="k">select</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">into</span> <span class="o">:</span><span class="n">errors</span> <span class="k">from</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span>
+<a id="L-142" name="L-142"></a>          <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span> <span class="k">between</span> <span class="o">:</span><span class="n">first</span> <span class="k">and</span> <span class="o">:</span><span class="n">last</span>
+<a id="L-143" name="L-143"></a>          <span class="k">and</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;E&#39;</span><span class="p">;</span>
+<a id="L-144" name="L-144"></a>        <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-145" name="L-145"></a>        <span class="k">if</span> <span class="n">errors</span> <span class="o">&gt;</span> <span class="m">0</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;A numeric batch job failed; inspect job log&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-146" name="L-146"></a>        <span class="k">exec</span> <span class="k">sql</span> <span class="k">select</span> <span class="n">count</span><span class="p">(</span><span class="o">*</span><span class="p">)</span> <span class="k">into</span> <span class="o">:</span><span class="n">completed</span> <span class="k">from</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span>
+<a id="L-147" name="L-147"></a>          <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span> <span class="k">between</span> <span class="o">:</span><span class="n">first</span> <span class="k">and</span> <span class="o">:</span><span class="n">last</span>
+<a id="L-148" name="L-148"></a>          <span class="k">and</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;D&#39;</span><span class="p">;</span>
+<a id="L-149" name="L-149"></a>        <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-150" name="L-150"></a>        <span class="k">if</span> <span class="n">completed</span> <span class="o">&lt;</span> <span class="n">last</span><span class="o">-</span><span class="n">first</span><span class="o">+</span><span class="m">1</span><span class="p">;</span>
+<a id="L-151" name="L-151"></a>          <span class="k">if</span> <span class="n">elapsed</span> <span class="o">&gt;=</span> <span class="m">600</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Batch timeout; inspect run in WORK_ITEMS&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-152" name="L-152"></a>          <span class="n">unused</span> <span class="o">=</span> <span class="n">SleepSeconds</span><span class="p">(</span><span class="m">1</span><span class="p">);</span>
+<a id="L-153" name="L-153"></a>          <span class="n">elapsed</span> <span class="o">+=</span> <span class="m">1</span><span class="p">;</span>
+<a id="L-154" name="L-154"></a>        <span class="k">endif</span><span class="p">;</span>
+<a id="L-155" name="L-155"></a>      <span class="k">enddo</span><span class="p">;</span>
+<a id="L-156" name="L-156"></a>      <span class="n">first</span> <span class="o">=</span> <span class="n">last</span><span class="o">+</span><span class="m">1</span><span class="p">;</span>
+<a id="L-157" name="L-157"></a>      <span class="n">completed</span> <span class="o">=</span> <span class="m">0</span><span class="p">;</span>
+<a id="L-158" name="L-158"></a>    <span class="k">enddo</span><span class="p">;</span>
+<a id="L-159" name="L-159"></a>
+<a id="L-160" name="L-160"></a>    <span class="c1">// Publish UTF-8 CSV only after every job has completed successfully.</span>
+<a id="L-161" name="L-161"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">call</span> <span class="n">QSYS2</span><span class="p">.</span><span class="n">IFS_WRITE_UTF8</span><span class="p">(</span><span class="n">path_name</span><span class="o">=&gt;:</span><span class="n">target</span><span class="p">,</span>
+<a id="L-162" name="L-162"></a>      <span class="n">line</span><span class="o">=&gt;</span><span class="s">&#39;x,j0,worker_pid&#39;</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=&gt;</span><span class="s">&#39;REPLACE&#39;</span><span class="p">,</span> <span class="n">end_of_line</span><span class="o">=&gt;</span><span class="s">&#39;LF&#39;</span><span class="p">);</span>
+<a id="L-163" name="L-163"></a>    <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-164" name="L-164"></a>    <span class="k">for</span> <span class="n">ordinal</span> <span class="o">=</span> <span class="m">1</span> <span class="n">to</span> <span class="n">total</span><span class="p">;</span>
+<a id="L-165" name="L-165"></a>      <span class="k">exec</span> <span class="k">sql</span> <span class="k">select</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">pid</span> <span class="k">into</span> <span class="o">:</span><span class="n">x</span><span class="p">,</span><span class="o">:</span><span class="n">y</span><span class="p">,</span><span class="o">:</span><span class="n">pid</span> <span class="k">from</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span>
+<a id="L-166" name="L-166"></a>        <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span><span class="o">=:</span><span class="n">ordinal</span><span class="p">;</span>
+<a id="L-167" name="L-167"></a>      <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-168" name="L-168"></a>      <span class="n">row</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="nb">%char</span><span class="p">(</span><span class="n">x</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">%trim</span><span class="p">(</span><span class="nb">%char</span><span class="p">(</span><span class="n">y</span><span class="p">))</span> <span class="o">+</span> <span class="s">&#39;,&#39;</span> <span class="o">+</span> <span class="nb">%trim</span><span class="p">(</span><span class="nb">%char</span><span class="p">(</span><span class="n">pid</span><span class="p">));</span>
+<a id="L-169" name="L-169"></a>      <span class="k">exec</span> <span class="k">sql</span> <span class="k">call</span> <span class="n">QSYS2</span><span class="p">.</span><span class="n">IFS_WRITE_UTF8</span><span class="p">(</span><span class="n">path_name</span><span class="o">=&gt;:</span><span class="n">target</span><span class="p">,</span>
+<a id="L-170" name="L-170"></a>        <span class="n">line</span><span class="o">=&gt;:</span><span class="n">row</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=&gt;</span><span class="s">&#39;APPEND&#39;</span><span class="p">,</span> <span class="n">end_of_line</span><span class="o">=&gt;</span><span class="s">&#39;LF&#39;</span><span class="p">);</span>
+<a id="L-171" name="L-171"></a>      <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-172" name="L-172"></a>    <span class="k">endfor</span><span class="p">;</span>
+<a id="L-173" name="L-173"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">delete</span> <span class="k">from</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span> <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span><span class="p">;</span>
+<a id="L-174" name="L-174"></a>    <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-175" name="L-175"></a>    <span class="k">dsply</span> <span class="s">&#39;Bessel observations written&#39;</span><span class="p">;</span>
+<a id="L-176" name="L-176"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-177" name="L-177"></a><span class="k">on-error</span><span class="p">;</span>
+<a id="L-178" name="L-178"></a>  <span class="n">failed</span> <span class="o">=</span> <span class="kc">*on</span><span class="p">;</span>
+<a id="L-179" name="L-179"></a><span class="k">endmon</span><span class="p">;</span>
+<a id="L-180" name="L-180"></a><span class="k">if</span> <span class="n">failed</span><span class="p">;</span>
+<a id="L-181" name="L-181"></a>  <span class="k">if</span> <span class="n">worker</span><span class="p">;</span>
+<a id="L-182" name="L-182"></a>    <span class="k">exec</span> <span class="k">sql</span> <span class="k">update</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span> <span class="k">set</span> <span class="n">state</span><span class="o">=</span><span class="s">&#39;E&#39;</span>
+<a id="L-183" name="L-183"></a>      <span class="k">where</span> <span class="n">run_id</span><span class="o">=:</span><span class="n">runId</span> <span class="k">and</span> <span class="n">ordinal</span><span class="o">=:</span><span class="n">ordinal</span><span class="p">;</span>
+<a id="L-184" name="L-184"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-185" name="L-185"></a>  <span class="c1">// Preserve failed run rows for diagnosis; queued jobs may still finish them.</span>
+<a id="L-186" name="L-186"></a>  <span class="k">dsply</span> <span class="p">(</span><span class="s">&#39;Failed run: &#39;</span> <span class="o">+</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">runId</span><span class="p">));</span>
+<a id="L-187" name="L-187"></a>  <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Bessel failed; inspect the preceding job messages&#39;</span><span class="p">);</span>
+<a id="L-188" name="L-188"></a><span class="k">endif</span><span class="p">;</span>
+<a id="L-189" name="L-189"></a><span class="kc">*inlr</span> <span class="o">=</span> <span class="kc">*on</span><span class="p">;</span>
+<a id="L-190" name="L-190"></a><span class="k">return</span><span class="p">;</span>
+<a id="L-191" name="L-191"></a>
+<a id="L-192" name="L-192"></a><span class="c1">// Accept validates and records one observation in shared run storage.</span>
+<a id="L-193" name="L-193"></a><span class="c1">// Inputs: global text and runId. Outputs: total, stopInput, or skipped warning.</span>
+<a id="L-194" name="L-194"></a><span class="c1">// Used by: both input loops; SQL validates spelling before RPG converts it.</span>
+<a id="L-195" name="L-195"></a><span class="k">dcl-proc</span> <span class="n">Accept</span><span class="p">;</span>
+<a id="L-196" name="L-196"></a>  <span class="k">dcl-s</span> <span class="n">valid</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-197" name="L-197"></a>  <span class="k">dcl-s</span> <span class="n">converted</span> <span class="kt">ind</span><span class="p">;</span>
+<a id="L-198" name="L-198"></a>  <span class="n">text</span> <span class="o">=</span> <span class="nb">%trim</span><span class="p">(</span><span class="n">text</span><span class="o">:</span><span class="s">x&#39;050D152540&#39;</span><span class="p">);</span> <span class="c1">// EBCDIC tab, CR, NL, LF, and space.</span>
+<a id="L-199" name="L-199"></a>  <span class="k">if</span> <span class="n">text</span> <span class="o">=</span> <span class="s">&#39;&#39;</span><span class="p">;</span> <span class="n">stopInput</span> <span class="o">=</span> <span class="kc">*on</span><span class="p">;</span> <span class="k">return</span><span class="p">;</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-200" name="L-200"></a>  <span class="k">if</span> <span class="nb">%subst</span><span class="p">(</span><span class="n">text</span><span class="o">:</span><span class="m">1</span><span class="o">:</span><span class="m">1</span><span class="p">)</span> <span class="o">=</span> <span class="s">&#39;#&#39;</span><span class="p">;</span> <span class="k">return</span><span class="p">;</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-201" name="L-201"></a>  <span class="k">exec</span> <span class="k">sql</span> <span class="k">values</span> <span class="k">case</span> <span class="k">when</span> <span class="n">regexp_like</span><span class="p">(</span><span class="o">:</span><span class="n">text</span><span class="p">,</span>
+<a id="L-202" name="L-202"></a>    <span class="s">&#39;^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$&#39;</span><span class="p">)</span>
+<a id="L-203" name="L-203"></a>    <span class="k">then</span> <span class="m">1</span> <span class="k">else</span> <span class="m">0</span> <span class="k">end</span> <span class="k">into</span> <span class="o">:</span><span class="n">valid</span><span class="p">;</span>
+<a id="L-204" name="L-204"></a>  <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-205" name="L-205"></a>  <span class="n">converted</span> <span class="o">=</span> <span class="kc">*off</span><span class="p">;</span>
+<a id="L-206" name="L-206"></a>  <span class="k">if</span> <span class="n">valid</span> <span class="o">=</span> <span class="m">1</span><span class="p">;</span>
+<a id="L-207" name="L-207"></a>    <span class="k">monitor</span><span class="p">;</span>
+<a id="L-208" name="L-208"></a>      <span class="n">x</span> <span class="o">=</span> <span class="nb">%float</span><span class="p">(</span><span class="n">text</span><span class="p">);</span>
+<a id="L-209" name="L-209"></a>      <span class="n">converted</span> <span class="o">=</span> <span class="n">x</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="m">1000</span> <span class="k">and</span> <span class="n">x</span> <span class="o">&lt;=</span> <span class="m">1000</span><span class="p">;</span>
+<a id="L-210" name="L-210"></a>    <span class="k">on-error</span><span class="p">;</span>
+<a id="L-211" name="L-211"></a>      <span class="n">converted</span> <span class="o">=</span> <span class="kc">*off</span><span class="p">;</span>
+<a id="L-212" name="L-212"></a>    <span class="k">endmon</span><span class="p">;</span>
+<a id="L-213" name="L-213"></a>  <span class="k">endif</span><span class="p">;</span>
+<a id="L-214" name="L-214"></a>  <span class="k">if</span> <span class="k">not</span> <span class="n">converted</span><span class="p">;</span> <span class="k">dsply</span> <span class="s">&#39;Skipping invalid value&#39;</span><span class="p">;</span> <span class="k">return</span><span class="p">;</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-215" name="L-215"></a>  <span class="k">if</span> <span class="n">total</span> <span class="o">&gt;=</span> <span class="m">4096</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;At most 4096 observations are allowed&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-216" name="L-216"></a>  <span class="n">total</span> <span class="o">+=</span> <span class="m">1</span><span class="p">;</span>
+<a id="L-217" name="L-217"></a>  <span class="k">exec</span> <span class="k">sql</span> <span class="k">insert</span> <span class="k">into</span> <span class="n">BESSELAB</span><span class="p">.</span><span class="n">WORK_ITEMS</span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="n">ordinal</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">state</span><span class="p">)</span>
+<a id="L-218" name="L-218"></a>    <span class="k">values</span><span class="p">(</span><span class="o">:</span><span class="n">runId</span><span class="p">,</span><span class="o">:</span><span class="n">total</span><span class="p">,</span><span class="o">:</span><span class="n">x</span><span class="p">,</span><span class="s">&#39;Q&#39;</span><span class="p">);</span>
+<a id="L-219" name="L-219"></a>  <span class="n">CheckSql</span><span class="p">();</span>
+<a id="L-220" name="L-220"></a><span class="k">end-proc</span><span class="p">;</span>
+<a id="L-221" name="L-221"></a>
+<a id="L-222" name="L-222"></a><span class="c1">// Observe performs double-precision midpoint quadrature in the worker job.</span>
+<a id="L-223" name="L-223"></a><span class="c1">// Input: a validated x by value. Output: approximate J0(x).</span>
+<a id="L-224" name="L-224"></a><span class="c1">// Used by: the &#39;*WORKER&#39; path. A based field aliases each array element;</span>
+<a id="L-225" name="L-225"></a><span class="c1">// pointer arithmetic advances by its byte size, remaining inside the array.</span>
+<a id="L-226" name="L-226"></a><span class="k">dcl-proc</span> <span class="n">Observe</span><span class="p">;</span>
+<a id="L-227" name="L-227"></a>  <span class="k">dcl-pi</span> <span class="kc">*n</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">);</span> <span class="kt">value</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">value</span><span class="p">;</span> <span class="k">end-pi</span><span class="p">;</span>
+<a id="L-228" name="L-228"></a>  <span class="k">dcl-c</span> <span class="n">n</span> <span class="m">16384</span><span class="p">;</span>
+<a id="L-229" name="L-229"></a>  <span class="k">dcl-c</span> <span class="n">pi</span> <span class="m">3.14159265358979323846</span><span class="p">;</span>
+<a id="L-230" name="L-230"></a>  <span class="k">dcl-s</span> <span class="n">samples</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">dim</span><span class="p">(</span><span class="n">n</span><span class="p">);</span>
+<a id="L-231" name="L-231"></a>  <span class="k">dcl-s</span> <span class="k">cursor</span> <span class="kt">pointer</span><span class="p">;</span>
+<a id="L-232" name="L-232"></a>  <span class="k">dcl-s</span> <span class="n">term</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">based</span><span class="p">(</span><span class="k">cursor</span><span class="p">);</span>
+<a id="L-233" name="L-233"></a>  <span class="k">dcl-s</span> <span class="n">sum</span> <span class="kt">float</span><span class="p">(</span><span class="m">8</span><span class="p">)</span> <span class="kt">inz</span><span class="p">(</span><span class="m">0</span><span class="p">);</span>
+<a id="L-234" name="L-234"></a>  <span class="k">dcl-s</span> <span class="n">k</span> <span class="kt">int</span><span class="p">(</span><span class="m">10</span><span class="p">);</span>
+<a id="L-235" name="L-235"></a>  <span class="k">for</span> <span class="n">k</span> <span class="o">=</span> <span class="m">1</span> <span class="n">to</span> <span class="n">n</span><span class="p">;</span>
+<a id="L-236" name="L-236"></a>    <span class="n">samples</span><span class="p">(</span><span class="n">k</span><span class="p">)</span> <span class="o">=</span> <span class="n">Cosine</span><span class="p">(</span><span class="kt">value</span><span class="kc">*Sine</span><span class="p">(</span><span class="n">pi</span><span class="o">*</span><span class="p">(</span><span class="n">k</span><span class="o">-</span><span class="m">0.5</span><span class="p">)</span><span class="o">/</span><span class="n">n</span><span class="p">));</span>
+<a id="L-237" name="L-237"></a>  <span class="k">endfor</span><span class="p">;</span>
+<a id="L-238" name="L-238"></a>  <span class="k">cursor</span> <span class="o">=</span> <span class="nb">%addr</span><span class="p">(</span><span class="n">samples</span><span class="p">(</span><span class="m">1</span><span class="p">));</span>
+<a id="L-239" name="L-239"></a>  <span class="k">for</span> <span class="n">k</span> <span class="o">=</span> <span class="m">1</span> <span class="n">to</span> <span class="n">n</span><span class="p">;</span>
+<a id="L-240" name="L-240"></a>    <span class="n">sum</span> <span class="o">+=</span> <span class="n">term</span><span class="p">;</span>
+<a id="L-241" name="L-241"></a>    <span class="k">if</span> <span class="n">k</span> <span class="o">&lt;</span> <span class="n">n</span><span class="p">;</span> <span class="k">cursor</span> <span class="o">+=</span> <span class="nb">%size</span><span class="p">(</span><span class="n">term</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-242" name="L-242"></a>  <span class="k">endfor</span><span class="p">;</span>
+<a id="L-243" name="L-243"></a>  <span class="k">return</span> <span class="n">sum</span><span class="o">/</span><span class="n">n</span><span class="p">;</span>
+<a id="L-244" name="L-244"></a><span class="k">end-proc</span><span class="p">;</span>
+<a id="L-245" name="L-245"></a>
+<a id="L-246" name="L-246"></a><span class="c1">// Command executes a CL operation through a varying-length string reference.</span>
+<a id="L-247" name="L-247"></a><span class="c1">// Input: command text. Output: normal return or CL escape exception.</span>
+<a id="L-248" name="L-248"></a><span class="c1">// Used by: Main to submit jobs and Die to propagate readable failures.</span>
+<a id="L-249" name="L-249"></a><span class="k">dcl-proc</span> <span class="n">Command</span><span class="p">;</span>
+<a id="L-250" name="L-250"></a>  <span class="k">dcl-pi</span> <span class="kc">*n</span><span class="p">;</span> <span class="n">text</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">32702</span><span class="p">)</span> <span class="kt">const</span><span class="p">;</span> <span class="k">end-pi</span><span class="p">;</span>
+<a id="L-251" name="L-251"></a>  <span class="n">Execute</span><span class="p">(</span><span class="n">text</span><span class="o">:</span><span class="nb">%len</span><span class="p">(</span><span class="n">text</span><span class="p">));</span>
+<a id="L-252" name="L-252"></a><span class="k">end-proc</span><span class="p">;</span>
+<a id="L-253" name="L-253"></a>
+<a id="L-254" name="L-254"></a><span class="c1">// CheckSql turns failed SQL operations into an application exception.</span>
+<a id="L-255" name="L-255"></a><span class="c1">// Input: the SQL precompiler&#39;s sqlcod. Output: normal return or escape.</span>
+<a id="L-256" name="L-256"></a><span class="c1">// Used by: every SQL operation; FETCH handles end-of-data before calling it.</span>
+<a id="L-257" name="L-257"></a><span class="k">dcl-proc</span> <span class="n">CheckSql</span><span class="p">;</span>
+<a id="L-258" name="L-258"></a>  <span class="k">if</span> <span class="n">sqlcod</span> <span class="o">&lt;&gt;</span> <span class="m">0</span><span class="p">;</span> <span class="n">Die</span><span class="p">(</span><span class="s">&#39;Database operation failed; inspect SQL job log&#39;</span><span class="p">);</span> <span class="k">endif</span><span class="p">;</span>
+<a id="L-259" name="L-259"></a><span class="k">end-proc</span><span class="p">;</span>
+<a id="L-260" name="L-260"></a>
+<a id="L-261" name="L-261"></a><span class="c1">// Die sends a CPF9898 escape message, preserving IBM i&#39;s error convention.</span>
+<a id="L-262" name="L-262"></a><span class="c1">// Input: explanatory text. Output: job log message and exception to caller.</span>
+<a id="L-263" name="L-263"></a><span class="c1">// Used by: validation, CheckSql, and the top-level error boundary.</span>
+<a id="L-264" name="L-264"></a><span class="k">dcl-proc</span> <span class="n">Die</span><span class="p">;</span>
+<a id="L-265" name="L-265"></a>  <span class="k">dcl-pi</span> <span class="kc">*n</span><span class="p">;</span> <span class="n">message</span> <span class="kt">varchar</span><span class="p">(</span><span class="m">256</span><span class="p">)</span> <span class="kt">const</span><span class="p">;</span> <span class="k">end-pi</span><span class="p">;</span>
+<a id="L-266" name="L-266"></a>  <span class="n">Command</span><span class="p">(</span><span class="s">&#39;SNDPGMMSG MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&#39;&#39;&#39;</span> <span class="o">+</span>
+<a id="L-267" name="L-267"></a>    <span class="nb">%scanrpl</span><span class="p">(</span><span class="s">&#39;&#39;&#39;&#39;</span><span class="o">:</span><span class="s">&#39;&#39;&#39;&#39;&#39;&#39;</span> <span class="o">:</span><span class="n">message</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39;&#39;&#39;) MSGTYPE(*ESCAPE)&#39;</span><span class="p">);</span>
+<a id="L-268" name="L-268"></a><span class="k">end-proc</span><span class="p">;</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>**free
+// Bessel Observatory for IBM i 7.5, fully free ILE RPG with embedded Db2 SQL.
+// Compile and queue setup are in rpg_setup.txt. This edition uses native CALL
+// parameters, DSPLY input, IFS files, and separate SBMJOB batch jobs.
+// RPG has no block-comment delimiter; consecutive // lines are its convention.
+ctl-opt dftactgrp(*no) actgrp(*new) bnddir(&#x27;QC2LE&#x27;) option(*srcstmt);
+
+// Program entry: optional 32-character CL parameters select input/output/jobs.
+// Inputs: input path or &#x27;-&#x27;, output path, worker count; &#x27;*WORKER&#x27; is internal.
+// Outputs: IFS CSV or an escape message. Called by a user or submitted batch job.
+dcl-pi *n;
+  argInput char(32) const options(*nopass);
+  argOutput char(32) const options(*nopass);
+  argWorkers char(32) const options(*nopass);
+end-pi;
+
+// Call the ILE C trigonometric functions by value.
+// Input: angle in radians. Output: double result. Used by Observe&#x27;s quadrature.
+dcl-pr Cosine float(8) extproc(&#x27;cos&#x27;); angle float(8) value; end-pr;
+dcl-pr Sine float(8) extproc(&#x27;sin&#x27;); angle float(8) value; end-pr;
+// Obtain an OS process identifier for the worker CSV column.
+// Input: none. Output: PID. Used by the &#x27;*WORKER&#x27; entry path.
+dcl-pr GetPid int(10) extproc(&#x27;getpid&#x27;); end-pr;
+// Pause polling without consuming a CPU continuously.
+// Input: seconds. Output: remaining seconds. Used by the parent&#x27;s wait loop.
+dcl-pr SleepSeconds uns(10) extproc(&#x27;sleep&#x27;); seconds uns(10) value; end-pr;
+// Execute one CL command through the IBM program-call ABI.
+// Inputs: command bytes and packed length. Output: normal return or escape.
+// Used by Command for SBMJOB and readable failure messages.
+dcl-pr Execute extpgm(&#x27;QCMDEXC&#x27;);
+  command char(32702) const options(*varsize);
+  length packed(15:5) const;
+end-pr;
+
+dcl-s source varchar(32) inz(&#x27;-&#x27;);
+dcl-s target varchar(32) inz(&#x27;results.csv&#x27;);
+dcl-s runId char(32);
+dcl-s text varchar(4096);
+dcl-s response char(52);
+dcl-s row varchar(256);
+dcl-s commandText varchar(1024);
+dcl-s total int(10) inz(0);
+dcl-s workers int(10) inz(2);
+dcl-s first int(10);
+dcl-s last int(10);
+dcl-s ordinal int(10);
+dcl-s completed int(10);
+dcl-s errors int(10);
+dcl-s elapsed int(10);
+dcl-s unused uns(10);
+dcl-s pid int(10);
+dcl-s x float(8);
+dcl-s y float(8);
+dcl-s worker ind inz(*off);
+dcl-s failed ind inz(*off);
+dcl-s stopInput ind inz(*off);
+
+// Autocommit makes newly inserted work visible to independently submitted jobs.
+exec sql set option commit=*none, closqlcsr=*endmod, naming=*sql;
+
+// Capture ordinary RPG and CL exceptions, then report one application failure.
+monitor;
+  if %parms() &gt; 3;
+    Die(&#x27;Expected at most three parameters&#x27;);
+  endif;
+  if %parms() &gt;= 1;
+    source = %trim(argInput);
+  endif;
+  if source = &#x27;--help&#x27;;
+    dsply &#x27;CALL BESSELAB/BESSEL (input output workers)&#x27;;
+    *inlr = *on;
+    return;
+  endif;
+  worker = source = &#x27;*WORKER&#x27;;
+  if worker;
+    if %parms() &lt;&gt; 3; Die(&#x27;Worker requires run and ordinal&#x27;); endif;
+    runId = argOutput;
+    ordinal = %int(argWorkers);
+    exec sql select x into :x from BESSELAB.WORK_ITEMS
+      where run_id=:runId and ordinal=:ordinal and state=&#x27;Q&#x27;;
+    CheckSql();
+    y = Observe(x);
+    pid = GetPid();
+    exec sql update BESSELAB.WORK_ITEMS set y=:y, pid=:pid, state=&#x27;D&#x27;
+      where run_id=:runId and ordinal=:ordinal;
+    CheckSql();
+  else;
+    if %parms() &gt;= 2; target = %trim(argOutput); endif;
+    if %parms() &gt;= 3;
+      text = %trim(argWorkers);
+      if text = &#x27;&#x27; or %check(&#x27;0123456789&#x27;:text) &lt;&gt; 0;
+        Die(&#x27;Workers must be an integer from 1 to 16&#x27;);
+      endif;
+      workers = %int(text);
+    endif;
+    if workers &lt; 1 or workers &gt; 16; Die(&#x27;Workers must be 1..16&#x27;); endif;
+    exec sql values hex(generate_unique()) into :runId;
+    CheckSql();
+
+    // DSPLY is the native workstation input path; blank input completes it.
+    if source = &#x27;-&#x27;;
+      dou stopInput;
+        clear response;
+        dsply &#x27;Enter x; blank finishes:&#x27; &#x27;&#x27; response;
+        text = %trim(response);
+        Accept();
+      enddo;
+    else;
+      // IFS_READ performs CCSID conversion, preserving line order explicitly.
+      exec sql declare inputRows cursor for
+        select cast(line as varchar(4096))
+        from table(QSYS2.IFS_READ(path_name=&gt;:source,
+          maximum_line_length=&gt;4096, ignore_errors=&gt;&#x27;NO&#x27;))
+        order by line_number;
+      exec sql open inputRows;
+      CheckSql();
+      dou stopInput;
+        exec sql fetch inputRows into :text;
+        if sqlcod = 100; leave; endif;
+        CheckSql();
+        Accept();
+      enddo;
+      exec sql close inputRows;
+      CheckSql();
+    endif;
+    if total = 0; Die(&#x27;No valid observations&#x27;); endif;
+
+    // Submit at most workers jobs, then wait for that batch&#x27;s database results.
+    first = 1;
+    dow first &lt;= total;
+      last = %min(total:first+workers-1);
+      for ordinal = first to last;
+        commandText = &#x27;SBMJOB CMD(CALL PGM(BESSELAB/BESSEL) PARM(&#x27; +
+          &#x27;&#x27;&#x27;*WORKER&#x27;&#x27; &#x27;&#x27;&#x27; + %trim(runId) + &#x27;&#x27;&#x27; &#x27;&#x27;&#x27; +
+          %trim(%char(ordinal)) + &#x27;&#x27;&#x27;)) JOB(BESSEL) &#x27; +
+          &#x27;JOBQ(BESSELAB/BESSELQ)&#x27;;
+        Command(commandText);
+      endfor;
+      elapsed = 0;
+      dou completed = last-first+1;
+        exec sql select count(*) into :errors from BESSELAB.WORK_ITEMS
+          where run_id=:runId and ordinal between :first and :last
+          and state=&#x27;E&#x27;;
+        CheckSql();
+        if errors &gt; 0; Die(&#x27;A numeric batch job failed; inspect job log&#x27;); endif;
+        exec sql select count(*) into :completed from BESSELAB.WORK_ITEMS
+          where run_id=:runId and ordinal between :first and :last
+          and state=&#x27;D&#x27;;
+        CheckSql();
+        if completed &lt; last-first+1;
+          if elapsed &gt;= 600; Die(&#x27;Batch timeout; inspect run in WORK_ITEMS&#x27;); endif;
+          unused = SleepSeconds(1);
+          elapsed += 1;
+        endif;
+      enddo;
+      first = last+1;
+      completed = 0;
+    enddo;
+
+    // Publish UTF-8 CSV only after every job has completed successfully.
+    exec sql call QSYS2.IFS_WRITE_UTF8(path_name=&gt;:target,
+      line=&gt;&#x27;x,j0,worker_pid&#x27;, overwrite=&gt;&#x27;REPLACE&#x27;, end_of_line=&gt;&#x27;LF&#x27;);
+    CheckSql();
+    for ordinal = 1 to total;
+      exec sql select x,y,pid into :x,:y,:pid from BESSELAB.WORK_ITEMS
+        where run_id=:runId and ordinal=:ordinal;
+      CheckSql();
+      row = %trim(%char(x)) + &#x27;,&#x27; + %trim(%char(y)) + &#x27;,&#x27; + %trim(%char(pid));
+      exec sql call QSYS2.IFS_WRITE_UTF8(path_name=&gt;:target,
+        line=&gt;:row, overwrite=&gt;&#x27;APPEND&#x27;, end_of_line=&gt;&#x27;LF&#x27;);
+      CheckSql();
+    endfor;
+    exec sql delete from BESSELAB.WORK_ITEMS where run_id=:runId;
+    CheckSql();
+    dsply &#x27;Bessel observations written&#x27;;
+  endif;
+on-error;
+  failed = *on;
+endmon;
+if failed;
+  if worker;
+    exec sql update BESSELAB.WORK_ITEMS set state=&#x27;E&#x27;
+      where run_id=:runId and ordinal=:ordinal;
+  endif;
+  // Preserve failed run rows for diagnosis; queued jobs may still finish them.
+  dsply (&#x27;Failed run: &#x27; + %trim(runId));
+  Die(&#x27;Bessel failed; inspect the preceding job messages&#x27;);
+endif;
+*inlr = *on;
+return;
+
+// Accept validates and records one observation in shared run storage.
+// Inputs: global text and runId. Outputs: total, stopInput, or skipped warning.
+// Used by: both input loops; SQL validates spelling before RPG converts it.
+dcl-proc Accept;
+  dcl-s valid int(10);
+  dcl-s converted ind;
+  text = %trim(text:x&#x27;050D152540&#x27;); // EBCDIC tab, CR, NL, LF, and space.
+  if text = &#x27;&#x27;; stopInput = *on; return; endif;
+  if %subst(text:1:1) = &#x27;#&#x27;; return; endif;
+  exec sql values case when regexp_like(:text,
+    &#x27;^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$&#x27;)
+    then 1 else 0 end into :valid;
+  CheckSql();
+  converted = *off;
+  if valid = 1;
+    monitor;
+      x = %float(text);
+      converted = x &gt;= -1000 and x &lt;= 1000;
+    on-error;
+      converted = *off;
+    endmon;
+  endif;
+  if not converted; dsply &#x27;Skipping invalid value&#x27;; return; endif;
+  if total &gt;= 4096; Die(&#x27;At most 4096 observations are allowed&#x27;); endif;
+  total += 1;
+  exec sql insert into BESSELAB.WORK_ITEMS(run_id,ordinal,x,state)
+    values(:runId,:total,:x,&#x27;Q&#x27;);
+  CheckSql();
+end-proc;
+
+// Observe performs double-precision midpoint quadrature in the worker job.
+// Input: a validated x by value. Output: approximate J0(x).
+// Used by: the &#x27;*WORKER&#x27; path. A based field aliases each array element;
+// pointer arithmetic advances by its byte size, remaining inside the array.
+dcl-proc Observe;
+  dcl-pi *n float(8); value float(8) value; end-pi;
+  dcl-c n 16384;
+  dcl-c pi 3.14159265358979323846;
+  dcl-s samples float(8) dim(n);
+  dcl-s cursor pointer;
+  dcl-s term float(8) based(cursor);
+  dcl-s sum float(8) inz(0);
+  dcl-s k int(10);
+  for k = 1 to n;
+    samples(k) = Cosine(value*Sine(pi*(k-0.5)/n));
+  endfor;
+  cursor = %addr(samples(1));
+  for k = 1 to n;
+    sum += term;
+    if k &lt; n; cursor += %size(term); endif;
+  endfor;
+  return sum/n;
+end-proc;
+
+// Command executes a CL operation through a varying-length string reference.
+// Input: command text. Output: normal return or CL escape exception.
+// Used by: Main to submit jobs and Die to propagate readable failures.
+dcl-proc Command;
+  dcl-pi *n; text varchar(32702) const; end-pi;
+  Execute(text:%len(text));
+end-proc;
+
+// CheckSql turns failed SQL operations into an application exception.
+// Input: the SQL precompiler&#x27;s sqlcod. Output: normal return or escape.
+// Used by: every SQL operation; FETCH handles end-of-data before calling it.
+dcl-proc CheckSql;
+  if sqlcod &lt;&gt; 0; Die(&#x27;Database operation failed; inspect SQL job log&#x27;); endif;
+end-proc;
+
+// Die sends a CPF9898 escape message, preserving IBM i&#x27;s error convention.
+// Input: explanatory text. Output: job log message and exception to caller.
+// Used by: validation, CheckSql, and the top-level error boundary.
+dcl-proc Die;
+  dcl-pi *n; message varchar(256) const; end-pi;
+  Command(&#x27;SNDPGMMSG MSGID(CPF9898) MSGF(QCPFMSG) MSGDTA(&#x27;&#x27;&#x27; +
+    %scanrpl(&#x27;&#x27;&#x27;&#x27;:&#x27;&#x27;&#x27;&#x27;&#x27;&#x27; :message) + &#x27;&#x27;&#x27;) MSGTYPE(*ESCAPE)&#x27;);
+end-proc;
+</textarea>
+<footer>Highlighted with Pygments using the Fully free RPG / embedded SQL (project lexer) lexer. All assets are local. SHA-256: <code>00597442ac4e2996f1f1df24e64abbca5c92526bda8f4e69f0a45506b2674d40</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

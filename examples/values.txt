@@ -1,0 +1,11 @@
+# Try the origin, two approximate zeros, negative x, and an oscillatory tail.
+0
+1
+-1
+2.404825557695773
+5
+5.520078110286311
+10
+25
+100
+1000

@@ -1,0 +1,555 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="35785b95935a14a981c3fe2e2dc90eba7ff434884711c2498399e3b446b51060">
+<title>Prolog — bessel.pro — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.lisp.html">← Lisp</a><a href="Bessel.kt.html">Kotlin →</a></nav>
+<h1>Prolog <code>bessel.pro</code></h1>
+<p>SWI-Prolog 9.x · Relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3.</p>
+<p><strong>Memory:</strong> Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.<br><strong>Strings:</strong> normalize_space, sub_string, number_string, atom/string conversion and format.</p>
+<div class="actions"><a href="../bessel.pro">Open raw source</a>
+<a href="../bessel.pro" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span>
+<span class="normal"><a href="#L-172">172</a></span>
+<span class="normal"><a href="#L-173">173</a></span>
+<span class="normal"><a href="#L-174">174</a></span>
+<span class="normal"><a href="#L-175">175</a></span>
+<span class="normal"><a href="#L-176">176</a></span>
+<span class="normal"><a href="#L-177">177</a></span>
+<span class="normal"><a href="#L-178">178</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent reads input and owns result ordering; the worker computes the midpoint approximation.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  SWI-Prolog 9.x: relations, recursive folds, catch/3, setup_call_cleanup/3.</span>
+<a id="L-6" name="L-6"></a><span class="cm">*/</span>
+<a id="L-7" name="L-7"></a><span class="p">:-</span> <span class="nf">use_module</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s s-Atom">readutil</span><span class="p">)).</span>
+<a id="L-8" name="L-8"></a><span class="p">:-</span> <span class="nf">use_module</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s s-Atom">process</span><span class="p">)).</span>
+<a id="L-9" name="L-9"></a><span class="p">:-</span> <span class="nf">use_module</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s s-Atom">lists</span><span class="p">)).</span>
+<a id="L-10" name="L-10"></a><span class="p">:-</span> <span class="nf">use_module</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s s-Atom">apply</span><span class="p">)).</span>
+<a id="L-11" name="L-11"></a><span class="p">:-</span> <span class="s s-Atom">dynamic</span> <span class="s s-Atom">script_path</span><span class="o">/</span><span class="mf">1.</span>
+<a id="L-12" name="L-12"></a><span class="p">:-</span> <span class="nf">prolog_load_context</span><span class="p">(</span><span class="s s-Atom">file</span><span class="p">,</span> <span class="nv">File</span><span class="p">),</span> <span class="nf">assertz</span><span class="p">(</span><span class="nf">script_path</span><span class="p">(</span><span class="nv">File</span><span class="p">)).</span>
+<a id="L-13" name="L-13"></a><span class="p">:-</span> <span class="nf">initialization</span><span class="p">(</span><span class="s s-Atom">main</span><span class="p">,</span> <span class="s s-Atom">main</span><span class="p">).</span>
+<a id="L-14" name="L-14"></a>
+<a id="L-15" name="L-15"></a><span class="cm">/*</span>
+<a id="L-16" name="L-16"></a><span class="cm">  Relate a complete numeric string to one bounded observation.</span>
+<a id="L-17" name="L-17"></a><span class="cm">  Inputs: Text is the candidate token; X is initially unbound.</span>
+<a id="L-18" name="L-18"></a><span class="cm">  Outputs: X becomes a finite numeric value, or validation fails/throws.</span>
+<a id="L-19" name="L-19"></a><span class="cm">  Used by: read_values and the worker clause of run.</span>
+<a id="L-20" name="L-20"></a><span class="cm">*/</span>
+<a id="L-21" name="L-21"></a><span class="nf">number</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="nv">X</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-22" name="L-22"></a>    <span class="s s-Atom">\+</span> <span class="nf">sub_string</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="k">_</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">_</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">),</span> <span class="c1">% number_string/2 otherwise accepts embedded spaces</span>
+<a id="L-23" name="L-23"></a>    <span class="nf">number_string</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="nv">Text</span><span class="p">),</span> <span class="nv">X</span> <span class="o">is</span> <span class="nf">float</span><span class="p">(</span><span class="nv">N</span><span class="p">),</span>
+<a id="L-24" name="L-24"></a>    <span class="p">(</span><span class="nv">X</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">1000</span><span class="p">,</span> <span class="nv">X</span> <span class="o">=&lt;</span> <span class="mi">1000</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">true</span> <span class="p">;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="nf">domain_error</span><span class="p">(</span><span class="s s-Atom">bounded_real</span><span class="p">,</span> <span class="nv">Text</span><span class="p">),</span> <span class="k">_</span><span class="p">))).</span>
+<a id="L-25" name="L-25"></a>
+<a id="L-26" name="L-26"></a><span class="cm">/*</span>
+<a id="L-27" name="L-27"></a><span class="cm">  Relate an input observation to its normalized Bessel approximation.</span>
+<a id="L-28" name="L-28"></a><span class="cm">  Inputs: A validated numeric X and an output variable Y.</span>
+<a id="L-29" name="L-29"></a><span class="cm">  Outputs: Y is unified with the midpoint result.</span>
+<a id="L-30" name="L-30"></a><span class="cm">  Used by: The worker clause of run.</span>
+<a id="L-31" name="L-31"></a><span class="cm">*/</span>
+<a id="L-32" name="L-32"></a><span class="nf">j0</span><span class="p">(</span><span class="nv">X</span><span class="p">,</span> <span class="nv">Y</span><span class="p">)</span> <span class="p">:-</span> <span class="nf">integrate</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">X</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="nv">Sum</span><span class="p">),</span> <span class="nv">Y</span> <span class="o">is</span> <span class="nv">Sum</span> <span class="o">/</span> <span class="mf">16384.</span>
+<a id="L-33" name="L-33"></a><span class="cm">/*</span>
+<a id="L-34" name="L-34"></a><span class="cm">  Accumulate midpoint samples through tail recursion.</span>
+<a id="L-35" name="L-35"></a><span class="cm">  Inputs: The sample index, X, running total, and result variable.</span>
+<a id="L-36" name="L-36"></a><span class="cm">  Outputs: The final unnormalized sum.</span>
+<a id="L-37" name="L-37"></a><span class="cm">  Used by: j0 and recursive integrate calls.</span>
+<a id="L-38" name="L-38"></a><span class="cm">*/</span>
+<a id="L-39" name="L-39"></a><span class="nf">integrate</span><span class="p">(</span><span class="mi">16384</span><span class="p">,</span> <span class="k">_</span><span class="p">,</span> <span class="nv">Sum</span><span class="p">,</span> <span class="nv">Sum</span><span class="p">)</span> <span class="p">:-</span> <span class="p">!.</span>
+<a id="L-40" name="L-40"></a><span class="nf">integrate</span><span class="p">(</span><span class="nv">K</span><span class="p">,</span> <span class="nv">X</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">,</span> <span class="nv">Sum</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-41" name="L-41"></a>    <span class="nv">Next</span> <span class="o">is</span> <span class="nv">K</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+<a id="L-42" name="L-42"></a>    <span class="nv">Total</span> <span class="o">is</span> <span class="nv">Acc</span> <span class="o">+</span> <span class="nf">cos</span><span class="p">(</span><span class="nv">X</span> <span class="o">*</span> <span class="nf">sin</span><span class="p">(</span><span class="s s-Atom">pi</span> <span class="o">*</span> <span class="p">(</span><span class="nv">K</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mi">16384</span><span class="p">)),</span>
+<a id="L-43" name="L-43"></a>    <span class="nf">integrate</span><span class="p">(</span><span class="nv">Next</span><span class="p">,</span> <span class="nv">X</span><span class="p">,</span> <span class="nv">Total</span><span class="p">,</span> <span class="nv">Sum</span><span class="p">).</span>
+<a id="L-44" name="L-44"></a>
+<a id="L-45" name="L-45"></a><span class="cm">/*</span>
+<a id="L-46" name="L-46"></a><span class="cm">  Start collecting observations from a stream.</span>
+<a id="L-47" name="L-47"></a><span class="cm">  Inputs: A readable stream and an output list variable.</span>
+<a id="L-48" name="L-48"></a><span class="cm">  Outputs: Values is unified with the accepted input in original order.</span>
+<a id="L-49" name="L-49"></a><span class="cm">  Used by: run for both file and interactive input.</span>
+<a id="L-50" name="L-50"></a><span class="cm">*/</span>
+<a id="L-51" name="L-51"></a><span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span> <span class="p">:-</span> <span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="p">[],</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">Values</span><span class="p">).</span>
+<a id="L-52" name="L-52"></a><span class="cm">/*</span>
+<a id="L-53" name="L-53"></a><span class="cm">  Read and classify the next line with explicit accumulated state.</span>
+<a id="L-54" name="L-54"></a><span class="cm">  Inputs: The stream, reversed accepted values, count and final result variable.</span>
+<a id="L-55" name="L-55"></a><span class="cm">  Outputs: The final ordered list, or a fatal input-limit condition.</span>
+<a id="L-56" name="L-56"></a><span class="cm">  Used by: read_values/2 and recursive calls.</span>
+<a id="L-57" name="L-57"></a><span class="cm">*/</span>
+<a id="L-58" name="L-58"></a><span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">,</span> <span class="nv">Count</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-59" name="L-59"></a>    <span class="nf">read_line_to_string</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="nv">Line</span><span class="p">),</span>
+<a id="L-60" name="L-60"></a>    <span class="p">(</span> <span class="nv">Line</span> <span class="o">==</span> <span class="s s-Atom">end_of_file</span> <span class="s s-Atom">-&gt;</span> <span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span>
+<a id="L-61" name="L-61"></a><span class="c1">% Normalize user whitespace before classifying blank lines, comments and numeric tokens.</span>
+<a id="L-62" name="L-62"></a>    <span class="p">;</span> <span class="nf">normalize_space</span><span class="p">(</span><span class="nf">string</span><span class="p">(</span><span class="nv">Text</span><span class="p">),</span> <span class="nv">Line</span><span class="p">),</span>
+<a id="L-63" name="L-63"></a>      <span class="p">(</span> <span class="nv">Text</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="s s-Atom">-&gt;</span> <span class="nf">reverse</span><span class="p">(</span><span class="nv">Acc</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span>
+<a id="L-64" name="L-64"></a>      <span class="p">;</span> <span class="nf">sub_string</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="k">_</span><span class="p">,</span> <span class="s2">&quot;#&quot;</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span> <span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">,</span> <span class="nv">Count</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span>
+<a id="L-65" name="L-65"></a>      <span class="p">;</span> <span class="p">(</span><span class="nf">catch</span><span class="p">(</span><span class="nf">number</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="nv">X</span><span class="p">),</span> <span class="k">_</span><span class="p">,</span> <span class="s s-Atom">fail</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span>
+<a id="L-66" name="L-66"></a>          <span class="p">(</span><span class="nv">Count</span> <span class="o">&lt;</span> <span class="mi">4096</span> <span class="s s-Atom">-&gt;</span> <span class="nv">Next</span> <span class="o">is</span> <span class="nv">Count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="p">[</span><span class="nv">X</span><span class="p">|</span><span class="nv">Acc</span><span class="p">],</span> <span class="nv">Next</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span>
+<a id="L-67" name="L-67"></a>          <span class="p">;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="nf">resource_error</span><span class="p">(</span><span class="s s-Atom">input_limit</span><span class="p">),</span> <span class="k">_</span><span class="p">)))</span>
+<a id="L-68" name="L-68"></a>        <span class="p">;</span> <span class="nf">format</span><span class="p">(</span><span class="s s-Atom">user_error</span><span class="p">,</span> <span class="s s-Atom">&#39;warning: invalid number; skipped~n&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="nf">read_values</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="nv">Acc</span><span class="p">,</span> <span class="nv">Count</span><span class="p">,</span> <span class="nv">Values</span><span class="p">))</span>
+<a id="L-69" name="L-69"></a>      <span class="p">)</span>
+<a id="L-70" name="L-70"></a>    <span class="p">).</span>
+<a id="L-71" name="L-71"></a>
+<a id="L-72" name="L-72"></a><span class="cm">/*</span>
+<a id="L-73" name="L-73"></a><span class="cm">  Create a separate SWI-Prolog process for one numerical observation.</span>
+<a id="L-74" name="L-74"></a><span class="cm">  Inputs: A validated X and an output worker descriptor.</span>
+<a id="L-75" name="L-75"></a><span class="cm">  Outputs: A descriptor holding the child PID and output stream.</span>
+<a id="L-76" name="L-76"></a><span class="cm">  Used by: launch through setup_call_cleanup.</span>
+<a id="L-77" name="L-77"></a><span class="cm">*/</span>
+<a id="L-78" name="L-78"></a><span class="nf">start_worker</span><span class="p">(</span><span class="nv">X</span><span class="p">,</span> <span class="nf">worker</span><span class="p">(</span><span class="nv">Pid</span><span class="p">,</span> <span class="nv">Stream</span><span class="p">))</span> <span class="p">:-</span>
+<a id="L-79" name="L-79"></a>    <span class="nf">script_path</span><span class="p">(</span><span class="nv">Script</span><span class="p">),</span> <span class="nf">format</span><span class="p">(</span><span class="nf">atom</span><span class="p">(</span><span class="nv">Text</span><span class="p">),</span> <span class="s s-Atom">&#39;~17g&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">X</span><span class="p">]),</span>
+<a id="L-80" name="L-80"></a>    <span class="nf">current_prolog_flag</span><span class="p">(</span><span class="s s-Atom">executable</span><span class="p">,</span> <span class="nv">Executable</span><span class="p">),</span>
+<a id="L-81" name="L-81"></a>    <span class="nf">process_create</span><span class="p">(</span><span class="nv">Executable</span><span class="p">,</span> <span class="p">[</span><span class="s s-Atom">&#39;-q&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;-s&#39;</span><span class="p">,</span> <span class="nv">Script</span><span class="p">,</span> <span class="s s-Atom">&#39;--&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;--worker&#39;</span><span class="p">,</span> <span class="nv">Text</span><span class="p">],</span>
+<a id="L-82" name="L-82"></a>                   <span class="p">[</span><span class="nf">stdin</span><span class="p">(</span><span class="s s-Atom">null</span><span class="p">),</span> <span class="nf">stdout</span><span class="p">(</span><span class="nf">pipe</span><span class="p">(</span><span class="nv">Stream</span><span class="p">)),</span> <span class="nf">process</span><span class="p">(</span><span class="nv">Pid</span><span class="p">)]).</span>
+<a id="L-83" name="L-83"></a><span class="cm">/*</span>
+<a id="L-84" name="L-84"></a><span class="cm">  Close the output stream and reap any remaining child.</span>
+<a id="L-85" name="L-85"></a><span class="cm">  Inputs: A worker descriptor.</span>
+<a id="L-86" name="L-86"></a><span class="cm">  Outputs: Cleanup effects; already-cleaned resources are tolerated.</span>
+<a id="L-87" name="L-87"></a><span class="cm">  Used by: setup_call_cleanup on both success and exception paths.</span>
+<a id="L-88" name="L-88"></a><span class="cm">*/</span>
+<a id="L-89" name="L-89"></a><span class="nf">cleanup_worker</span><span class="p">(</span><span class="nf">worker</span><span class="p">(</span><span class="nv">Pid</span><span class="p">,</span> <span class="nv">Stream</span><span class="p">))</span> <span class="p">:-</span>
+<a id="L-90" name="L-90"></a>    <span class="nf">catch</span><span class="p">(</span><span class="nf">close</span><span class="p">(</span><span class="nv">Stream</span><span class="p">),</span> <span class="k">_</span><span class="p">,</span> <span class="s s-Atom">true</span><span class="p">),</span>
+<a id="L-91" name="L-91"></a>    <span class="nf">catch</span><span class="p">(</span><span class="nf">process_wait</span><span class="p">(</span><span class="nv">Pid</span><span class="p">,</span> <span class="k">_</span><span class="p">),</span> <span class="k">_</span><span class="p">,</span> <span class="s s-Atom">true</span><span class="p">).</span>
+<a id="L-92" name="L-92"></a><span class="cm">/*</span>
+<a id="L-93" name="L-93"></a><span class="cm">  Receive a complete result and require successful child termination.</span>
+<a id="L-94" name="L-94"></a><span class="cm">  Inputs: A worker descriptor and row output variable.</span>
+<a id="L-95" name="L-95"></a><span class="cm">  Outputs: One CSV string, or a worker_failed exception.</span>
+<a id="L-96" name="L-96"></a><span class="cm">  Used by: launch after all children have been started.</span>
+<a id="L-97" name="L-97"></a><span class="cm">*/</span>
+<a id="L-98" name="L-98"></a><span class="nf">collect</span><span class="p">(</span><span class="nf">worker</span><span class="p">(</span><span class="nv">Pid</span><span class="p">,</span> <span class="nv">Stream</span><span class="p">),</span> <span class="nv">Row</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-99" name="L-99"></a>    <span class="nf">read_string</span><span class="p">(</span><span class="nv">Stream</span><span class="p">,</span> <span class="k">_</span><span class="p">,</span> <span class="nv">Row</span><span class="p">),</span> <span class="nf">process_wait</span><span class="p">(</span><span class="nv">Pid</span><span class="p">,</span> <span class="nv">Status</span><span class="p">),</span>
+<a id="L-100" name="L-100"></a>    <span class="p">(</span><span class="nv">Status</span> <span class="o">==</span> <span class="nf">exit</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="nv">Row</span> <span class="s s-Atom">\==</span> <span class="s2">&quot;&quot;</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">true</span> <span class="p">;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="nf">worker_failed</span><span class="p">(</span><span class="nv">Status</span><span class="p">),</span> <span class="k">_</span><span class="p">))).</span>
+<a id="L-101" name="L-101"></a><span class="cm">/*</span>
+<a id="L-102" name="L-102"></a><span class="cm">  Keep worker lifetimes scoped while launching and gathering a whole group.</span>
+<a id="L-103" name="L-103"></a><span class="cm">  Inputs: Remaining values, pending worker descriptors, and result rows.</span>
+<a id="L-104" name="L-104"></a><span class="cm">  Outputs: Rows in original order; cleanup is guaranteed around nested calls.</span>
+<a id="L-105" name="L-105"></a><span class="cm">  Used by: compute and recursive launch calls.</span>
+<a id="L-106" name="L-106"></a><span class="cm">*/</span>
+<a id="L-107" name="L-107"></a><span class="nf">launch</span><span class="p">([],</span> <span class="nv">Pending</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">)</span> <span class="p">:-</span> <span class="nf">reverse</span><span class="p">(</span><span class="nv">Pending</span><span class="p">,</span> <span class="nv">Ordered</span><span class="p">),</span> <span class="nf">maplist</span><span class="p">(</span><span class="s s-Atom">collect</span><span class="p">,</span> <span class="nv">Ordered</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">).</span>
+<a id="L-108" name="L-108"></a><span class="nf">launch</span><span class="p">([</span><span class="nv">X</span><span class="p">|</span><span class="nv">Xs</span><span class="p">],</span> <span class="nv">Pending</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-109" name="L-109"></a>    <span class="c1">% Keep the child resource lifetime around the rest of this batch, including failures.</span>
+<a id="L-110" name="L-110"></a>    <span class="nf">setup_call_cleanup</span><span class="p">(</span><span class="nf">start_worker</span><span class="p">(</span><span class="nv">X</span><span class="p">,</span> <span class="nv">Worker</span><span class="p">),</span> <span class="nf">launch</span><span class="p">(</span><span class="nv">Xs</span><span class="p">,</span> <span class="p">[</span><span class="nv">Worker</span><span class="p">|</span><span class="nv">Pending</span><span class="p">],</span> <span class="nv">Rows</span><span class="p">),</span> <span class="nf">cleanup_worker</span><span class="p">(</span><span class="nv">Worker</span><span class="p">)).</span>
+<a id="L-111" name="L-111"></a>
+<a id="L-112" name="L-112"></a><span class="cm">/*</span>
+<a id="L-113" name="L-113"></a><span class="cm">  Split a list into one bounded prefix and its remainder.</span>
+<a id="L-114" name="L-114"></a><span class="cm">  Inputs: A limit and remaining values; the last two arguments are outputs.</span>
+<a id="L-115" name="L-115"></a><span class="cm">  Outputs: A prefix list and the unconsumed suffix.</span>
+<a id="L-116" name="L-116"></a><span class="cm">  Used by: compute to implement bounded concurrency.</span>
+<a id="L-117" name="L-117"></a><span class="cm">*/</span>
+<a id="L-118" name="L-118"></a><span class="nf">take</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nv">Xs</span><span class="p">,</span> <span class="p">[],</span> <span class="nv">Xs</span><span class="p">)</span> <span class="p">:-</span> <span class="p">!.</span>
+<a id="L-119" name="L-119"></a><span class="nf">take</span><span class="p">(</span><span class="k">_</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[])</span> <span class="p">:-</span> <span class="p">!.</span>
+<a id="L-120" name="L-120"></a><span class="nf">take</span><span class="p">(</span><span class="nv">N</span><span class="p">,</span> <span class="p">[</span><span class="nv">X</span><span class="p">|</span><span class="nv">Xs</span><span class="p">],</span> <span class="p">[</span><span class="nv">X</span><span class="p">|</span><span class="nv">Front</span><span class="p">],</span> <span class="nv">Rest</span><span class="p">)</span> <span class="p">:-</span> <span class="nv">Next</span> <span class="o">is</span> <span class="nv">N</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nf">take</span><span class="p">(</span><span class="nv">Next</span><span class="p">,</span> <span class="nv">Xs</span><span class="p">,</span> <span class="nv">Front</span><span class="p">,</span> <span class="nv">Rest</span><span class="p">).</span>
+<a id="L-121" name="L-121"></a><span class="cm">/*</span>
+<a id="L-122" name="L-122"></a><span class="cm">  Run consecutive groups of observations without changing their order.</span>
+<a id="L-123" name="L-123"></a><span class="cm">  Inputs: Remaining values, worker limit, and result-list variable.</span>
+<a id="L-124" name="L-124"></a><span class="cm">  Outputs: All CSV rows, or a propagated worker exception.</span>
+<a id="L-125" name="L-125"></a><span class="cm">  Used by: run after input is validated.</span>
+<a id="L-126" name="L-126"></a><span class="cm">*/</span>
+<a id="L-127" name="L-127"></a><span class="nf">compute</span><span class="p">([],</span> <span class="k">_</span><span class="p">,</span> <span class="p">[])</span> <span class="p">:-</span> <span class="p">!.</span>
+<a id="L-128" name="L-128"></a><span class="nf">compute</span><span class="p">(</span><span class="nv">Values</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-129" name="L-129"></a>    <span class="nf">take</span><span class="p">(</span><span class="nv">Jobs</span><span class="p">,</span> <span class="nv">Values</span><span class="p">,</span> <span class="nv">Group</span><span class="p">,</span> <span class="nv">Rest</span><span class="p">),</span> <span class="nf">launch</span><span class="p">(</span><span class="nv">Group</span><span class="p">,</span> <span class="p">[],</span> <span class="nv">Batch</span><span class="p">),</span>
+<a id="L-130" name="L-130"></a>    <span class="nf">compute</span><span class="p">(</span><span class="nv">Rest</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">,</span> <span class="nv">Tail</span><span class="p">),</span> <span class="nf">append</span><span class="p">(</span><span class="nv">Batch</span><span class="p">,</span> <span class="nv">Tail</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">).</span>
+<a id="L-131" name="L-131"></a>
+<a id="L-132" name="L-132"></a><span class="cm">/*</span>
+<a id="L-133" name="L-133"></a><span class="cm">  Relate positional CLI forms to their defaults.</span>
+<a id="L-134" name="L-134"></a><span class="cm">  Inputs: An argument list; source, target and jobs are outputs.</span>
+<a id="L-135" name="L-135"></a><span class="cm">  Outputs: One normalized option tuple, or failure for an unsupported form.</span>
+<a id="L-136" name="L-136"></a><span class="cm">  Used by: run before file I/O or worker creation.</span>
+<a id="L-137" name="L-137"></a><span class="cm">*/</span>
+<a id="L-138" name="L-138"></a><span class="nf">options</span><span class="p">([],</span> <span class="s s-Atom">&#39;-&#39;</span><span class="p">,</span> <span class="s s-Atom">&#39;results.csv&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span>
+<a id="L-139" name="L-139"></a><span class="nf">options</span><span class="p">([</span><span class="nv">Source</span><span class="p">],</span> <span class="nv">Source</span><span class="p">,</span> <span class="s s-Atom">&#39;results.csv&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span>
+<a id="L-140" name="L-140"></a><span class="nf">options</span><span class="p">([</span><span class="nv">Source</span><span class="p">,</span><span class="nv">Target</span><span class="p">],</span> <span class="nv">Source</span><span class="p">,</span> <span class="nv">Target</span><span class="p">,</span> <span class="mi">2</span><span class="p">).</span>
+<a id="L-141" name="L-141"></a><span class="nf">options</span><span class="p">([</span><span class="nv">Source</span><span class="p">,</span><span class="nv">Target</span><span class="p">,</span><span class="nv">Text</span><span class="p">],</span> <span class="nv">Source</span><span class="p">,</span> <span class="nv">Target</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">)</span> <span class="p">:-</span> <span class="nf">atom_number</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">).</span>
+<a id="L-142" name="L-142"></a>
+<a id="L-143" name="L-143"></a><span class="cm">/*</span>
+<a id="L-144" name="L-144"></a><span class="cm">  Select help, worker computation, or the parent workflow by pattern.</span>
+<a id="L-145" name="L-145"></a><span class="cm">  Inputs: The command-line argument list.</span>
+<a id="L-146" name="L-146"></a><span class="cm">  Outputs: CSV/console effects, or an exception for a fatal error.</span>
+<a id="L-147" name="L-147"></a><span class="cm">  Used by: main as the common invocation dispatcher.</span>
+<a id="L-148" name="L-148"></a><span class="cm">*/</span>
+<a id="L-149" name="L-149"></a><span class="nf">run</span><span class="p">([</span><span class="s s-Atom">&#39;--help&#39;</span><span class="p">])</span> <span class="p">:-</span> <span class="p">!,</span>
+<a id="L-150" name="L-150"></a>    <span class="nf">writeln</span><span class="p">(</span><span class="s s-Atom">&#39;Usage: swipl -q -s bessel.pro -- [INPUT|- [OUTPUT [WORKERS 1..16]]]&#39;</span><span class="p">).</span>
+<a id="L-151" name="L-151"></a><span class="nf">run</span><span class="p">([</span><span class="s s-Atom">&#39;--worker&#39;</span><span class="p">,</span> <span class="nv">Text</span><span class="p">])</span> <span class="p">:-</span> <span class="p">!,</span>
+<a id="L-152" name="L-152"></a>    <span class="nf">atom_string</span><span class="p">(</span><span class="nv">Text</span><span class="p">,</span> <span class="nv">String</span><span class="p">),</span> <span class="nf">number</span><span class="p">(</span><span class="nv">String</span><span class="p">,</span> <span class="nv">X</span><span class="p">),</span> <span class="nf">j0</span><span class="p">(</span><span class="nv">X</span><span class="p">,</span> <span class="nv">Y</span><span class="p">),</span> <span class="nf">current_prolog_flag</span><span class="p">(</span><span class="s s-Atom">pid</span><span class="p">,</span> <span class="nv">Pid</span><span class="p">),</span>
+<a id="L-153" name="L-153"></a>    <span class="nf">format</span><span class="p">(</span><span class="s s-Atom">&#39;~17g,~17g,~d~n&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">X</span><span class="p">,</span> <span class="nv">Y</span><span class="p">,</span> <span class="nv">Pid</span><span class="p">]).</span>
+<a id="L-154" name="L-154"></a><span class="nf">run</span><span class="p">(</span><span class="nv">Args</span><span class="p">)</span> <span class="p">:-</span>
+<a id="L-155" name="L-155"></a>    <span class="p">(</span><span class="nf">options</span><span class="p">(</span><span class="nv">Args</span><span class="p">,</span> <span class="nv">Source</span><span class="p">,</span> <span class="nv">Target</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">),</span> <span class="nf">integer</span><span class="p">(</span><span class="nv">Jobs</span><span class="p">),</span> <span class="nf">between</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="nv">Jobs</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">true</span>
+<a id="L-156" name="L-156"></a>    <span class="p">;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="nf">domain_error</span><span class="p">(</span><span class="s s-Atom">arguments</span><span class="p">,</span> <span class="nv">Args</span><span class="p">),</span> <span class="k">_</span><span class="p">))),</span>
+<a id="L-157" name="L-157"></a>    <span class="p">(</span><span class="nv">Source</span> <span class="o">==</span> <span class="s s-Atom">&#39;-&#39;</span> <span class="s s-Atom">-&gt;</span>
+<a id="L-158" name="L-158"></a>        <span class="nf">format</span><span class="p">(</span><span class="s s-Atom">user_error</span><span class="p">,</span> <span class="s s-Atom">&#39;Enter one x per line; blank line or EOF finishes:~n&#39;</span><span class="p">,</span> <span class="p">[]),</span>
+<a id="L-159" name="L-159"></a>        <span class="nf">read_values</span><span class="p">(</span><span class="s s-Atom">user_input</span><span class="p">,</span> <span class="nv">Values</span><span class="p">)</span>
+<a id="L-160" name="L-160"></a>    <span class="p">;</span> <span class="nf">setup_call_cleanup</span><span class="p">(</span><span class="nf">open</span><span class="p">(</span><span class="nv">Source</span><span class="p">,</span> <span class="s s-Atom">read</span><span class="p">,</span> <span class="nv">Input</span><span class="p">),</span> <span class="nf">read_values</span><span class="p">(</span><span class="nv">Input</span><span class="p">,</span> <span class="nv">Values</span><span class="p">),</span> <span class="nf">close</span><span class="p">(</span><span class="nv">Input</span><span class="p">))),</span>
+<a id="L-161" name="L-161"></a>    <span class="p">(</span><span class="nv">Values</span> <span class="o">==</span> <span class="p">[]</span> <span class="s s-Atom">-&gt;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="nf">domain_error</span><span class="p">(</span><span class="s s-Atom">nonempty_input</span><span class="p">,</span> <span class="nv">Values</span><span class="p">),</span> <span class="k">_</span><span class="p">))</span> <span class="p">;</span> <span class="s s-Atom">true</span><span class="p">),</span>
+<a id="L-162" name="L-162"></a>    <span class="c1">% Complete all numerical batches before opening the output file.</span>
+<a id="L-163" name="L-163"></a>    <span class="nf">compute</span><span class="p">(</span><span class="nv">Values</span><span class="p">,</span> <span class="nv">Jobs</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">),</span>
+<a id="L-164" name="L-164"></a>    <span class="nf">setup_call_cleanup</span><span class="p">(</span><span class="nf">open</span><span class="p">(</span><span class="nv">Target</span><span class="p">,</span> <span class="s s-Atom">write</span><span class="p">,</span> <span class="nv">Output</span><span class="p">),</span>
+<a id="L-165" name="L-165"></a><span class="c1">% Write rows in their already-preserved input sequence.</span>
+<a id="L-166" name="L-166"></a>        <span class="p">(</span><span class="nf">format</span><span class="p">(</span><span class="nv">Output</span><span class="p">,</span> <span class="s s-Atom">&#39;x,j0,worker_pid~n&#39;</span><span class="p">,</span> <span class="p">[]),</span> <span class="nf">forall</span><span class="p">(</span><span class="nf">member</span><span class="p">(</span><span class="nv">Row</span><span class="p">,</span> <span class="nv">Rows</span><span class="p">),</span> <span class="nf">format</span><span class="p">(</span><span class="nv">Output</span><span class="p">,</span> <span class="s s-Atom">&#39;~s&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">Row</span><span class="p">]))),</span>
+<a id="L-167" name="L-167"></a>        <span class="nf">close</span><span class="p">(</span><span class="nv">Output</span><span class="p">)),</span>
+<a id="L-168" name="L-168"></a>    <span class="nf">length</span><span class="p">(</span><span class="nv">Rows</span><span class="p">,</span> <span class="nv">Count</span><span class="p">),</span> <span class="nf">format</span><span class="p">(</span><span class="s s-Atom">&#39;Wrote ~d observations to ~w~n&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">Count</span><span class="p">,</span> <span class="nv">Target</span><span class="p">]).</span>
+<a id="L-169" name="L-169"></a>
+<a id="L-170" name="L-170"></a><span class="cm">/*</span>
+<a id="L-171" name="L-171"></a><span class="cm">  Bridge Prolog success/failure semantics to a command-line exit status.</span>
+<a id="L-172" name="L-172"></a><span class="cm">  Inputs: The argv process flag.</span>
+<a id="L-173" name="L-173"></a><span class="cm">  Outputs: Success or a readable diagnostic followed by status 1.</span>
+<a id="L-174" name="L-174"></a><span class="cm">  Used by: The initialization directive when the file is launched.</span>
+<a id="L-175" name="L-175"></a><span class="cm">*/</span>
+<a id="L-176" name="L-176"></a><span class="nf">main</span> <span class="o">:-</span> <span class="nf">current_prolog_flag</span><span class="p">(</span><span class="s s-Atom">argv</span><span class="p">,</span> <span class="nv">Args</span><span class="p">),</span>
+<a id="L-177" name="L-177"></a>    <span class="nf">catch</span><span class="p">((</span><span class="nf">run</span><span class="p">(</span><span class="nv">Args</span><span class="p">)</span> <span class="s s-Atom">-&gt;</span> <span class="s s-Atom">true</span> <span class="p">;</span> <span class="nf">throw</span><span class="p">(</span><span class="nf">error</span><span class="p">(</span><span class="s s-Atom">program_failed</span><span class="p">,</span> <span class="k">_</span><span class="p">))),</span>
+<a id="L-178" name="L-178"></a>          <span class="nv">Error</span><span class="p">,</span> <span class="p">(</span><span class="nf">format</span><span class="p">(</span><span class="s s-Atom">user_error</span><span class="p">,</span> <span class="s s-Atom">&#39;error: ~w~n&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nv">Error</span><span class="p">]),</span> <span class="nf">halt</span><span class="p">(</span><span class="mi">1</span><span class="p">))).</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/*
+  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.
+  The parent reads input and owns result ordering; the worker computes the midpoint approximation.
+  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.
+  SWI-Prolog 9.x: relations, recursive folds, catch/3, setup_call_cleanup/3.
+*/
+:- use_module(library(readutil)).
+:- use_module(library(process)).
+:- use_module(library(lists)).
+:- use_module(library(apply)).
+:- dynamic script_path/1.
+:- prolog_load_context(file, File), assertz(script_path(File)).
+:- initialization(main, main).
+
+/*
+  Relate a complete numeric string to one bounded observation.
+  Inputs: Text is the candidate token; X is initially unbound.
+  Outputs: X becomes a finite numeric value, or validation fails/throws.
+  Used by: read_values and the worker clause of run.
+*/
+number(Text, X) :-
+    \+ sub_string(Text, _, 1, _, &quot; &quot;), % number_string/2 otherwise accepts embedded spaces
+    number_string(N, Text), X is float(N),
+    (X &gt;= -1000, X =&lt; 1000 -&gt; true ; throw(error(domain_error(bounded_real, Text), _))).
+
+/*
+  Relate an input observation to its normalized Bessel approximation.
+  Inputs: A validated numeric X and an output variable Y.
+  Outputs: Y is unified with the midpoint result.
+  Used by: The worker clause of run.
+*/
+j0(X, Y) :- integrate(0, X, 0.0, Sum), Y is Sum / 16384.
+/*
+  Accumulate midpoint samples through tail recursion.
+  Inputs: The sample index, X, running total, and result variable.
+  Outputs: The final unnormalized sum.
+  Used by: j0 and recursive integrate calls.
+*/
+integrate(16384, _, Sum, Sum) :- !.
+integrate(K, X, Acc, Sum) :-
+    Next is K + 1,
+    Total is Acc + cos(X * sin(pi * (K + 0.5) / 16384)),
+    integrate(Next, X, Total, Sum).
+
+/*
+  Start collecting observations from a stream.
+  Inputs: A readable stream and an output list variable.
+  Outputs: Values is unified with the accepted input in original order.
+  Used by: run for both file and interactive input.
+*/
+read_values(Stream, Values) :- read_values(Stream, [], 0, Values).
+/*
+  Read and classify the next line with explicit accumulated state.
+  Inputs: The stream, reversed accepted values, count and final result variable.
+  Outputs: The final ordered list, or a fatal input-limit condition.
+  Used by: read_values/2 and recursive calls.
+*/
+read_values(Stream, Acc, Count, Values) :-
+    read_line_to_string(Stream, Line),
+    ( Line == end_of_file -&gt; reverse(Acc, Values)
+% Normalize user whitespace before classifying blank lines, comments and numeric tokens.
+    ; normalize_space(string(Text), Line),
+      ( Text == &quot;&quot; -&gt; reverse(Acc, Values)
+      ; sub_string(Text, 0, 1, _, &quot;#&quot;) -&gt; read_values(Stream, Acc, Count, Values)
+      ; (catch(number(Text, X), _, fail) -&gt;
+          (Count &lt; 4096 -&gt; Next is Count + 1, read_values(Stream, [X|Acc], Next, Values)
+          ; throw(error(resource_error(input_limit), _)))
+        ; format(user_error, &#x27;warning: invalid number; skipped~n&#x27;, []), read_values(Stream, Acc, Count, Values))
+      )
+    ).
+
+/*
+  Create a separate SWI-Prolog process for one numerical observation.
+  Inputs: A validated X and an output worker descriptor.
+  Outputs: A descriptor holding the child PID and output stream.
+  Used by: launch through setup_call_cleanup.
+*/
+start_worker(X, worker(Pid, Stream)) :-
+    script_path(Script), format(atom(Text), &#x27;~17g&#x27;, [X]),
+    current_prolog_flag(executable, Executable),
+    process_create(Executable, [&#x27;-q&#x27;, &#x27;-s&#x27;, Script, &#x27;--&#x27;, &#x27;--worker&#x27;, Text],
+                   [stdin(null), stdout(pipe(Stream)), process(Pid)]).
+/*
+  Close the output stream and reap any remaining child.
+  Inputs: A worker descriptor.
+  Outputs: Cleanup effects; already-cleaned resources are tolerated.
+  Used by: setup_call_cleanup on both success and exception paths.
+*/
+cleanup_worker(worker(Pid, Stream)) :-
+    catch(close(Stream), _, true),
+    catch(process_wait(Pid, _), _, true).
+/*
+  Receive a complete result and require successful child termination.
+  Inputs: A worker descriptor and row output variable.
+  Outputs: One CSV string, or a worker_failed exception.
+  Used by: launch after all children have been started.
+*/
+collect(worker(Pid, Stream), Row) :-
+    read_string(Stream, _, Row), process_wait(Pid, Status),
+    (Status == exit(0), Row \== &quot;&quot; -&gt; true ; throw(error(worker_failed(Status), _))).
+/*
+  Keep worker lifetimes scoped while launching and gathering a whole group.
+  Inputs: Remaining values, pending worker descriptors, and result rows.
+  Outputs: Rows in original order; cleanup is guaranteed around nested calls.
+  Used by: compute and recursive launch calls.
+*/
+launch([], Pending, Rows) :- reverse(Pending, Ordered), maplist(collect, Ordered, Rows).
+launch([X|Xs], Pending, Rows) :-
+    % Keep the child resource lifetime around the rest of this batch, including failures.
+    setup_call_cleanup(start_worker(X, Worker), launch(Xs, [Worker|Pending], Rows), cleanup_worker(Worker)).
+
+/*
+  Split a list into one bounded prefix and its remainder.
+  Inputs: A limit and remaining values; the last two arguments are outputs.
+  Outputs: A prefix list and the unconsumed suffix.
+  Used by: compute to implement bounded concurrency.
+*/
+take(0, Xs, [], Xs) :- !.
+take(_, [], [], []) :- !.
+take(N, [X|Xs], [X|Front], Rest) :- Next is N - 1, take(Next, Xs, Front, Rest).
+/*
+  Run consecutive groups of observations without changing their order.
+  Inputs: Remaining values, worker limit, and result-list variable.
+  Outputs: All CSV rows, or a propagated worker exception.
+  Used by: run after input is validated.
+*/
+compute([], _, []) :- !.
+compute(Values, Jobs, Rows) :-
+    take(Jobs, Values, Group, Rest), launch(Group, [], Batch),
+    compute(Rest, Jobs, Tail), append(Batch, Tail, Rows).
+
+/*
+  Relate positional CLI forms to their defaults.
+  Inputs: An argument list; source, target and jobs are outputs.
+  Outputs: One normalized option tuple, or failure for an unsupported form.
+  Used by: run before file I/O or worker creation.
+*/
+options([], &#x27;-&#x27;, &#x27;results.csv&#x27;, 2).
+options([Source], Source, &#x27;results.csv&#x27;, 2).
+options([Source,Target], Source, Target, 2).
+options([Source,Target,Text], Source, Target, Jobs) :- atom_number(Text, Jobs).
+
+/*
+  Select help, worker computation, or the parent workflow by pattern.
+  Inputs: The command-line argument list.
+  Outputs: CSV/console effects, or an exception for a fatal error.
+  Used by: main as the common invocation dispatcher.
+*/
+run([&#x27;--help&#x27;]) :- !,
+    writeln(&#x27;Usage: swipl -q -s bessel.pro -- [INPUT|- [OUTPUT [WORKERS 1..16]]]&#x27;).
+run([&#x27;--worker&#x27;, Text]) :- !,
+    atom_string(Text, String), number(String, X), j0(X, Y), current_prolog_flag(pid, Pid),
+    format(&#x27;~17g,~17g,~d~n&#x27;, [X, Y, Pid]).
+run(Args) :-
+    (options(Args, Source, Target, Jobs), integer(Jobs), between(1,16,Jobs) -&gt; true
+    ; throw(error(domain_error(arguments, Args), _))),
+    (Source == &#x27;-&#x27; -&gt;
+        format(user_error, &#x27;Enter one x per line; blank line or EOF finishes:~n&#x27;, []),
+        read_values(user_input, Values)
+    ; setup_call_cleanup(open(Source, read, Input), read_values(Input, Values), close(Input))),
+    (Values == [] -&gt; throw(error(domain_error(nonempty_input, Values), _)) ; true),
+    % Complete all numerical batches before opening the output file.
+    compute(Values, Jobs, Rows),
+    setup_call_cleanup(open(Target, write, Output),
+% Write rows in their already-preserved input sequence.
+        (format(Output, &#x27;x,j0,worker_pid~n&#x27;, []), forall(member(Row, Rows), format(Output, &#x27;~s&#x27;, [Row]))),
+        close(Output)),
+    length(Rows, Count), format(&#x27;Wrote ~d observations to ~w~n&#x27;, [Count, Target]).
+
+/*
+  Bridge Prolog success/failure semantics to a command-line exit status.
+  Inputs: The argv process flag.
+  Outputs: Success or a readable diagnostic followed by status 1.
+  Used by: The initialization directive when the file is launched.
+*/
+main :- current_prolog_flag(argv, Args),
+    catch((run(Args) -&gt; true ; throw(error(program_failed, _))),
+          Error, (format(user_error, &#x27;error: ~w~n&#x27;, [Error]), halt(1))).
+</textarea>
+<footer>Highlighted with Pygments using the Prolog lexer. All assets are local. SHA-256: <code>35785b95935a14a981c3fe2e2dc90eba7ff434884711c2498399e3b446b51060</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

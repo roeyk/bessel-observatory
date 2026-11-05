@@ -1,0 +1,362 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bessel Observatory — 30 languages</title>
+<style>
+:root{color-scheme:dark;--bg:#101519;--panel:#192126;--line:#344047;--ink:#e6eeec;--muted:#a6b5b6;--accent:#9ae4bf}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,sans-serif}
+main{max-width:1380px;margin:auto;padding:44px 5vw 72px}a{color:var(--accent);text-underline-offset:4px}
+nav{display:flex;flex-wrap:wrap;gap:24px;font-size:14px;border-bottom:1px solid var(--line);padding-bottom:18px}
+.eyebrow{color:var(--accent);font-size:12px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;margin-top:44px}
+h1{font-size:clamp(36px,6vw,72px);font-weight:600;letter-spacing:-.05em;line-height:1.06;margin:14px 0 24px}
+h2{font-size:28px;letter-spacing:-.02em;margin:50px 0 16px}h3{font-size:18px}p{max-width:840px}
+.intro{font-size:20px;color:var(--muted);max-width:800px}.stats{display:flex;gap:34px;flex-wrap:wrap;margin:28px 0}
+.stats b{font-size:26px;display:block}.stats span{font-size:13px;color:var(--muted)}
+.plot{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:22px;margin:28px 0}
+svg{display:block;width:100%;height:auto;max-height:260px}.plot label{display:block;font-size:14px}.plot input{width:min(560px,100%);accent-color:var(--accent)}
+.plot output{display:inline-block;margin-left:16px;font-family:monospace}.muted,small{color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}.card{padding:22px;background:var(--panel);border:1px solid var(--line);border-radius:8px}
+.card h3{margin-top:0}code,pre{font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace}
+pre{padding:14px;background:#0b1013;border:1px solid var(--line);border-radius:6px;overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere}
+.filter{width:100%;max-width:500px;background:var(--panel);border:1px solid var(--line);color:var(--ink);font:inherit;padding:10px 14px;border-radius:6px;margin:8px 0 22px}
+.table-wrap{overflow-x:auto}table{width:100%;border-collapse:collapse;text-align:left;min-width:850px}th,td{padding:18px 12px;vertical-align:top;border-bottom:1px solid var(--line)}
+thead th{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(--muted);background:var(--panel)}tbody th{width:16%;font-size:17px}td:nth-child(2){width:14%}td:nth-child(3){width:22%}td:nth-child(4){width:30%}td:nth-child(5){width:18%}
+small{display:block;font-size:12px;line-height:1.6;font-weight:400;margin-top:7px}.process{border-left:2px solid #55746a;padding-left:10px;margin-top:12px}
+.source{font-family:monospace;font-size:14px}summary{cursor:pointer;color:var(--muted);font-size:12px;margin-top:12px}.badge{display:inline-block;border:1px solid var(--line);border-radius:30px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px}
+.passed{background:#1b3e31;color:#a3ebc4}.untested{background:#3b3220;color:#e7c584}.failed{background:#4d2525;color:#ffbbbb}
+li{margin-bottom:8px}footer{margin-top:50px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}
+@media print{body{background:white;color:black}nav,.filter,.plot input{display:none}small{color:#555}a{color:#173f32}details{display:block}main{padding:0}.badge{background:white;color:black}}
+</style></head><body><main>
+<nav aria-label="Project navigation"><a href="#languages">Languages</a><a href="#contract">Shared behavior</a><a href="#method">Methodology</a><a href="#sql">SQL edition</a><a href="manifest.json">Manifest JSON</a><a href="tests/report.json">Test evidence</a></nav>
+<div class="eyebrow">A comparative programming experiment</div>
+<h1>Bessel Observatory<br><span style="color:var(--accent)">30 languages. One wave.</span></h1>
+<p class="intro">Read numbers. Launch worker processes. Compute an oscillating special function. Write a CSV. The same small experiment, expressed in the native style of each language.</p>
+<div class="stats"><div><b>30</b><span>independent implementations</span></div><div><b>16,384</b><span>quadrature samples per value</span></div><div><b>25 / 30</b><span>editions passed execution checks</span></div></div>
+<div class="plot"><svg id="wave" viewBox="0 0 1000 220" role="img" aria-labelledby="wave-title wave-desc">
+<title id="wave-title">Bessel function J₀ from zero to thirty</title><desc id="wave-desc">The function starts at one, crosses zero near 2.4, and oscillates with a decreasing amplitude.</desc>
+<path d="M40 135H975 M40 15V200" stroke="#546069" fill="none"/><path id="curve" stroke="#9ae4bf" stroke-width="2.5" fill="none"/>
+<text x="18" y="30" fill="#a6b5b6" font-size="12">1</text><text x="18" y="140" fill="#a6b5b6" font-size="12">0</text><text x="950" y="215" fill="#a6b5b6" font-size="12">x = 30</text>
+<circle id="dot" r="5" fill="#f2cf83"/></svg>
+<label for="x">Explore the curve (browser preview)</label><input id="x" type="range" min="0" max="30" step="0.05" value="5"><output id="value" for="x"></output>
+<small>The preview runs in the browser. The linked source programs perform the computation in separate OS processes.</small></div>
+<div class="grid"><div class="card"><h3>Start with Python</h3><pre>python3 bessel.py examples/values.txt results.csv 2
+python3 bessel.py - results.csv 4</pre><p>Run commands from this project directory. The second command prompts for one value per line. A blank line or EOF finishes.</p><a href="examples/values.txt">Sample values</a> · <a href="examples/mixed.txt">Invalid-input example</a></div>
+<div class="card"><h3>The mathematical contract</h3><p><strong>J₀(x) = (1/π) ∫₀ᵖⁱ cos(x sin θ) dθ</strong></p><p>Every implementation approximates this integral at 16,384 equally spaced midpoints. Inputs are restricted to −1000 ≤ x ≤ 1000.</p><p><a href="https://dlmf.nist.gov/10.9#E1">NIST’s Bessel integral</a> supplies the common definition. This is a numerical demonstration, not a certified special-function library.</p></div></div>
+<h2 id="languages">Explore the implementations</h2>
+<p class="muted">Open a syntax-highlighted HTML view or the adjacent raw source file, and expand its build instructions. “Untested” means execution has not been verified here; it does not mean a stub. Each edition contains its numerical kernel and process orchestration. Bash embeds an awk kernel; Oberon and Perligata disclose their small OS/syntax adapters. RPG uses native IBM i jobs.</p>
+<label for="filter">Filter by language, runtime, idiom, or process model</label><br><input id="filter" class="filter" type="search" placeholder="Try: pattern matching, POSIX, JVM…" autocomplete="off">
+<div class="table-wrap"><table><thead><tr><th>Language / dialect</th><th>Highlighted code</th><th>Raw source &amp; commands</th><th>Language character / processes</th><th>Validation</th></tr></thead><tbody><tr data-search="ada gnat / ada 2012 on posix lp64 strong types, range checks, generic float_io, exception handlers, explicit c imports. posix fork, pipe and waitpid">
+<th scope="row">Ada<small>GNAT / Ada 2012 on POSIX LP64</small></th>
+<td><a class="source" href="code/bessel.adb.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.adb">bessel.adb ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+gnatmake -gnat2012 -O2 -D build/ada bessel.adb -o build/bessel-ada
+build/bessel-ada examples/values.txt ada-results.csv 2</pre></details></td>
+<td>Strong types, range checks, generic Float_IO, exception handlers, explicit C imports.<small class="process">POSIX fork, pipe and waitpid</small><details><summary>Memory &amp; string features</summary><small>Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.</small><small>Trim, string slices, argument strings, image conversion and diagnostic concatenation.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="bash bash 4.3+ with awk and posix utilities arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec. background bash workers exec awk; bashpid remains the os pid performing the numerical calculation.">
+<th scope="row">Bash<small>Bash 4.3+ with awk and POSIX utilities</small></th>
+<td><a class="source" href="code/bessel.sh.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.sh">bessel.sh ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+bash bessel.sh examples/values.txt bash-results.csv 2</pre></details></td>
+<td>Arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec.<small class="process">Background Bash workers exec awk; BASHPID remains the OS PID performing the numerical calculation.</small><details><summary>Memory &amp; string features</summary><small>Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.</small><small>Whitespace parameter expansion, substring offsets, regex validation and printf.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="basic freebasic 1.10 on linux x86-64 structured basic, typed arrays, line input and explicit return-code checks. posix fork and binary pipes via c abi">
+<th scope="row">BASIC<small>FreeBASIC 1.10 on Linux x86-64</small></th>
+<td><a class="source" href="code/bessel.bas.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.bas">bessel.bas ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+sh tools/build_basic.sh
+build/bessel-basic examples/values.txt basic-results.csv 2</pre></details></td>
+<td>Structured BASIC, typed arrays, line input and explicit return-code checks.<small class="process">POSIX fork and binary pipes via C ABI</small><details><summary>Memory &amp; string features</summary><small>ByRef parameters, Double Ptr, dereference and cursor += 1 across a locally owned numeric array.</small><small>Trim, Left, StrPtr, C-string end-pointer validation and CSV concatenation.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="c c17 + posix structs, explicit ownership, checked return codes, complete pipe transfers. posix fork, pipe and waitpid">
+<th scope="row">C<small>C17 + POSIX</small></th>
+<td><a class="source" href="code/bessel.c.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.c">bessel.c ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+cc -std=c17 -O2 -Wall -Wextra bessel.c -lm -o build/bessel-c
+build/bessel-c examples/values.txt c-results.csv 2</pre></details></td>
+<td>Structs, explicit ownership, checked return codes, complete pipe transfers.<small class="process">POSIX fork, pipe and waitpid</small><details><summary>Memory &amp; string features</summary><small>Pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked IPC transfers.</small><small>strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted CSV.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="c++ c++20 + posix raii, unique_ptr, structured bindings, standard exceptions and std::numbers. raii-managed posix fork workers">
+<th scope="row">C++<small>C++20 + POSIX</small></th>
+<td><a class="source" href="code/bessel.cpp.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.cpp">bessel.cpp ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+c++ -std=c++20 -O2 -Wall -Wextra bessel.cpp -o build/bessel-cpp
+build/bessel-cpp examples/values.txt cpp-results.csv 2</pre></details></td>
+<td>RAII, unique_ptr, structured bindings, standard exceptions and std::numbers.<small class="process">RAII-managed POSIX fork workers</small><details><summary>Memory &amp; string features</summary><small>C++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references.</small><small>std::string searches, substring position validation, stoi/stod and stream formatting.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="cobol gnucobol 3.2 on linux x86-64 divisions, paragraphs, picture fields, evaluate, file status and on size error. cbl_gc_fork with posix pipes and waitpid">
+<th scope="row">COBOL<small>GnuCOBOL 3.2 on Linux x86-64</small></th>
+<td><a class="source" href="code/bessel.cob.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.cob">bessel.cob ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+cobc -A -std=gnu17 -x -free bessel.cob -o build/bessel-cobol
+build/bessel-cobol examples/values.txt cobol-results.csv 2</pre></details></td>
+<td>Divisions, paragraphs, PICTURE fields, EVALUATE, file status and ON SIZE ERROR.<small class="process">CBL_GC_FORK with POSIX pipes and waitpid</small><details><summary>Memory &amp; string features</summary><small>USAGE POINTER, ADDRESS OF, a LINKAGE reference, and SET pointer UP BY LENGTH OF current-sample.</small><small>FUNCTION TRIM, reference modification, TEST-NUMVAL-F, STRING and edited PICTURE output.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="erlang erlang/otp 25+ pattern matching, tail recursion, mailbox receive, ports and try/after. ports start separate escript os vms; not just beam processes">
+<th scope="row">Erlang<small>Erlang/OTP 25+</small></th>
+<td><a class="source" href="code/bessel.erl.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.erl">bessel.erl ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+escript bessel.erl examples/values.txt erlang-results.csv 2</pre></details></td>
+<td>Pattern matching, tail recursion, mailbox receive, ports and try/after.<small class="process">Ports start separate escript OS VMs; not just BEAM processes</small><details><summary>Memory &amp; string features</summary><small>Immutable values and opaque port handles. BEAM terms do not expose raw memory pointers or pointer arithmetic.</small><small>string:trim, string:to_float/to_integer, float_to_list and io:format.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="fortran fortran 2008 / gfortran on posix lp64 modules, numeric kinds, typed array pointers, ieee checks, iostat and iso_c_binding. posix fork and pipes through iso_c_binding">
+<th scope="row">Fortran<small>Fortran 2008 / gfortran on POSIX LP64</small></th>
+<td><a class="source" href="code/bessel.f90.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.f90">bessel.f90 ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+gfortran -std=f2008 -O2 -Jbuild/fortran bessel.f90 -o build/bessel-fortran
+build/bessel-fortran examples/values.txt fortran-results.csv 2</pre></details></td>
+<td>Modules, numeric kinds, typed array pointers, IEEE checks, IOSTAT and ISO_C_BINDING.<small class="process">POSIX fork and pipes through ISO_C_BINDING</small><details><summary>Memory &amp; string features</summary><small>C_LOC / C_F_POINTER produce typed array pointers; pointer sections shift the view using array descriptors. Raw address addition is not portable standard Fortran.</small><small>TRIM, ADJUSTL, VERIFY, character slices, concatenation, internal numeric READ and formatted WRITE.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="go go 1.22+ explicit errors, defer, small structs, interfaces and standard-library process apis. os/exec child executables; goroutines only support pipe i/o">
+<th scope="row">Go<small>Go 1.22+</small></th>
+<td><a class="source" href="code/bessel.go.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.go">bessel.go ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+go build -o build/bessel-go bessel.go
+build/bessel-go examples/values.txt go-results.csv 2</pre></details></td>
+<td>Explicit errors, defer, small structs, interfaces and standard-library process APIs.<small class="process">os/exec child executables; goroutines only support pipe I/O</small><details><summary>Memory &amp; string features</summary><small>A slice owns samples; unsafe.SliceData, unsafe.Add and typed dereference show byte arithmetic, with runtime.KeepAlive.</small><small>TrimSpace, HasPrefix, ParseFloat, FormatFloat, bytes.Buffer and formatted CSV.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="haskell ghc 9.x + process and unix packages pure sample generation, either, pattern matching, scoped foreign memory, explicit io and bracketed child lifetimes. system.process child executables">
+<th scope="row">Haskell<small>GHC 9.x + process and unix packages</small></th>
+<td><a class="source" href="code/bessel.hs.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.hs">bessel.hs ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+ghc -O2 -outputdir build/haskell bessel.hs -o build/bessel-haskell
+build/bessel-haskell examples/values.txt haskell-results.csv 2</pre></details></td>
+<td>Pure sample generation, Either, pattern matching, scoped foreign memory, explicit IO and bracketed child lifetimes.<small class="process">System.Process child executables</small><details><summary>Memory &amp; string features</summary><small>withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.</small><small>Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="java jdk 17+ records, streams, try-with-resources and processbuilder. separate jvm worker processes">
+<th scope="row">Java<small>JDK 17+</small></th>
+<td><a class="source" href="code/Bessel.java.html">View highlighted code →</a></td>
+<td><a class="source" href="Bessel.java">Bessel.java ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+javac -d build Bessel.java
+java -cp build Bessel examples/values.txt java-results.csv 2</pre></details></td>
+<td>Records, streams, try-with-resources and ProcessBuilder.<small class="process">Separate JVM worker processes</small><details><summary>Memory &amp; string features</summary><small>Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.</small><small>strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="javascript node.js 20+ es modules, async iteration, promises, promise.all, try/finally. child_process.fork with ipc messages, not worker threads">
+<th scope="row">JavaScript<small>Node.js 20+</small></th>
+<td><a class="source" href="code/bessel.mjs.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.mjs">bessel.mjs ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+node bessel.mjs examples/values.txt javascript-results.csv 2</pre></details></td>
+<td>ES modules, async iteration, promises, Promise.all, try/finally.<small class="process">child_process.fork with IPC messages, not worker threads</small><details><summary>Memory &amp; string features</summary><small>ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.</small><small>trim, startsWith, regex validation, template strings and array joining.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="julia julia 1.10+ / distributed standard library multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap. distributed.addprocs / pmap on os workers">
+<th scope="row">Julia<small>Julia 1.10+ / Distributed standard library</small></th>
+<td><a class="source" href="code/bessel.jl.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.jl">bessel.jl ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+julia --startup-file=no bessel.jl examples/values.txt julia-results.csv 2</pre></details></td>
+<td>Multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap.<small class="process">Distributed.addprocs / pmap on OS workers</small><details><summary>Memory &amp; string features</summary><small>Ptr byte arithmetic and unsafe_load within GC.@preserve; the owning Float64 array stays alive and unmodified.</small><small>strip, startswith, parse, interpolation and Printf output.</small></details></td>
+<td><span class="badge untested" title="Tool or executable unavailable: julia">untested</span>
+<small>Tool or executable unavailable: julia</small></td></tr>
+<tr data-search="kotlin kotlin 1.9+ + jvm 17 data classes, when, collection pipelines, use, require and finally. processbuilder starts separate jvms">
+<th scope="row">Kotlin<small>Kotlin 1.9+ + JVM 17</small></th>
+<td><a class="source" href="code/Bessel.kt.html">View highlighted code →</a></td>
+<td><a class="source" href="Bessel.kt">Bessel.kt ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+kotlinc Bessel.kt -include-runtime -d build/bessel-kotlin.jar
+java -jar build/bessel-kotlin.jar examples/values.txt kotlin-results.csv 2</pre></details></td>
+<td>Data classes, when, collection pipelines, use, require and finally.<small class="process">ProcessBuilder starts separate JVMs</small><details><summary>Memory &amp; string features</summary><small>JVM object references and ByteBuffer getDouble at checked byte offsets; raw pointers are not available on this target.</small><small>trim, startsWith, conversions, string interpolation and Locale.ROOT formatting.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="lingua::romana::perligata posix perl + cpan lingua::romana::perligata 0.605 latin declensions, roman numerals, sic/cis blocks, adnota comments and ecce documentation; explicit small perl compatibility prelude. latin scheduling loop uses a perl fork bridge, bounded pid batches and private per-observation files.">
+<th scope="row">Lingua::Romana::Perligata<small>POSIX Perl + CPAN Lingua::Romana::Perligata 0.605</small></th>
+<td><a class="source" href="code/bessel-perligata.pl.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel-perligata.pl">bessel-perligata.pl ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+perl bessel-perligata.pl examples/values.txt perligata-results.csv 2</pre></details></td>
+<td>Latin declensions, Roman numerals, sic/cis blocks, adnota comments and ecce documentation; explicit small Perl compatibility prelude.<small class="process">Latin scheduling loop uses a Perl fork bridge, bounded PID batches and private per-observation files.</small><details><summary>Memory &amp; string features</summary><small>Latin ad creates a scalar reference for in-place trim; Perl references preserve owners. No raw pointer arithmetic.</small><small>Latin excerpementum (substr), serementum (concatenation), chr punctuation, and a regex-based Perl validation bridge.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="lisp common lisp / sbcl 2.x conditions, a skip-value restart, loop, with-open-file and unwind-protect. sbcl run-program with asynchronous os processes">
+<th scope="row">Lisp<small>Common Lisp / SBCL 2.x</small></th>
+<td><a class="source" href="code/bessel.lisp.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.lisp">bessel.lisp ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+sbcl --script bessel.lisp examples/values.txt lisp-results.csv 2</pre></details></td>
+<td>Conditions, a skip-value restart, LOOP, WITH-OPEN-FILE and UNWIND-PROTECT.<small class="process">SBCL run-program with asynchronous OS processes</small><details><summary>Memory &amp; string features</summary><small>SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.</small><small>STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="lua lua 5.4 + luaposix tables, closures, protected calls, to-be-closed local, small explicit modules. luaposix fork, pipes and wait">
+<th scope="row">Lua<small>Lua 5.4 + luaposix</small></th>
+<td><a class="source" href="code/bessel.lua.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.lua">bessel.lua ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+lua bessel.lua examples/values.txt lua-results.csv 2</pre></details></td>
+<td>Tables, closures, protected calls, to-be-closed local, small explicit modules.<small class="process">luaposix fork, pipes and wait</small><details><summary>Memory &amp; string features</summary><small>Tables are passed by reference and process pipes are handles. Standard Lua 5.4 has no raw-pointer arithmetic; no LuaJIT FFI is assumed.</small><small>Lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct CSV.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="oberon-2 oxford oberon-2 obc 3 + posix c toolchain modules, typed record pointers, var parameters, explicit error checks, longreal quadrature. bounded fork/pipe batches through the supplied checked posix adapter.">
+<th scope="row">Oberon-2<small>Oxford Oberon-2 OBC 3 + POSIX C toolchain</small></th>
+<td><a class="source" href="code/Bessel.Mod.html">View highlighted code →</a></td>
+<td><a class="source" href="Bessel.Mod">Bessel.Mod ↗</a><small><a href="bessel-oberon-posix.c">bessel-oberon-posix.c</a> · <a href="code/bessel-oberon-posix.c.html">highlighted</a></small><small><a href="tools/build_oberon.sh">tools/build_oberon.sh</a> · <a href="code/tools_build_oberon.sh.html">highlighted</a></small>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+sh tools/build_oberon.sh
+build/bessel-oberon examples/values.txt oberon-results.csv 2</pre></details></td>
+<td>Modules, typed record pointers, VAR parameters, explicit error checks, LONGREAL quadrature.<small class="process">Bounded fork/pipe batches through the supplied checked POSIX adapter.</small><details><summary>Memory &amp; string features</summary><small>Typed pointer owns a sample record; SYSTEM.ADR/GET and byte offsets traverse it without intervening allocations.</small><small>VAR-based in-place whitespace trimming, CHAR scanning, NUL-terminated CLI strings, checked numeric conversion.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="objective-c foundation: macos or gnustep objective-c class messages, foundation collections, nstask, nserror and @try/@finally. nstask child executables">
+<th scope="row">Objective-C<small>Foundation: macOS or GNUstep</small></th>
+<td><a class="source" href="code/bessel.m.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.m">bessel.m ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+# macOS:
+clang -fobjc-exceptions bessel.m -framework Foundation -o build/bessel-objc
+# GNUstep (GNUstep development headers and Objective-C runtime required):
+clang $(gnustep-config --objc-flags) bessel.m -o build/bessel-objc $(gnustep-config --base-libs)
+build/bessel-objc examples/values.txt objc-results.csv 2</pre></details></td>
+<td>Objective-C class messages, Foundation collections, NSTask, NSError and @try/@finally.<small class="process">NSTask child executables</small><details><summary>Memory &amp; string features</summary><small>Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.</small><small>NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="ocaml ocaml 4.14+ + unix algebraic variants, pattern matching, recursive list processing, fun.protect. unix.fork and pipes">
+<th scope="row">OCaml<small>OCaml 4.14+ + Unix</small></th>
+<td><a class="source" href="code/bessel.ml.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.ml">bessel.ml ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+ocamlopt -I +unix unix.cmxa bessel.ml -o build/bessel-ocaml
+build/bessel-ocaml examples/values.txt ocaml-results.csv 2</pre></details></td>
+<td>Algebraic variants, pattern matching, recursive list processing, Fun.protect.<small class="process">Unix.fork and pipes</small><details><summary>Memory &amp; string features</summary><small>ref cells, shared values and mutable array/channel handles. Portable OCaml does not expose raw address arithmetic.</small><small>String.trim, prefix indexing, float_of_string, concatenation and Printf.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="pascal free pascal 3.2+ procedures, dynamic arrays, try/except and try/finally, tprocess ownership. tprocess child executables in bounded batches">
+<th scope="row">Pascal<small>Free Pascal 3.2+</small></th>
+<td><a class="source" href="code/bessel.pas.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.pas">bessel.pas ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+fpc -O2 -FUbuild/pascal -obuild/bessel-pascal bessel.pas
+build/bessel-pascal examples/values.txt pascal-results.csv 2</pre></details></td>
+<td>Procedures, dynamic arrays, try/except and try/finally, TProcess ownership.<small class="process">TProcess child executables in bounded batches</small><details><summary>Memory &amp; string features</summary><small>PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.</small><small>Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="perl perl 5.20+ / posix lexical filehandles, regexes, eval/die, list processing and posix module. fork with pipe handles">
+<th scope="row">Perl<small>Perl 5.20+ / POSIX</small></th>
+<td><a class="source" href="code/bessel.pl.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.pl">bessel.pl ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+perl bessel.pl examples/values.txt perl-results.csv 2</pre></details></td>
+<td>Lexical filehandles, regexes, eval/die, list processing and POSIX module.<small class="process">fork with pipe handles</small><details><summary>Memory &amp; string features</summary><small>Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.</small><small>Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="prolog swi-prolog 9.x relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3. library(process) creates separate swi-prolog os workers">
+<th scope="row">Prolog<small>SWI-Prolog 9.x</small></th>
+<td><a class="source" href="code/bessel.pro.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.pro">bessel.pro ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+swipl -q -s bessel.pro -- examples/values.txt prolog-results.csv 2</pre></details></td>
+<td>Relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3.<small class="process">library(process) creates separate SWI-Prolog OS workers</small><details><summary>Memory &amp; string features</summary><small>Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.</small><small>normalize_space, sub_string, number_string, atom/string conversion and format.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="python python 3.10+ structural match/case, type hints, generators, context managers, argparse, fsum. a small ctypes example demonstrates pointer offsets. processpoolexecutor with spawn context">
+<th scope="row">Python<small>Python 3.10+</small></th>
+<td><a class="source" href="code/bessel.py.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.py">bessel.py ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+python3 bessel.py examples/values.txt python-results.csv 2</pre></details></td>
+<td>Structural match/case, type hints, generators, context managers, argparse, fsum. A small ctypes example demonstrates pointer offsets.<small class="process">ProcessPoolExecutor with spawn context</small><details><summary>Memory &amp; string features</summary><small>ctypes array ownership, byref(array, byte_offset), POINTER(c_double) casts and contents dereference. math.fsum remains the reducer.</small><small>strip, startswith, float parsing, f-strings and csv.writer serialization.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="rpg ibm i 7.5, ile rpg + db2 sql + qc2le; see rpg_setup.txt fully free rpg, monitor/on-error, prototyped calls, embedded sql, native job messages. sbmjob creates bounded ibm i batch jobs; dedicated queue must permit concurrent execution.">
+<th scope="row">RPG<small>IBM i 7.5, ILE RPG + Db2 SQL + QC2LE; see rpg_setup.txt</small></th>
+<td><a class="source" href="code/bessel.sqlrpgle.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.sqlrpgle">bessel.sqlrpgle ↗</a><small><a href="rpg_setup.txt">rpg_setup.txt</a></small><small><a href="rpg_setup.sql">rpg_setup.sql</a> · <a href="code/rpg_setup.sql.html">highlighted</a></small>
+<details><summary>Build &amp; run</summary><pre>See rpg_setup.txt for compilation and queue setup.
+CALL PGM(BESSELAB/BESSEL) PARM(&#x27;/tmp/values.txt&#x27; &#x27;/tmp/results.csv&#x27; &#x27;2&#x27;)</pre></details></td>
+<td>Fully free RPG, MONITOR/ON-ERROR, prototyped calls, embedded SQL, native job messages.<small class="process">SBMJOB creates bounded IBM i batch jobs; dedicated queue must permit concurrent execution.</small><details><summary>Memory &amp; string features</summary><small>POINTER, %ADDR, BASED aliases, by-reference parameters, and byte-wise pointer advancement by %SIZE.</small><small>%TRIM, %CHECK, %SUBST, %SCANRPL, %CHAR, concatenation and CCSID-aware IFS services.</small></details></td>
+<td><span class="badge untested" title="Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.">untested</span>
+<small>Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.</small></td></tr>
+<tr data-search="ruby ruby 3.x / posix blocks, enumerable sum and each_slice, rescue/ensure, csv library. fork with io.pipe">
+<th scope="row">Ruby<small>Ruby 3.x / POSIX</small></th>
+<td><a class="source" href="code/bessel.rb.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.rb">bessel.rb ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+ruby bessel.rb examples/values.txt ruby-results.csv 2</pre></details></td>
+<td>Blocks, Enumerable sum and each_slice, rescue/ensure, CSV library.<small class="process">fork with IO.pipe</small><details><summary>Memory &amp; string features</summary><small>Object references plus Fiddle::Pointer over a retained packed string; pointer + byte offset and native-double reads.</small><small>strip, start_with?, pack/unpack, interpolation, numeric conversion and CSV serialization.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="rust rust 2021 / standard library result and ?, exhaustive match, iterators, ownership and drop cleanup. std::process::command child executables">
+<th scope="row">Rust<small>Rust 2021 / standard library</small></th>
+<td><a class="source" href="code/bessel.rs.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.rs">bessel.rs ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+rustc --edition=2021 -O bessel.rs -o build/bessel-rust
+build/bessel-rust examples/values.txt rust-results.csv 2</pre></details></td>
+<td>Result and ?, exhaustive match, iterators, ownership and Drop cleanup.<small class="process">std::process::Command child executables</small><details><summary>Memory &amp; string features</summary><small>Borrowed &amp;[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.</small><small>trim, starts_with, parse, String accumulation and UTF-8 validation.</small></details></td>
+<td><span class="badge passed" title="11 behavior checks passed.">passed</span>
+<small>11 behavior checks passed.</small></td></tr>
+<tr data-search="smalltalk gnu smalltalk 3.2+ / posix message sends, blocks, inject:into:, orderedcollection, on:do: and ensure:. external gnu smalltalk vms via filestream popen:">
+<th scope="row">Smalltalk<small>GNU Smalltalk 3.2+ / POSIX</small></th>
+<td><a class="source" href="code/bessel.st.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.st">bessel.st ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+gst -f bessel.st examples/values.txt smalltalk-results.csv 2</pre></details></td>
+<td>Message sends, blocks, inject:into:, OrderedCollection, on:do: and ensure:.<small class="process">External GNU Smalltalk VMs via FileStream popen:</small><details><summary>Memory &amp; string features</summary><small>Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.</small><small>trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.</small></details></td>
+<td><span class="badge untested" title="Tool or executable unavailable: gst">untested</span>
+<small>Tool or executable unavailable: gst</small></td></tr>
+<tr data-search="sql postgresql 14+ + psql + dblink set-based numeric aggregation, temporary relations, pl/pgsql exceptions, psql variables. dblink_send_query dispatches to separate postgresql backend os processes">
+<th scope="row">SQL<small>PostgreSQL 14+ + psql + dblink</small></th>
+<td><a class="source" href="code/bessel.sql.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.sql">bessel.sql ↗</a>
+<details><summary>Build &amp; run</summary><pre>psql -X -d observatory -v values=&#x27;0,1,5,10&#x27; -v workers=2 -v output=results.csv -f bessel.sql</pre></details></td>
+<td>Set-based numeric aggregation, temporary relations, PL/pgSQL exceptions, psql variables.<small class="process">dblink_send_query dispatches to separate PostgreSQL backend OS processes</small><details><summary>Memory &amp; string features</summary><small>Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.</small><small>btrim, regexp validation, replace, string_to_array, format and array operations.</small></details></td>
+<td><span class="badge untested" title="A local PostgreSQL 18 cluster was initialized, but the sandbox denies creating the server socket. No SQL integration execution is claimed.">untested</span>
+<small>A local PostgreSQL 18 cluster was initialized, but the sandbox denies creating the server socket. No SQL integration execution is claimed.</small></td></tr>
+<tr data-search="swift swift 5.9+ / foundation value types, typed error enum, guard, defer and foundation process. foundation process child executables">
+<th scope="row">Swift<small>Swift 5.9+ / Foundation</small></th>
+<td><a class="source" href="code/bessel.swift.html">View highlighted code →</a></td>
+<td><a class="source" href="bessel.swift">bessel.swift ↗</a>
+<details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
+swiftc bessel.swift -o build/bessel-swift
+build/bessel-swift examples/values.txt swift-results.csv 2</pre></details></td>
+<td>Value types, typed error enum, guard, defer and Foundation Process.<small class="process">Foundation Process child executables</small><details><summary>Memory &amp; string features</summary><small>Foundation class references plus withUnsafeBufferPointer, advanced(by:) and pointee inside the buffer lifetime.</small><small>Trimming, hasPrefix, UTF-8 conversion, splitting lines and interpolation.</small></details></td>
+<td><span class="badge untested" title="Tool or executable unavailable: swiftc">untested</span>
+<small>Tool or executable unavailable: swiftc</small></td></tr></tbody></table></div>
+<p id="empty" hidden>No languages match this filter.</p>
+<h2 id="contract">Shared behavior</h2><div class="grid"><div class="card"><h3>Inputs &amp; arguments</h3><pre>PROGRAM [INPUT|- [OUTPUT [WORKERS]]]</pre><p>Defaults: standard input, <code>results.csv</code>, two workers. Workers must be an integer from 1 to 16. Files and interactive input accept one decimal real per line, ignore <code>#</code> comment lines, and end at the first blank line or EOF. At most 4,096 valid values are accepted.</p><p>Native numeric parsers may accept additional literal forms. Decimal and scientific <code>e</code> notation are the common interchange format.</p></div>
+<div class="card"><h3>Outputs &amp; failures</h3><pre>x,j0,worker_pid
+0,1,12345
+1,0.7651976865579666,12346</pre><p>Rows preserve input order; the PID identifies the numerical worker. Invalid value lines are reported and skipped. Invalid arguments, empty input, I/O failures, and worker failures produce diagnostics and a nonzero exit. Output replaces the specified file after calculations complete.</p><p>Process IDs, decimal formatting, and final rounding vary by implementation. PIDs above are illustrative.</p></div></div>
+<h2 id="method">Goals &amp; methodology</h2><p>The aim is to compare how languages express the same work: ownership in Rust, relations in Prolog, conditions and restarts in Lisp, records and streams in Java, file statuses in COBOL, and structural matching in Python. The <a href="manifest.json">manifest</a> records the full project description, goals, methodology, dependencies and constraints.</p><ol><li>Specify a shared input/output and failure contract before writing implementations.</li><li>Use midpoint quadrature of the same integral with 16384 samples in every version.</li><li>Choose native idioms and standard libraries; use a named dialect or OS extension when a language lacks process APIs.</li><li>Use bounded process batches, or native process pools, preserving input order.</li><li>Validate numerical answers against independent high-precision reference values, not just against another translation.</li><li>Check invalid input, stdin, worker limits, file failures, empty input and argument misuse. Record unavailable toolchains as untested.</li><li>Document SQL input/argument adaptations, process startup overhead, and floating-point differences.</li><li>Keep unsafe memory demonstrations isolated; preserve allocation lifetime and bounds, then rerun the behavioral checks. Display an explicit memory/string feature map for every language.</li><li>Use functional comments and purpose/input/output/caller contracts; use native block comments where available, # comments for Python, and ERA blocks for Perligata.</li></ol>
+<h3>Reproduce the checks</h3><pre>python3 tests/verify.py
+python3 tests/verify.py --only python,c,rust
+python3 tools/render_sources.py  # requires Pygments to regenerate pages
+python3 tools/render_index.py</pre><p>The runner builds available editions and checks reference values, CSV ordering, subprocess IDs, a single-worker run, malformed lines, stdin, argument errors, file failures, empty input and the input-size bound. Missing toolchains are recorded as untested. Reference values were generated with <code>mpmath.besselj</code> at 80 decimal digits; the absolute comparison tolerance is 10⁻¹⁰. See <a href="tests/reference.json">reference data</a> and <a href="tests/report.json">recorded results</a>.</p>
+<h2 id="sql">SQL: a database-native edition</h2><p><code>bessel.sql</code> targets PostgreSQL with PL/pgSQL and <code>dblink</code>. Run it in a dedicated database. The script creates the extension if absent and temporary tables for the session. Each worker connection has a separate backend OS process; its numerical kernel is an aggregate over <code>generate_series</code>.</p>
+<pre>psql -X -d observatory -v values='0,1,5,10' -v workers=2 -v output=results.csv -f bessel.sql
+# Interactive comma-separated input:
+psql -X -d observatory -f bessel.sql
+# Server-side file input:
+psql -X -d observatory -v input=/absolute/server/path/values.txt -f bessel.sql</pre>
+<p>Connections must authenticate to the same database. An optional <code>-v conn='service=observatory'</code> selects a libpq service. File input uses <code>pg_read_file</code> on the database server and requires the corresponding permissions; CSV output is local to <code>psql</code>. Do not use <code>--single-transaction</code>, because worker connections must see the committed extension. PostgreSQL failures are reported by <code>psql</code> with <code>ON_ERROR_STOP</code>.</p>
+<h2>Additional dialects</h2><p><a href="rpg_setup.txt">RPG setup and its IBM i interface</a> explains CALL parameters, IFS paths, queue concurrency and job-message errors. Oberon-2 uses Oxford OBC with the supplied C OS adapter. Install Perligata with <code>cpanm Lingua::Romana::Perligata</code>; its source marks the small Perl bridge explicitly. Bash uses the embedded awk loop for floating-point arithmetic.</p><h3>Comments</h3><p>Function contracts describe purpose, inputs, outputs and callers. Comments explain functional effects. Native block comments are used where available; Python uses #, RPG uses //, and Perligata uses ecce documentation blocks and adnota.</p><h3>Pointers, references, and strings</h3><p>The source files include explicit pointer arithmetic where the target supports it. Each unsafe example documents its bounds and allocation lifetime. Managed languages use checked buffer offsets or object references; SQL, Erlang, and Prolog expose different models. Expand “Memory &amp; string features” in the table or open a highlighted source page to see the precise mapping. String manipulation includes whitespace normalization, prefix and token checks, numeric conversion, and CSV construction.</p><h3>Comparison limits</h3><ul><li>This is a language study, not a process-startup benchmark: some versions reuse workers, others launch one child per value.</li><li>Runtime startup often costs more than the calculation; large JVM/BEAM runs are intentionally not optimized for throughput.</li><li>Error cleanup covers ordinary I/O and worker failures; signal handling is runtime-dependent. The examples do not promise transactional output under disk-full failures or process termination.</li><li>GNU Smalltalk must be launched from the project directory because its workers use the relative bessel.st path.</li><li>SQL requires a running PostgreSQL server; it cannot be executed as a standalone portable SQL file in SQLite/MySQL.</li><li>Use the supplied BASIC build helper: FreeBASIC generates a C intermediate, so compiling the same basename in the source directory can collide with the C edition.</li><li>Bash orchestrates the embedded awk numerical kernel because Bash arithmetic is integer-only.</li><li>Oberon-2 uses the supplied C adapter for checked OS and stdio interfaces; its quadrature and raw-address traversal are Oberon.</li><li>Perligata uses an explicitly marked Perl prelude for regex validation, lexical filehandles, and checked process services; the Latin portion owns quadrature and scheduling.</li><li>RPG requires IBM i setup described in rpg_setup.txt; failed or timed-out runs retain work rows, and submitted jobs may finish after parent failure.</li><li>Raw pointer arithmetic is unavailable in several listed languages; their native reference/offset models are documented instead.</li></ul>
+<footer>Built as a local source catalogue. No CDN, web server, or network connection is needed to browse this page.<br>Primary references: <a href="https://dlmf.nist.gov/10.9#E1">NIST DLMF — Bessel integral</a> · <a href="https://www.freepascal.org/docs-html/fcl/process/tprocess.html">Free Pascal TProcess</a> · <a href="https://gnucobol.sourceforge.io/doc/gnucobol.html">GnuCOBOL system routines</a> · <a href="https://www.gnu.org/software/smalltalk/manual-base/gst-base.html">GNU Smalltalk library</a> · <a href="https://luaposix.github.io/luaposix/">luaposix</a> · <a href="https://www.erlang.org/doc/apps/erts/erlang.html">Erlang ports</a> · <a href="https://www.sbcl.org/manual/">SBCL manual</a> · <a href="https://www.postgresql.org/docs/current/dblink.html">PostgreSQL dblink</a> · <a href="https://www.postgresql.org/docs/18/app-psql.html">PostgreSQL psql</a> · <a href="https://docs.julialang.org/en/v1.11/base/base/#Base.GC.@preserve">Julia GC.@preserve</a> · <a href="https://gnucobol.sourceforge.io/faq/">GnuCOBOL pointer arithmetic</a> · <a href="https://github.com/Spivoxity/obc-3">Oxford Oberon-2 compiler and library sources</a> · <a href="https://metacpan.org/pod/Lingua::Romana::Perligata">Perligata grammar and CPAN distribution</a> · <a href="https://www.gnu.org/software/bash/manual/bash.html">GNU Bash manual</a> · <a href="https://www.ibm.com/docs/en/i/7.5.0?topic=is-ifs-write-ifs-write-binary-ifs-write-utf8-procedures">IBM i IFS UTF-8 file services</a> · <a href="https://www.ibm.com/docs/en/i/7.4.0?topic=rpg-ile-reference">IBM ILE RPG reference</a></footer>
+</main><script>
+const search=document.querySelector('#filter'), rows=[...document.querySelectorAll('tbody tr')];
+search.addEventListener('input',()=>{const q=search.value.trim().toLowerCase();let n=0;for(const row of rows){row.hidden=!row.dataset.search.includes(q);if(!row.hidden)n++;}document.querySelector('#empty').hidden=n!==0;});
+function j0(x){let sum=0;const n=2048;for(let k=0;k<n;k++)sum+=Math.cos(x*Math.sin(Math.PI*(k+.5)/n));return sum/n;}
+const px=x=>40+x/30*935, py=y=>135-y*110;
+document.querySelector('#curve').setAttribute('d',Array.from({length:601},(_,i)=>`${i?'L':'M'}${px(i/20).toFixed(2)} ${py(j0(i/20)).toFixed(2)}`).join(' '));
+const slider=document.querySelector('#x');function update(){const x=Number(slider.value),y=j0(x);document.querySelector('#dot').setAttribute('cx',px(x));document.querySelector('#dot').setAttribute('cy',py(y));document.querySelector('#value').textContent=`x = ${x.toFixed(2)}   J₀(x) ≈ ${y.toFixed(8)}`;}slider.addEventListener('input',update);update();
+</script></body></html>

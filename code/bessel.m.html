@@ -1,0 +1,456 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="9293e1453d85afe9abea39a012b4a1a2b65125f8a963d41fbcc24b12c1917ac4">
+<title>Objective-C — bessel.m — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.c.html">← C</a><a href="bessel.st.html">Smalltalk →</a></nav>
+<h1>Objective-C <code>bessel.m</code></h1>
+<p>Foundation: macOS or GNUstep · Objective-C class messages, Foundation collections, NSTask, NSError and @try/@finally.</p>
+<p><strong>Memory:</strong> Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.<br><strong>Strings:</strong> NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.</p>
+<div class="actions"><a href="../bessel.m">Open raw source</a>
+<a href="../bessel.m" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent owns file I/O and result ordering; children perform the numerical work.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  Objective-C with Foundation (macOS or GNUstep), manual retain/release compatible.</span>
+<a id="L-6" name="L-6"></a><span class="cm">*/</span>
+<a id="L-7" name="L-7"></a><span class="cp">#import &lt;Foundation/Foundation.h&gt;</span>
+<a id="L-8" name="L-8"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
+<a id="L-9" name="L-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<a id="L-10" name="L-10"></a>
+<a id="L-11" name="L-11"></a><span class="cm">/*</span>
+<a id="L-12" name="L-12"></a><span class="cm">  Represent an ordinary application failure as a readable Objective-C exception.</span>
+<a id="L-13" name="L-13"></a><span class="cm">  Inputs: A message string.</span>
+<a id="L-14" name="L-14"></a><span class="cm">  Outputs: No normal return; an ObservatoryError is thrown.</span>
+<a id="L-15" name="L-15"></a><span class="cm">  Used by: Validation, process and output checks inside Observatory methods.</span>
+<a id="L-16" name="L-16"></a><span class="cm">*/</span>
+<a id="L-17" name="L-17"></a><span class="k">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">Fail</span><span class="p">(</span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">message</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-18" name="L-18"></a><span class="w">    </span><span class="k">@throw</span><span class="w"> </span><span class="p">[</span><span class="bp">NSException</span><span class="w"> </span><span class="n">exceptionWithName</span><span class="o">:</span><span class="s">@&quot;ObservatoryError&quot;</span><span class="w"> </span><span class="n">reason</span><span class="o">:</span><span class="n">message</span><span class="w"> </span><span class="n">userInfo</span><span class="o">:</span><span class="nb">nil</span><span class="p">];</span>
+<a id="L-19" name="L-19"></a><span class="p">}</span>
+<a id="L-20" name="L-20"></a><span class="cm">/*</span>
+<a id="L-21" name="L-21"></a><span class="cm">  Parse one complete numeric token with a fixed decimal separator.</span>
+<a id="L-22" name="L-22"></a><span class="cm">  Inputs: An NSString from input or a worker argument.</span>
+<a id="L-23" name="L-23"></a><span class="cm">  Outputs: A finite bounded double, or an ObservatoryError.</span>
+<a id="L-24" name="L-24"></a><span class="cm">  Used by: run: when accepting input and entering worker mode.</span>
+<a id="L-25" name="L-25"></a><span class="cm">*/</span>
+<a id="L-26" name="L-26"></a><span class="k">static</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">Number</span><span class="p">(</span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-27" name="L-27"></a><span class="w">    </span><span class="c1">// Use Foundation parsing while checking that no unconsumed token suffix remains.</span>
+<a id="L-28" name="L-28"></a><span class="w">    </span><span class="bp">NSScanner</span><span class="w"> </span><span class="o">*</span><span class="n">scanner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="bp">NSScanner</span><span class="w"> </span><span class="n">scannerWithString</span><span class="o">:</span><span class="n">text</span><span class="p">];</span>
+<a id="L-29" name="L-29"></a><span class="w">    </span><span class="p">[</span><span class="n">scanner</span><span class="w"> </span><span class="n">setLocale</span><span class="o">:</span><span class="l">@{</span><span class="n">NSDecimalSeparator</span><span class="o">:</span><span class="w"> </span><span class="s">@&quot;.&quot;</span><span class="l">}</span><span class="p">];</span>
+<a id="L-30" name="L-30"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="L-31" name="L-31"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">scanner</span><span class="w"> </span><span class="n">scanDouble</span><span class="o">:&amp;</span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="p">[</span><span class="n">scanner</span><span class="w"> </span><span class="n">isAtEnd</span><span class="p">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="n">isfinite</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">fabs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span>
+<a id="L-32" name="L-32"></a><span class="w">        </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;expected finite x in [-1000,1000]&quot;</span><span class="p">);</span>
+<a id="L-33" name="L-33"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="L-34" name="L-34"></a><span class="p">}</span>
+<a id="L-35" name="L-35"></a><span class="c1">// Expose one operation for a worker result and one for the overall command-line workflow.</span>
+<a id="L-36" name="L-36"></a><span class="k">@interface</span> <span class="nc">Observatory</span> : <span class="bp">NSObject</span>
+<a id="L-37" name="L-37"></a><span class="p">+</span> <span class="p">(</span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="nf">observe:</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="nv">x</span><span class="p">;</span>
+<a id="L-38" name="L-38"></a><span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">run:</span><span class="p">(</span><span class="bp">NSArray</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="nv">args</span><span class="p">;</span>
+<a id="L-39" name="L-39"></a><span class="k">@end</span>
+<a id="L-40" name="L-40"></a><span class="k">@implementation</span> <span class="nc">Observatory</span>
+<a id="L-41" name="L-41"></a><span class="cm">/*</span>
+<a id="L-42" name="L-42"></a><span class="cm">  Compute and serialize one observation in the current process.</span>
+<a id="L-43" name="L-43"></a><span class="cm">  Inputs: One validated double x.</span>
+<a id="L-44" name="L-44"></a><span class="cm">  Outputs: An autoreleased NSString containing x, J0 and the worker OS PID.</span>
+<a id="L-45" name="L-45"></a><span class="cm">  Used by: run: when the executable is launched with --worker.</span>
+<a id="L-46" name="L-46"></a><span class="cm">*/</span>
+<a id="L-47" name="L-47"></a><span class="p">+</span> <span class="p">(</span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="nf">observe:</span><span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="nv">x</span><span class="w"> </span><span class="p">{</span>
+<a id="L-48" name="L-48"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="n">samples</span><span class="p">[</span><span class="mi">16384</span><span class="p">];</span>
+<a id="L-49" name="L-49"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">16384</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">k</span><span class="p">)</span><span class="w"> </span><span class="n">samples</span><span class="p">[</span><span class="n">k</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cos</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="p">(</span><span class="n">acos</span><span class="p">(</span><span class="mi">-1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">));</span>
+<a id="L-50" name="L-50"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-51" name="L-51"></a><span class="cm">      C pointers coexist with Objective-C object references. end is a legal</span>
+<a id="L-52" name="L-52"></a><span class="cm">      one-past-the-array pointer and is never dereferenced.</span>
+<a id="L-53" name="L-53"></a><span class="cm">    */</span>
+<a id="L-54" name="L-54"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">cursor</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">samples</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">end</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">16384</span><span class="p">;</span><span class="w"> </span><span class="n">cursor</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">end</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">cursor</span><span class="p">)</span>
+<a id="L-55" name="L-55"></a><span class="w">        </span><span class="n">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="o">*</span><span class="n">cursor</span><span class="p">;</span>
+<a id="L-56" name="L-56"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">[</span><span class="bp">NSString</span><span class="w"> </span><span class="n">stringWithFormat</span><span class="o">:</span><span class="s">@&quot;%.17g,%.17g,%ld</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">long</span><span class="p">)</span><span class="n">getpid</span><span class="p">()];</span>
+<a id="L-57" name="L-57"></a><span class="p">}</span>
+<a id="L-58" name="L-58"></a><span class="cm">/*</span>
+<a id="L-59" name="L-59"></a><span class="cm">  Select help, worker execution, or the full parent experiment.</span>
+<a id="L-60" name="L-60"></a><span class="cm">  Inputs: The Foundation process-argument array including the executable name.</span>
+<a id="L-61" name="L-61"></a><span class="cm">  Outputs: CSV/console output; failed operations throw to the entry boundary.</span>
+<a id="L-62" name="L-62"></a><span class="cm">  Used by: main inside the autorelease pool.</span>
+<a id="L-63" name="L-63"></a><span class="cm">*/</span>
+<a id="L-64" name="L-64"></a><span class="p">+</span> <span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="nf">run:</span><span class="p">(</span><span class="bp">NSArray</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="nv">args</span><span class="w"> </span><span class="p">{</span>
+<a id="L-65" name="L-65"></a><span class="w">    </span><span class="n">NSUInteger</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">args</span><span class="w"> </span><span class="n">count</span><span class="p">];</span>
+<a id="L-66" name="L-66"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">[[</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="n">isEqual</span><span class="o">:</span><span class="s">@&quot;--help&quot;</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<a id="L-67" name="L-67"></a><span class="w">        </span><span class="n">puts</span><span class="p">(</span><span class="s">&quot;Usage: bessel-objc [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="L-68" name="L-68"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-69" name="L-69"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="p">[[</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="n">isEqual</span><span class="o">:</span><span class="s">@&quot;--worker&quot;</span><span class="p">])</span><span class="w"> </span><span class="p">{</span>
+<a id="L-70" name="L-70"></a><span class="w">        </span><span class="n">fputs</span><span class="p">([[</span><span class="nb">self</span><span class="w"> </span><span class="n">observe</span><span class="o">:</span><span class="n">Number</span><span class="p">([</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">2</span><span class="p">])]</span><span class="w"> </span><span class="n">UTF8String</span><span class="p">],</span><span class="w"> </span><span class="n">stdout</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="L-71" name="L-71"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-72" name="L-72"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4</span><span class="p">)</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;too many arguments&quot;</span><span class="p">);</span>
+<a id="L-73" name="L-73"></a><span class="w">    </span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="p">[</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">@&quot;-&quot;</span><span class="p">;</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="p">[</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="s">@&quot;results.csv&quot;</span><span class="p">;</span>
+<a id="L-75" name="L-75"></a><span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">requested</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">Number</span><span class="p">([</span><span class="n">args</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="mi">3</span><span class="p">])</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="L-76" name="L-76"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">requested</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">requested</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">trunc</span><span class="p">(</span><span class="n">requested</span><span class="p">)</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">requested</span><span class="p">)</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;workers must be 1..16&quot;</span><span class="p">);</span>
+<a id="L-77" name="L-77"></a><span class="w">    </span><span class="n">NSUInteger</span><span class="w"> </span><span class="n">jobs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="n">NSUInteger</span><span class="p">)</span><span class="n">requested</span><span class="p">;</span>
+<a id="L-78" name="L-78"></a><span class="w">    </span><span class="kt">FILE</span><span class="w"> </span><span class="o">*</span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="n">source</span><span class="w"> </span><span class="n">isEqual</span><span class="o">:</span><span class="s">@&quot;-&quot;</span><span class="p">]</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">stdin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">fopen</span><span class="p">([</span><span class="n">source</span><span class="w"> </span><span class="n">fileSystemRepresentation</span><span class="p">],</span><span class="w"> </span><span class="s">&quot;r&quot;</span><span class="p">);</span>
+<a id="L-79" name="L-79"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;cannot open input&quot;</span><span class="p">);</span>
+<a id="L-80" name="L-80"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">stdin</span><span class="p">)</span><span class="w"> </span><span class="n">fputs</span><span class="p">(</span><span class="s">&quot;Enter one x per line; blank line or EOF finishes:</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">stderr</span><span class="p">);</span>
+<a id="L-81" name="L-81"></a><span class="w">    </span><span class="bp">NSMutableArray</span><span class="w"> </span><span class="o">*</span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="bp">NSMutableArray</span><span class="w"> </span><span class="n">array</span><span class="p">];</span>
+<a id="L-82" name="L-82"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">buffer</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">NULL</span><span class="p">;</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">capacity</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-83" name="L-83"></a><span class="w">    </span><span class="k">@try</span><span class="w"> </span><span class="p">{</span>
+<a id="L-84" name="L-84"></a><span class="w">        </span><span class="c1">// Read complete UTF-8 lines and normalize their surrounding whitespace.</span>
+<a id="L-85" name="L-85"></a><span class="w">        </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">getline</span><span class="p">(</span><span class="o">&amp;</span><span class="n">buffer</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">capacity</span><span class="p">,</span><span class="w"> </span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-86" name="L-86"></a><span class="w">            </span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[</span><span class="bp">NSString</span><span class="w"> </span><span class="n">stringWithUTF8String</span><span class="o">:</span><span class="n">buffer</span><span class="p">]</span>
+<a id="L-87" name="L-87"></a><span class="w">                </span><span class="nl">stringByTrimmingCharactersInSet</span><span class="p">:[</span><span class="bp">NSCharacterSet</span><span class="w"> </span><span class="n">whitespaceAndNewlineCharacterSet</span><span class="p">]];</span>
+<a id="L-88" name="L-88"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;input is not UTF-8&quot;</span><span class="p">);</span>
+<a id="L-89" name="L-89"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">text</span><span class="w"> </span><span class="n">length</span><span class="p">])</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<a id="L-90" name="L-90"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">([</span><span class="n">text</span><span class="w"> </span><span class="n">hasPrefix</span><span class="o">:</span><span class="s">@&quot;#&quot;</span><span class="p">])</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<a id="L-91" name="L-91"></a><span class="w">            </span><span class="k">@try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="n">values</span><span class="w"> </span><span class="n">addObject</span><span class="o">:</span><span class="p">[</span><span class="bp">NSNumber</span><span class="w"> </span><span class="n">numberWithDouble</span><span class="o">:</span><span class="n">Number</span><span class="p">(</span><span class="n">text</span><span class="p">)]];</span><span class="w"> </span><span class="p">}</span>
+<a id="L-92" name="L-92"></a><span class="w">            </span><span class="c1">// Recover from an invalid input token while retaining later usable observations.</span>
+<a id="L-93" name="L-93"></a><span class="w">            </span><span class="k">@catch</span><span class="w"> </span><span class="p">(</span><span class="bp">NSException</span><span class="w"> </span><span class="o">*</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;warning: %s; skipped</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[[</span><span class="n">e</span><span class="w"> </span><span class="n">reason</span><span class="p">]</span><span class="w"> </span><span class="n">UTF8String</span><span class="p">]);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-94" name="L-94"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">([</span><span class="n">values</span><span class="w"> </span><span class="n">count</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4096</span><span class="p">)</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;at most 4096 values&quot;</span><span class="p">);</span>
+<a id="L-95" name="L-95"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-96" name="L-96"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">ferror</span><span class="p">(</span><span class="n">input</span><span class="p">))</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;input read failed&quot;</span><span class="p">);</span>
+<a id="L-97" name="L-97"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">@finally</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">free</span><span class="p">(</span><span class="n">buffer</span><span class="p">);</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="n">stdin</span><span class="p">)</span><span class="w"> </span><span class="n">fclose</span><span class="p">(</span><span class="n">input</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-98" name="L-98"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">values</span><span class="w"> </span><span class="n">count</span><span class="p">])</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;no valid input values&quot;</span><span class="p">);</span>
+<a id="L-99" name="L-99"></a><span class="w">    </span><span class="bp">NSMutableString</span><span class="w"> </span><span class="o">*</span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="bp">NSMutableString</span><span class="w"> </span><span class="n">stringWithString</span><span class="o">:</span><span class="s">@&quot;x,j0,worker_pid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">];</span>
+<a id="L-100" name="L-100"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NSUInteger</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="p">[</span><span class="n">values</span><span class="w"> </span><span class="n">count</span><span class="p">];</span><span class="w"> </span><span class="n">first</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">jobs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-101" name="L-101"></a><span class="w">        </span><span class="bp">NSMutableArray</span><span class="w"> </span><span class="o">*</span><span class="n">children</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="bp">NSMutableArray</span><span class="w"> </span><span class="n">array</span><span class="p">];</span>
+<a id="L-102" name="L-102"></a><span class="w">        </span><span class="k">@try</span><span class="w"> </span><span class="p">{</span>
+<a id="L-103" name="L-103"></a><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NSUInteger</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">first</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">MIN</span><span class="p">(</span><span class="n">first</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">jobs</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="n">values</span><span class="w"> </span><span class="n">count</span><span class="p">]);</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-104" name="L-104"></a><span class="w">                </span><span class="c1">// Create a separate executable process and its dedicated result pipe.</span>
+<a id="L-105" name="L-105"></a><span class="w">                </span><span class="n">NSTask</span><span class="w"> </span><span class="o">*</span><span class="n">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[[</span><span class="n">NSTask</span><span class="w"> </span><span class="n">alloc</span><span class="p">]</span><span class="w"> </span><span class="n">init</span><span class="p">]</span><span class="w"> </span><span class="n">autorelease</span><span class="p">];</span>
+<a id="L-106" name="L-106"></a><span class="w">                </span><span class="bp">NSPipe</span><span class="w"> </span><span class="o">*</span><span class="n">pipe</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="bp">NSPipe</span><span class="w"> </span><span class="n">pipe</span><span class="p">];</span>
+<a id="L-107" name="L-107"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">setLaunchPath</span><span class="o">:</span><span class="p">[[</span><span class="bp">NSBundle</span><span class="w"> </span><span class="n">mainBundle</span><span class="p">]</span><span class="w"> </span><span class="n">executablePath</span><span class="p">]];</span>
+<a id="L-108" name="L-108"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">setArguments</span><span class="o">:</span><span class="l">@[</span><span class="s">@&quot;--worker&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[[</span><span class="n">values</span><span class="w"> </span><span class="n">objectAtIndex</span><span class="o">:</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="n">stringValue</span><span class="p">]</span><span class="l">]</span><span class="p">];</span>
+<a id="L-109" name="L-109"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">setStandardOutput</span><span class="o">:</span><span class="n">pipe</span><span class="p">];</span>
+<a id="L-110" name="L-110"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">setStandardInput</span><span class="o">:</span><span class="p">[</span><span class="bp">NSFileHandle</span><span class="w"> </span><span class="n">fileHandleWithNullDevice</span><span class="p">]];</span>
+<a id="L-111" name="L-111"></a><span class="w">                </span><span class="c1">// Launch now and collect later so the entire bounded group computes concurrently.</span>
+<a id="L-112" name="L-112"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">launch</span><span class="p">];</span><span class="w"> </span><span class="p">[</span><span class="n">children</span><span class="w"> </span><span class="n">addObject</span><span class="o">:</span><span class="n">child</span><span class="p">];</span>
+<a id="L-113" name="L-113"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-114" name="L-114"></a><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NSTask</span><span class="w"> </span><span class="o">*</span><span class="n">child</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-115" name="L-115"></a><span class="w">                </span><span class="c1">// Drain each result pipe before waiting and accepting the child result.</span>
+<a id="L-116" name="L-116"></a><span class="w">                </span><span class="bp">NSData</span><span class="w"> </span><span class="o">*</span><span class="n">data</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[[</span><span class="n">child</span><span class="w"> </span><span class="n">standardOutput</span><span class="p">]</span><span class="w"> </span><span class="n">fileHandleForReading</span><span class="p">]</span><span class="w"> </span><span class="n">readDataToEndOfFile</span><span class="p">];</span>
+<a id="L-117" name="L-117"></a><span class="w">                </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">waitUntilExit</span><span class="p">];</span>
+<a id="L-118" name="L-118"></a><span class="w">                </span><span class="bp">NSString</span><span class="w"> </span><span class="o">*</span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[[[</span><span class="bp">NSString</span><span class="w"> </span><span class="n">alloc</span><span class="p">]</span><span class="w"> </span><span class="n">initWithData</span><span class="o">:</span><span class="n">data</span><span class="w"> </span><span class="n">encoding</span><span class="o">:</span><span class="n">NSUTF8StringEncoding</span><span class="p">]</span><span class="w"> </span><span class="n">autorelease</span><span class="p">];</span>
+<a id="L-119" name="L-119"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">([</span><span class="n">child</span><span class="w"> </span><span class="n">terminationStatus</span><span class="p">]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="p">[</span><span class="n">row</span><span class="w"> </span><span class="n">length</span><span class="p">])</span><span class="w"> </span><span class="n">Fail</span><span class="p">(</span><span class="s">@&quot;worker failed&quot;</span><span class="p">);</span>
+<a id="L-120" name="L-120"></a><span class="w">                </span><span class="p">[</span><span class="n">rows</span><span class="w"> </span><span class="n">appendString</span><span class="o">:</span><span class="n">row</span><span class="p">];</span>
+<a id="L-121" name="L-121"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-122" name="L-122"></a><span class="w">        </span><span class="p">}</span><span class="w"> </span><span class="k">@finally</span><span class="w"> </span><span class="p">{</span>
+<a id="L-123" name="L-123"></a><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">NSTask</span><span class="w"> </span><span class="o">*</span><span class="n">child</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">([</span><span class="n">child</span><span class="w"> </span><span class="n">isRunning</span><span class="p">])</span><span class="w"> </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">terminate</span><span class="p">];</span><span class="w"> </span><span class="p">[</span><span class="n">child</span><span class="w"> </span><span class="n">waitUntilExit</span><span class="p">];</span><span class="w"> </span><span class="p">}</span>
+<a id="L-124" name="L-124"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-125" name="L-125"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-126" name="L-126"></a><span class="w">    </span><span class="c1">// Translate a Foundation file-write error into the same readable application failure path.</span>
+<a id="L-127" name="L-127"></a><span class="w">    </span><span class="bp">NSError</span><span class="w"> </span><span class="o">*</span><span class="n">error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">nil</span><span class="p">;</span>
+<a id="L-128" name="L-128"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">rows</span><span class="w"> </span><span class="n">writeToFile</span><span class="o">:</span><span class="n">target</span><span class="w"> </span><span class="n">atomically</span><span class="o">:</span><span class="nb">YES</span><span class="w"> </span><span class="n">encoding</span><span class="o">:</span><span class="n">NSUTF8StringEncoding</span><span class="w"> </span><span class="n">error</span><span class="o">:&amp;</span><span class="n">error</span><span class="p">])</span>
+<a id="L-129" name="L-129"></a><span class="w">        </span><span class="n">Fail</span><span class="p">([</span><span class="n">error</span><span class="w"> </span><span class="n">localizedDescription</span><span class="p">]);</span>
+<a id="L-130" name="L-130"></a><span class="w">    </span><span class="n">printf</span><span class="p">(</span><span class="s">&quot;Wrote %lu observations to %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="kt">unsigned</span><span class="w"> </span><span class="kt">long</span><span class="p">)[</span><span class="n">values</span><span class="w"> </span><span class="n">count</span><span class="p">],</span><span class="w"> </span><span class="p">[</span><span class="n">target</span><span class="w"> </span><span class="n">UTF8String</span><span class="p">]);</span>
+<a id="L-131" name="L-131"></a><span class="p">}</span>
+<a id="L-132" name="L-132"></a><span class="k">@end</span>
+<a id="L-133" name="L-133"></a><span class="cm">/*</span>
+<a id="L-134" name="L-134"></a><span class="cm">  Create Foundation lifetime management and provide the final exception boundary.</span>
+<a id="L-135" name="L-135"></a><span class="cm">  Inputs: The process arguments obtained through NSProcessInfo.</span>
+<a id="L-136" name="L-136"></a><span class="cm">  Outputs: A successful return or a diagnostic and status 1.</span>
+<a id="L-137" name="L-137"></a><span class="cm">  Used by: The operating system when the executable starts.</span>
+<a id="L-138" name="L-138"></a><span class="cm">*/</span>
+<a id="L-139" name="L-139"></a><span class="kt">int</span><span class="w"> </span><span class="n">main</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-140" name="L-140"></a><span class="w">    </span><span class="k">@autoreleasepool</span><span class="w"> </span><span class="p">{</span>
+<a id="L-141" name="L-141"></a><span class="w">        </span><span class="k">@try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[</span><span class="n">Observatory</span><span class="w"> </span><span class="n">run</span><span class="o">:</span><span class="p">[[</span><span class="bp">NSProcessInfo</span><span class="w"> </span><span class="n">processInfo</span><span class="p">]</span><span class="w"> </span><span class="n">arguments</span><span class="p">]];</span><span class="w"> </span><span class="p">}</span>
+<a id="L-142" name="L-142"></a><span class="w">        </span><span class="k">@catch</span><span class="w"> </span><span class="p">(</span><span class="bp">NSException</span><span class="w"> </span><span class="o">*</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="n">stderr</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;error: %s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="w"> </span><span class="p">[[</span><span class="n">e</span><span class="w"> </span><span class="n">reason</span><span class="p">]</span><span class="w"> </span><span class="n">UTF8String</span><span class="p">]);</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-143" name="L-143"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-144" name="L-144"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-145" name="L-145"></a><span class="p">}</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/*
+  Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.
+  The parent owns file I/O and result ordering; children perform the numerical work.
+  The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.
+  Objective-C with Foundation (macOS or GNUstep), manual retain/release compatible.
+*/
+#import &lt;Foundation/Foundation.h&gt;
+#include &lt;math.h&gt;
+#include &lt;unistd.h&gt;
+
+/*
+  Represent an ordinary application failure as a readable Objective-C exception.
+  Inputs: A message string.
+  Outputs: No normal return; an ObservatoryError is thrown.
+  Used by: Validation, process and output checks inside Observatory methods.
+*/
+static void Fail(NSString *message) {
+    @throw [NSException exceptionWithName:@&quot;ObservatoryError&quot; reason:message userInfo:nil];
+}
+/*
+  Parse one complete numeric token with a fixed decimal separator.
+  Inputs: An NSString from input or a worker argument.
+  Outputs: A finite bounded double, or an ObservatoryError.
+  Used by: run: when accepting input and entering worker mode.
+*/
+static double Number(NSString *text) {
+    // Use Foundation parsing while checking that no unconsumed token suffix remains.
+    NSScanner *scanner = [NSScanner scannerWithString:text];
+    [scanner setLocale:@{NSDecimalSeparator: @&quot;.&quot;}];
+    double x;
+    if (![scanner scanDouble:&amp;x] || ![scanner isAtEnd] || !isfinite(x) || fabs(x) &gt; 1000)
+        Fail(@&quot;expected finite x in [-1000,1000]&quot;);
+    return x;
+}
+// Expose one operation for a worker result and one for the overall command-line workflow.
+@interface Observatory : NSObject
++ (NSString *)observe:(double)x;
++ (void)run:(NSArray *)args;
+@end
+@implementation Observatory
+/*
+  Compute and serialize one observation in the current process.
+  Inputs: One validated double x.
+  Outputs: An autoreleased NSString containing x, J0 and the worker OS PID.
+  Used by: run: when the executable is launched with --worker.
+*/
++ (NSString *)observe:(double)x {
+    double sum = 0, samples[16384];
+    for (int k = 0; k &lt; 16384; ++k) samples[k] = cos(x * sin(acos(-1) * (k + 0.5) / 16384));
+    /*
+      C pointers coexist with Objective-C object references. end is a legal
+      one-past-the-array pointer and is never dereferenced.
+    */
+    for (const double *cursor = samples, *end = samples + 16384; cursor != end; ++cursor)
+        sum += *cursor;
+    return [NSString stringWithFormat:@&quot;%.17g,%.17g,%ld\n&quot;, x, sum / 16384, (long)getpid()];
+}
+/*
+  Select help, worker execution, or the full parent experiment.
+  Inputs: The Foundation process-argument array including the executable name.
+  Outputs: CSV/console output; failed operations throw to the entry boundary.
+  Used by: main inside the autorelease pool.
+*/
++ (void)run:(NSArray *)args {
+    NSUInteger n = [args count];
+    if (n == 2 &amp;&amp; [[args objectAtIndex:1] isEqual:@&quot;--help&quot;]) {
+        puts(&quot;Usage: bessel-objc [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;); return;
+    }
+    if (n == 3 &amp;&amp; [[args objectAtIndex:1] isEqual:@&quot;--worker&quot;]) {
+        fputs([[self observe:Number([args objectAtIndex:2])] UTF8String], stdout); return;
+    }
+    if (n &gt; 4) Fail(@&quot;too many arguments&quot;);
+    NSString *source = n &gt; 1 ? [args objectAtIndex:1] : @&quot;-&quot;;
+    NSString *target = n &gt; 2 ? [args objectAtIndex:2] : @&quot;results.csv&quot;;
+    double requested = n &gt; 3 ? Number([args objectAtIndex:3]) : 2;
+    if (requested &lt; 1 || requested &gt; 16 || trunc(requested) != requested) Fail(@&quot;workers must be 1..16&quot;);
+    NSUInteger jobs = (NSUInteger)requested;
+    FILE *input = [source isEqual:@&quot;-&quot;] ? stdin : fopen([source fileSystemRepresentation], &quot;r&quot;);
+    if (!input) Fail(@&quot;cannot open input&quot;);
+    if (input == stdin) fputs(&quot;Enter one x per line; blank line or EOF finishes:\n&quot;, stderr);
+    NSMutableArray *values = [NSMutableArray array];
+    char *buffer = NULL; size_t capacity = 0;
+    @try {
+        // Read complete UTF-8 lines and normalize their surrounding whitespace.
+        while (getline(&amp;buffer, &amp;capacity, input) &gt;= 0) {
+            NSString *text = [[NSString stringWithUTF8String:buffer]
+                stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]];
+            if (!text) Fail(@&quot;input is not UTF-8&quot;);
+            if (![text length]) break;
+            if ([text hasPrefix:@&quot;#&quot;]) continue;
+            @try { [values addObject:[NSNumber numberWithDouble:Number(text)]]; }
+            // Recover from an invalid input token while retaining later usable observations.
+            @catch (NSException *e) { fprintf(stderr, &quot;warning: %s; skipped\n&quot;, [[e reason] UTF8String]); }
+            if ([values count] &gt; 4096) Fail(@&quot;at most 4096 values&quot;);
+        }
+        if (ferror(input)) Fail(@&quot;input read failed&quot;);
+    } @finally { free(buffer); if (input != stdin) fclose(input); }
+    if (![values count]) Fail(@&quot;no valid input values&quot;);
+    NSMutableString *rows = [NSMutableString stringWithString:@&quot;x,j0,worker_pid\n&quot;];
+    for (NSUInteger first = 0; first &lt; [values count]; first += jobs) {
+        NSMutableArray *children = [NSMutableArray array];
+        @try {
+            for (NSUInteger i = first; i &lt; MIN(first + jobs, [values count]); ++i) {
+                // Create a separate executable process and its dedicated result pipe.
+                NSTask *child = [[[NSTask alloc] init] autorelease];
+                NSPipe *pipe = [NSPipe pipe];
+                [child setLaunchPath:[[NSBundle mainBundle] executablePath]];
+                [child setArguments:@[@&quot;--worker&quot;, [[values objectAtIndex:i] stringValue]]];
+                [child setStandardOutput:pipe];
+                [child setStandardInput:[NSFileHandle fileHandleWithNullDevice]];
+                // Launch now and collect later so the entire bounded group computes concurrently.
+                [child launch]; [children addObject:child];
+            }
+            for (NSTask *child in children) {
+                // Drain each result pipe before waiting and accepting the child result.
+                NSData *data = [[[child standardOutput] fileHandleForReading] readDataToEndOfFile];
+                [child waitUntilExit];
+                NSString *row = [[[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding] autorelease];
+                if ([child terminationStatus] || ![row length]) Fail(@&quot;worker failed&quot;);
+                [rows appendString:row];
+            }
+        } @finally {
+            for (NSTask *child in children) { if ([child isRunning]) [child terminate]; [child waitUntilExit]; }
+        }
+    }
+    // Translate a Foundation file-write error into the same readable application failure path.
+    NSError *error = nil;
+    if (![rows writeToFile:target atomically:YES encoding:NSUTF8StringEncoding error:&amp;error])
+        Fail([error localizedDescription]);
+    printf(&quot;Wrote %lu observations to %s\n&quot;, (unsigned long)[values count], [target UTF8String]);
+}
+@end
+/*
+  Create Foundation lifetime management and provide the final exception boundary.
+  Inputs: The process arguments obtained through NSProcessInfo.
+  Outputs: A successful return or a diagnostic and status 1.
+  Used by: The operating system when the executable starts.
+*/
+int main(void) {
+    @autoreleasepool {
+        @try { [Observatory run:[[NSProcessInfo processInfo] arguments]]; }
+        @catch (NSException *e) { fprintf(stderr, &quot;error: %s\n&quot;, [[e reason] UTF8String]); return 1; }
+    }
+    return 0;
+}
+</textarea>
+<footer>Highlighted with Pygments using the Objective-C lexer. All assets are local. SHA-256: <code>9293e1453d85afe9abea39a012b4a1a2b65125f8a963d41fbcc24b12c1917ac4</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

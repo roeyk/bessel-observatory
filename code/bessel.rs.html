@@ -1,0 +1,429 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="f6ab8c3fafb710929463df8dfad0910e5761e11e1192c2542108c15a9b6b100a">
+<title>Rust — bessel.rs — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.cpp.html">← C++</a><a href="Bessel.java.html">Java →</a></nav>
+<h1>Rust <code>bessel.rs</code></h1>
+<p>Rust 2021 / standard library · Result and ?, exhaustive match, iterators, ownership and Drop cleanup.</p>
+<p><strong>Memory:</strong> Borrowed &amp;[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.<br><strong>Strings:</strong> trim, starts_with, parse, String accumulation and UTF-8 validation.</p>
+<div class="actions"><a href="../bessel.rs">Open raw source</a>
+<a href="../bessel.rs" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: read numeric observations, compute J0 in child processes, and save ordered CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  J0 is approximated by averaging cos(x*sin(theta)) at 16,384 midpoint angles.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  Normal use: PROGRAM [INPUT|- [OUTPUT [WORKERS]]]. Invalid value lines are reported and skipped.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  Rust 2021; no crates. Result, iterators, ownership, and real child processes.</span>
+<a id="L-6" name="L-6"></a><span class="cm">*/</span>
+<a id="L-7" name="L-7"></a><span class="k">use</span><span class="w"> </span><span class="n">std</span><span class="p">::{</span><span class="n">env</span><span class="p">,</span><span class="w"> </span><span class="n">error</span><span class="p">::</span><span class="n">Error</span><span class="p">,</span><span class="w"> </span><span class="n">fs</span><span class="p">::</span><span class="n">File</span><span class="p">,</span><span class="w"> </span><span class="n">io</span><span class="p">::{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">BufRead</span><span class="p">,</span><span class="w"> </span><span class="n">BufReader</span><span class="p">,</span><span class="w"> </span><span class="n">Write</span><span class="p">},</span>
+<a id="L-8" name="L-8"></a><span class="w">          </span><span class="n">process</span><span class="p">::{</span><span class="bp">self</span><span class="p">,</span><span class="w"> </span><span class="n">Child</span><span class="p">,</span><span class="w"> </span><span class="n">Command</span><span class="p">,</span><span class="w"> </span><span class="n">Stdio</span><span class="p">}};</span>
+<a id="L-9" name="L-9"></a><span class="k">type</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">T</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">std</span><span class="p">::</span><span class="n">result</span><span class="p">::</span><span class="nb">Result</span><span class="o">&lt;</span><span class="n">T</span><span class="p">,</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">Error</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+<a id="L-10" name="L-10"></a>
+<a id="L-11" name="L-11"></a><span class="cm">/*</span>
+<a id="L-12" name="L-12"></a><span class="cm">  Convert one token into a bounded observation value.</span>
+<a id="L-13" name="L-13"></a><span class="cm">  Inputs: A borrowed string slice.</span>
+<a id="L-14" name="L-14"></a><span class="cm">  Outputs: Result containing a finite f64, or a descriptive error.</span>
+<a id="L-15" name="L-15"></a><span class="cm">  Used by: run for file input and the internal worker command.</span>
+<a id="L-16" name="L-16"></a><span class="cm">*/</span>
+<a id="L-17" name="L-17"></a><span class="k">fn</span><span class="w"> </span><span class="nf">number</span><span class="p">(</span><span class="n">s</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="kt">str</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="kt">f64</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-18" name="L-18"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f64</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">trim</span><span class="p">().</span><span class="n">parse</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<a id="L-19" name="L-19"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">x</span><span class="p">.</span><span class="n">is_finite</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">x</span><span class="p">.</span><span class="n">abs</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1000.0</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;expected finite x in [-1000,1000]&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-20" name="L-20"></a><span class="w">    </span><span class="nb">Ok</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<a id="L-21" name="L-21"></a><span class="p">}</span>
+<a id="L-22" name="L-22"></a><span class="cm">/*</span>
+<a id="L-23" name="L-23"></a><span class="cm">  Generate midpoint samples and reduce their values to J0.</span>
+<a id="L-24" name="L-24"></a><span class="cm">  Inputs: A validated f64 x.</span>
+<a id="L-25" name="L-25"></a><span class="cm">  Outputs: The approximate J0 result.</span>
+<a id="L-26" name="L-26"></a><span class="cm">  Used by: run when it is executing the internal worker mode.</span>
+<a id="L-27" name="L-27"></a><span class="cm">*/</span>
+<a id="L-28" name="L-28"></a><span class="k">fn</span><span class="w"> </span><span class="nf">observe</span><span class="p">(</span><span class="n">x</span><span class="p">:</span><span class="w"> </span><span class="kt">f64</span><span class="p">)</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f64</span><span class="w"> </span><span class="p">{</span>
+<a id="L-29" name="L-29"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">samples</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="kt">f64</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="mi">16384</span><span class="p">)</span>
+<a id="L-30" name="L-30"></a><span class="w">        </span><span class="p">.</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">k</span><span class="o">|</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">std</span><span class="p">::</span><span class="kt">f64</span><span class="p">::</span><span class="n">consts</span><span class="p">::</span><span class="n">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="kt">f64</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">16384.0</span><span class="p">).</span><span class="n">sin</span><span class="p">()).</span><span class="n">cos</span><span class="p">()).</span><span class="n">collect</span><span class="p">();</span>
+<a id="L-31" name="L-31"></a><span class="w">    </span><span class="n">sum_buffer</span><span class="p">(</span><span class="o">&amp;</span><span class="n">samples</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">16384.0</span>
+<a id="L-32" name="L-32"></a><span class="p">}</span>
+<a id="L-33" name="L-33"></a><span class="cm">/*</span>
+<a id="L-34" name="L-34"></a><span class="cm">  Demonstrate a borrowed raw-pointer walk without transferring ownership.</span>
+<a id="L-35" name="L-35"></a><span class="cm">  Inputs: An immutable slice of initialized f64 samples.</span>
+<a id="L-36" name="L-36"></a><span class="cm">  Outputs: Their sum; memory ownership remains with the caller.</span>
+<a id="L-37" name="L-37"></a><span class="cm">  Used by: observe to reduce the numerical samples.</span>
+<a id="L-38" name="L-38"></a><span class="cm">*/</span>
+<a id="L-39" name="L-39"></a><span class="k">fn</span><span class="w"> </span><span class="nf">sum_buffer</span><span class="p">(</span><span class="n">samples</span><span class="p">:</span><span class="w"> </span><span class="kp">&amp;</span><span class="p">[</span><span class="kt">f64</span><span class="p">])</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="kt">f64</span><span class="w"> </span><span class="p">{</span>
+<a id="L-40" name="L-40"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">base</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">samples</span><span class="p">.</span><span class="n">as_ptr</span><span class="p">();</span>
+<a id="L-41" name="L-41"></a><span class="w">    </span><span class="p">(</span><span class="mi">0</span><span class="o">..</span><span class="n">samples</span><span class="p">.</span><span class="n">len</span><span class="p">()).</span><span class="n">map</span><span class="p">(</span><span class="o">|</span><span class="n">i</span><span class="o">|</span><span class="w"> </span><span class="p">{</span>
+<a id="L-42" name="L-42"></a><span class="w">        </span><span class="cm">/*</span>
+<a id="L-43" name="L-43"></a><span class="cm">          SAFETY: i is in bounds; the borrowed slice owns live, aligned f64s</span>
+<a id="L-44" name="L-44"></a><span class="cm">          for this entire call. add advances in ELEMENTS, not bytes.</span>
+<a id="L-45" name="L-45"></a><span class="cm">          This isolated unsafe block is an educational pointer example;</span>
+<a id="L-46" name="L-46"></a><span class="cm">          ordinary Rust would use samples.iter().sum().</span>
+<a id="L-47" name="L-47"></a><span class="cm">        */</span>
+<a id="L-48" name="L-48"></a><span class="w">        </span><span class="k">unsafe</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="o">*</span><span class="n">base</span><span class="p">.</span><span class="n">add</span><span class="p">(</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">}</span>
+<a id="L-49" name="L-49"></a><span class="w">    </span><span class="p">}).</span><span class="n">sum</span><span class="p">()</span>
+<a id="L-50" name="L-50"></a><span class="p">}</span>
+<a id="L-51" name="L-51"></a><span class="c1">// Drop also reaps children if spawning or collecting a later child fails.</span>
+<a id="L-52" name="L-52"></a><span class="k">struct</span><span class="w"> </span><span class="nc">Worker</span><span class="p">(</span><span class="nb">Option</span><span class="o">&lt;</span><span class="n">Child</span><span class="o">&gt;</span><span class="p">);</span>
+<a id="L-53" name="L-53"></a><span class="k">impl</span><span class="w"> </span><span class="nb">Drop</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">Worker</span><span class="w"> </span><span class="p">{</span>
+<a id="L-54" name="L-54"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-55" name="L-55"></a><span class="cm">      Ensure abandoning a Worker does not leave a running or unreaped child.</span>
+<a id="L-56" name="L-56"></a><span class="cm">      Inputs: The optional child still owned by this wrapper.</span>
+<a id="L-57" name="L-57"></a><span class="cm">      Outputs: No value; a remaining child is killed and waited for.</span>
+<a id="L-58" name="L-58"></a><span class="cm">      Used by: Rust drop glue on normal scope exit and early Result propagation.</span>
+<a id="L-59" name="L-59"></a><span class="cm">    */</span>
+<a id="L-60" name="L-60"></a><span class="w">    </span><span class="k">fn</span><span class="w"> </span><span class="nf">drop</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="bp">self</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-61" name="L-61"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Some</span><span class="p">(</span><span class="n">child</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="bp">self</span><span class="p">.</span><span class="mf">0.</span><span class="n">as_mut</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">child</span><span class="p">.</span><span class="n">kill</span><span class="p">();</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">_</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">child</span><span class="p">.</span><span class="n">wait</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="L-62" name="L-62"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-63" name="L-63"></a><span class="p">}</span>
+<a id="L-64" name="L-64"></a><span class="cm">/*</span>
+<a id="L-65" name="L-65"></a><span class="cm">  Select CLI or worker behavior and perform the experiment with fallible operations.</span>
+<a id="L-66" name="L-66"></a><span class="cm">  Inputs: Command-line arguments and, in normal mode, input data.</span>
+<a id="L-67" name="L-67"></a><span class="cm">  Outputs: Ok on success or an error describing the failed operation.</span>
+<a id="L-68" name="L-68"></a><span class="cm">  Used by: main, which turns errors into a diagnostic and process exit status.</span>
+<a id="L-69" name="L-69"></a><span class="cm">*/</span>
+<a id="L-70" name="L-70"></a><span class="k">fn</span><span class="w"> </span><span class="nf">run</span><span class="p">()</span><span class="w"> </span><span class="p">-&gt;</span><span class="w"> </span><span class="nb">Result</span><span class="o">&lt;</span><span class="p">()</span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-71" name="L-71"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">args</span><span class="p">:</span><span class="w"> </span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">String</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">::</span><span class="n">args</span><span class="p">().</span><span class="n">skip</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">collect</span><span class="p">();</span>
+<a id="L-72" name="L-72"></a><span class="w">    </span><span class="c1">// Separate help and child computation from the ordinary interactive/file workflow.</span>
+<a id="L-73" name="L-73"></a><span class="w">    </span><span class="k">match</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">as_slice</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="L-74" name="L-74"></a><span class="w">        </span><span class="p">[</span><span class="n">flag</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;--help&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-75" name="L-75"></a><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;Usage: bessel-rust [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(());</span>
+<a id="L-76" name="L-76"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-77" name="L-77"></a><span class="w">        </span><span class="p">[</span><span class="n">flag</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">]</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">flag</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;--worker&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-78" name="L-78"></a><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">number</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<a id="L-79" name="L-79"></a><span class="w">            </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;{x:.17},{:.17},{}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">observe</span><span class="p">(</span><span class="n">x</span><span class="p">),</span><span class="w"> </span><span class="n">process</span><span class="p">::</span><span class="n">id</span><span class="p">());</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(());</span>
+<a id="L-80" name="L-80"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-81" name="L-81"></a><span class="w">        </span><span class="n">_</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="p">{}</span>
+<a id="L-82" name="L-82"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-83" name="L-83"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;too many arguments&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-84" name="L-84"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">first</span><span class="p">().</span><span class="n">map_or</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">String</span><span class="p">::</span><span class="n">as_str</span><span class="p">);</span>
+<a id="L-85" name="L-85"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">).</span><span class="n">map_or</span><span class="p">(</span><span class="s">&quot;results.csv&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">String</span><span class="p">::</span><span class="n">as_str</span><span class="p">);</span>
+<a id="L-86" name="L-86"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">jobs</span><span class="p">:</span><span class="w"> </span><span class="kt">usize</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="mi">2</span><span class="p">).</span><span class="n">map_or</span><span class="p">(</span><span class="s">&quot;2&quot;</span><span class="p">,</span><span class="w"> </span><span class="nb">String</span><span class="p">::</span><span class="n">as_str</span><span class="p">).</span><span class="n">parse</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<a id="L-87" name="L-87"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="p">(</span><span class="mi">1</span><span class="o">..=</span><span class="mi">16</span><span class="p">).</span><span class="n">contains</span><span class="p">(</span><span class="o">&amp;</span><span class="n">jobs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;workers must be 1..16&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-88" name="L-88"></a><span class="w">    </span><span class="c1">// Expose a file or stdin through a shared buffered-reading interface.</span>
+<a id="L-89" name="L-89"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">input</span><span class="p">:</span><span class="w"> </span><span class="nb">Box</span><span class="o">&lt;</span><span class="k">dyn</span><span class="w"> </span><span class="n">BufRead</span><span class="o">&gt;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-90" name="L-90"></a><span class="w">        </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&quot;Enter one x per line; blank line or EOF finishes:&quot;</span><span class="p">);</span><span class="w"> </span><span class="nb">Box</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">io</span><span class="p">::</span><span class="n">stdin</span><span class="p">().</span><span class="n">lock</span><span class="p">())</span>
+<a id="L-91" name="L-91"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">Box</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">BufReader</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="n">File</span><span class="p">::</span><span class="n">open</span><span class="p">(</span><span class="n">source</span><span class="p">)</span><span class="o">?</span><span class="p">))</span><span class="w"> </span><span class="p">};</span>
+<a id="L-92" name="L-92"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="p">::</span><span class="n">new</span><span class="p">();</span>
+<a id="L-93" name="L-93"></a><span class="w">    </span><span class="c1">// Preserve line order and include line numbers in recoverable input diagnostics.</span>
+<a id="L-94" name="L-94"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">index</span><span class="p">,</span><span class="w"> </span><span class="n">line</span><span class="p">)</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="n">lines</span><span class="p">().</span><span class="n">enumerate</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="L-95" name="L-95"></a><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="o">?</span><span class="p">;</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="n">trim</span><span class="p">();</span>
+<a id="L-96" name="L-96"></a><span class="w">        </span><span class="k">match</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="p">{</span>
+<a id="L-97" name="L-97"></a><span class="w">            </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">break</span><span class="p">,</span>
+<a id="L-98" name="L-98"></a><span class="w">            </span><span class="n">s</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">s</span><span class="p">.</span><span class="n">starts_with</span><span class="p">(</span><span class="sc">&#39;#&#39;</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">continue</span><span class="p">,</span>
+<a id="L-99" name="L-99"></a><span class="w">            </span><span class="n">s</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="k">match</span><span class="w"> </span><span class="n">number</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-100" name="L-100"></a><span class="w">                </span><span class="nb">Ok</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
+<a id="L-101" name="L-101"></a><span class="w">                </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=&gt;</span><span class="w"> </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&quot;warning: line {}: {e}; skipped&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">index</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<a id="L-102" name="L-102"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-103" name="L-103"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-104" name="L-104"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">len</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;at most 4096 values&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-105" name="L-105"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-106" name="L-106"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">is_empty</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;no valid input values&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-107" name="L-107"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="n">executable</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">env</span><span class="p">::</span><span class="n">current_exe</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<a id="L-108" name="L-108"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">String</span><span class="p">::</span><span class="n">from</span><span class="p">(</span><span class="s">&quot;x,j0,worker_pid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">);</span>
+<a id="L-109" name="L-109"></a><span class="w">    </span><span class="c1">// Bound concurrent processes without requiring a nonstandard process-pool crate.</span>
+<a id="L-110" name="L-110"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">chunks</span><span class="p">(</span><span class="n">jobs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-111" name="L-111"></a><span class="w">        </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">children</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Vec</span><span class="p">::</span><span class="n">new</span><span class="p">();</span>
+<a id="L-112" name="L-112"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="n">batch</span><span class="w"> </span><span class="p">{</span>
+<a id="L-113" name="L-113"></a><span class="w">            </span><span class="n">children</span><span class="p">.</span><span class="n">push</span><span class="p">(</span><span class="n">Worker</span><span class="p">(</span><span class="nb">Some</span><span class="p">(</span><span class="n">Command</span><span class="p">::</span><span class="n">new</span><span class="p">(</span><span class="o">&amp;</span><span class="n">executable</span><span class="p">).</span><span class="n">arg</span><span class="p">(</span><span class="s">&quot;--worker&quot;</span><span class="p">).</span><span class="n">arg</span><span class="p">(</span><span class="n">x</span><span class="p">.</span><span class="n">to_string</span><span class="p">())</span>
+<a id="L-114" name="L-114"></a><span class="w">                </span><span class="p">.</span><span class="n">stdin</span><span class="p">(</span><span class="n">Stdio</span><span class="p">::</span><span class="n">null</span><span class="p">()).</span><span class="n">stdout</span><span class="p">(</span><span class="n">Stdio</span><span class="p">::</span><span class="n">piped</span><span class="p">()).</span><span class="n">spawn</span><span class="p">()</span><span class="o">?</span><span class="p">)));</span>
+<a id="L-115" name="L-115"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-116" name="L-116"></a><span class="w">        </span><span class="c1">// Drain each child output and validate its status before appending its CSV row.</span>
+<a id="L-117" name="L-117"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">worker</span><span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="o">&amp;</span><span class="k">mut</span><span class="w"> </span><span class="n">children</span><span class="w"> </span><span class="p">{</span>
+<a id="L-118" name="L-118"></a><span class="w">            </span><span class="kd">let</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">worker</span><span class="p">.</span><span class="mf">0.</span><span class="n">take</span><span class="p">().</span><span class="n">ok_or</span><span class="p">(</span><span class="s">&quot;missing child&quot;</span><span class="p">)</span><span class="o">?</span><span class="p">.</span><span class="n">wait_with_output</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<a id="L-119" name="L-119"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="n">output</span><span class="p">.</span><span class="n">status</span><span class="p">.</span><span class="n">success</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">stdout</span><span class="p">.</span><span class="n">is_empty</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="s">&quot;worker failed&quot;</span><span class="p">.</span><span class="n">into</span><span class="p">());</span><span class="w"> </span><span class="p">}</span>
+<a id="L-120" name="L-120"></a><span class="w">            </span><span class="n">rows</span><span class="p">.</span><span class="n">push_str</span><span class="p">(</span><span class="n">std</span><span class="p">::</span><span class="kt">str</span><span class="p">::</span><span class="n">from_utf8</span><span class="p">(</span><span class="o">&amp;</span><span class="n">output</span><span class="p">.</span><span class="n">stdout</span><span class="p">)</span><span class="o">?</span><span class="p">);</span>
+<a id="L-121" name="L-121"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-122" name="L-122"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-123" name="L-123"></a><span class="w">    </span><span class="c1">// Write the accumulated CSV after all numerical work is complete.</span>
+<a id="L-124" name="L-124"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="k">mut</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">File</span><span class="p">::</span><span class="n">create</span><span class="p">(</span><span class="n">target</span><span class="p">)</span><span class="o">?</span><span class="p">;</span>
+<a id="L-125" name="L-125"></a><span class="w">    </span><span class="n">output</span><span class="p">.</span><span class="n">write_all</span><span class="p">(</span><span class="n">rows</span><span class="p">.</span><span class="n">as_bytes</span><span class="p">())</span><span class="o">?</span><span class="p">;</span><span class="w"> </span><span class="n">output</span><span class="p">.</span><span class="n">flush</span><span class="p">()</span><span class="o">?</span><span class="p">;</span>
+<a id="L-126" name="L-126"></a><span class="w">    </span><span class="fm">println!</span><span class="p">(</span><span class="s">&quot;Wrote {} observations to {target}&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="n">len</span><span class="p">());</span><span class="w"> </span><span class="nb">Ok</span><span class="p">(())</span>
+<a id="L-127" name="L-127"></a><span class="p">}</span>
+<a id="L-128" name="L-128"></a><span class="cm">/*</span>
+<a id="L-129" name="L-129"></a><span class="cm">  Provide the executable entry point and final error boundary.</span>
+<a id="L-130" name="L-130"></a><span class="cm">  Inputs: The process environment, consumed by run.</span>
+<a id="L-131" name="L-131"></a><span class="cm">  Outputs: Success output or a nonzero process exit after printing the error.</span>
+<a id="L-132" name="L-132"></a><span class="cm">  Used by: Rust runtime startup.</span>
+<a id="L-133" name="L-133"></a><span class="cm">*/</span>
+<a id="L-134" name="L-134"></a><span class="k">fn</span><span class="w"> </span><span class="nf">main</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<a id="L-135" name="L-135"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="kd">let</span><span class="w"> </span><span class="nb">Err</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">run</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="fm">eprintln!</span><span class="p">(</span><span class="s">&quot;error: {e}&quot;</span><span class="p">);</span><span class="w"> </span><span class="n">process</span><span class="p">::</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-136" name="L-136"></a><span class="p">}</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/*
+  Bessel Observatory: read numeric observations, compute J0 in child processes, and save ordered CSV.
+  J0 is approximated by averaging cos(x*sin(theta)) at 16,384 midpoint angles.
+  Normal use: PROGRAM [INPUT|- [OUTPUT [WORKERS]]]. Invalid value lines are reported and skipped.
+  Rust 2021; no crates. Result, iterators, ownership, and real child processes.
+*/
+use std::{env, error::Error, fs::File, io::{self, BufRead, BufReader, Write},
+          process::{self, Child, Command, Stdio}};
+type Result&lt;T&gt; = std::result::Result&lt;T, Box&lt;dyn Error&gt;&gt;;
+
+/*
+  Convert one token into a bounded observation value.
+  Inputs: A borrowed string slice.
+  Outputs: Result containing a finite f64, or a descriptive error.
+  Used by: run for file input and the internal worker command.
+*/
+fn number(s: &amp;str) -&gt; Result&lt;f64&gt; {
+    let x: f64 = s.trim().parse()?;
+    if !x.is_finite() || x.abs() &gt; 1000.0 { return Err(&quot;expected finite x in [-1000,1000]&quot;.into()); }
+    Ok(x)
+}
+/*
+  Generate midpoint samples and reduce their values to J0.
+  Inputs: A validated f64 x.
+  Outputs: The approximate J0 result.
+  Used by: run when it is executing the internal worker mode.
+*/
+fn observe(x: f64) -&gt; f64 {
+    let samples: Vec&lt;f64&gt; = (0..16384)
+        .map(|k| (x * (std::f64::consts::PI * (k as f64 + 0.5) / 16384.0).sin()).cos()).collect();
+    sum_buffer(&amp;samples) / 16384.0
+}
+/*
+  Demonstrate a borrowed raw-pointer walk without transferring ownership.
+  Inputs: An immutable slice of initialized f64 samples.
+  Outputs: Their sum; memory ownership remains with the caller.
+  Used by: observe to reduce the numerical samples.
+*/
+fn sum_buffer(samples: &amp;[f64]) -&gt; f64 {
+    let base = samples.as_ptr();
+    (0..samples.len()).map(|i| {
+        /*
+          SAFETY: i is in bounds; the borrowed slice owns live, aligned f64s
+          for this entire call. add advances in ELEMENTS, not bytes.
+          This isolated unsafe block is an educational pointer example;
+          ordinary Rust would use samples.iter().sum().
+        */
+        unsafe { *base.add(i) }
+    }).sum()
+}
+// Drop also reaps children if spawning or collecting a later child fails.
+struct Worker(Option&lt;Child&gt;);
+impl Drop for Worker {
+    /*
+      Ensure abandoning a Worker does not leave a running or unreaped child.
+      Inputs: The optional child still owned by this wrapper.
+      Outputs: No value; a remaining child is killed and waited for.
+      Used by: Rust drop glue on normal scope exit and early Result propagation.
+    */
+    fn drop(&amp;mut self) {
+        if let Some(child) = self.0.as_mut() { let _ = child.kill(); let _ = child.wait(); }
+    }
+}
+/*
+  Select CLI or worker behavior and perform the experiment with fallible operations.
+  Inputs: Command-line arguments and, in normal mode, input data.
+  Outputs: Ok on success or an error describing the failed operation.
+  Used by: main, which turns errors into a diagnostic and process exit status.
+*/
+fn run() -&gt; Result&lt;()&gt; {
+    let args: Vec&lt;String&gt; = env::args().skip(1).collect();
+    // Separate help and child computation from the ordinary interactive/file workflow.
+    match args.as_slice() {
+        [flag] if flag == &quot;--help&quot; =&gt; {
+            println!(&quot;Usage: bessel-rust [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;); return Ok(());
+        }
+        [flag, x] if flag == &quot;--worker&quot; =&gt; {
+            let x = number(x)?;
+            println!(&quot;{x:.17},{:.17},{}&quot;, observe(x), process::id()); return Ok(());
+        }
+        _ =&gt; {}
+    }
+    if args.len() &gt; 3 { return Err(&quot;too many arguments&quot;.into()); }
+    let source = args.first().map_or(&quot;-&quot;, String::as_str);
+    let target = args.get(1).map_or(&quot;results.csv&quot;, String::as_str);
+    let jobs: usize = args.get(2).map_or(&quot;2&quot;, String::as_str).parse()?;
+    if !(1..=16).contains(&amp;jobs) { return Err(&quot;workers must be 1..16&quot;.into()); }
+    // Expose a file or stdin through a shared buffered-reading interface.
+    let input: Box&lt;dyn BufRead&gt; = if source == &quot;-&quot; {
+        eprintln!(&quot;Enter one x per line; blank line or EOF finishes:&quot;); Box::new(io::stdin().lock())
+    } else { Box::new(BufReader::new(File::open(source)?)) };
+    let mut values = Vec::new();
+    // Preserve line order and include line numbers in recoverable input diagnostics.
+    for (index, line) in input.lines().enumerate() {
+        let line = line?; let text = line.trim();
+        match text {
+            &quot;&quot; =&gt; break,
+            s if s.starts_with(&#x27;#&#x27;) =&gt; continue,
+            s =&gt; match number(s) {
+                Ok(x) =&gt; values.push(x),
+                Err(e) =&gt; eprintln!(&quot;warning: line {}: {e}; skipped&quot;, index + 1),
+            }
+        }
+        if values.len() &gt; 4096 { return Err(&quot;at most 4096 values&quot;.into()); }
+    }
+    if values.is_empty() { return Err(&quot;no valid input values&quot;.into()); }
+    let executable = env::current_exe()?;
+    let mut rows = String::from(&quot;x,j0,worker_pid\n&quot;);
+    // Bound concurrent processes without requiring a nonstandard process-pool crate.
+    for batch in values.chunks(jobs) {
+        let mut children = Vec::new();
+        for x in batch {
+            children.push(Worker(Some(Command::new(&amp;executable).arg(&quot;--worker&quot;).arg(x.to_string())
+                .stdin(Stdio::null()).stdout(Stdio::piped()).spawn()?)));
+        }
+        // Drain each child output and validate its status before appending its CSV row.
+        for worker in &amp;mut children {
+            let output = worker.0.take().ok_or(&quot;missing child&quot;)?.wait_with_output()?;
+            if !output.status.success() || output.stdout.is_empty() { return Err(&quot;worker failed&quot;.into()); }
+            rows.push_str(std::str::from_utf8(&amp;output.stdout)?);
+        }
+    }
+    // Write the accumulated CSV after all numerical work is complete.
+    let mut output = File::create(target)?;
+    output.write_all(rows.as_bytes())?; output.flush()?;
+    println!(&quot;Wrote {} observations to {target}&quot;, values.len()); Ok(())
+}
+/*
+  Provide the executable entry point and final error boundary.
+  Inputs: The process environment, consumed by run.
+  Outputs: Success output or a nonzero process exit after printing the error.
+  Used by: Rust runtime startup.
+*/
+fn main() {
+    if let Err(e) = run() { eprintln!(&quot;error: {e}&quot;); process::exit(1); }
+}
+</textarea>
+<footer>Highlighted with Pygments using the Rust lexer. All assets are local. SHA-256: <code>f6ab8c3fafb710929463df8dfad0910e5761e11e1192c2542108c15a9b6b100a</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

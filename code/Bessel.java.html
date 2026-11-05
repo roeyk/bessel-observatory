@@ -1,0 +1,399 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="3fa37b4726a9d5cc48296880913e1a87d9961501478683be093c9fa0da82cd4a">
+<title>Java — Bessel.java — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.rs.html">← Rust</a><a href="bessel.rb.html">Ruby →</a></nav>
+<h1>Java <code>Bessel.java</code></h1>
+<p>JDK 17+ · Records, streams, try-with-resources and ProcessBuilder.</p>
+<p><strong>Memory:</strong> Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.<br><strong>Strings:</strong> strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.</p>
+<div class="actions"><a href="../Bessel.java">Open raw source</a>
+<a href="../Bessel.java" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: read x values, compute the same midpoint integral in OS workers, and write CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The normal argument order is input file (or -), output file, then worker limit.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  User input is validated before workers start; malformed numeric lines are reported and skipped.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  Java 17+: records, streams, try-with-resources, and ProcessBuilder.</span>
+<a id="L-6" name="L-6"></a><span class="cm">*/</span>
+<a id="L-7" name="L-7"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.io.*</span><span class="p">;</span>
+<a id="L-8" name="L-8"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.charset.StandardCharsets</span><span class="p">;</span>
+<a id="L-9" name="L-9"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.file.*</span><span class="p">;</span>
+<a id="L-10" name="L-10"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.ByteBuffer</span><span class="p">;</span>
+<a id="L-11" name="L-11"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.nio.ByteOrder</span><span class="p">;</span>
+<a id="L-12" name="L-12"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.*</span><span class="p">;</span>
+<a id="L-13" name="L-13"></a><span class="kn">import</span><span class="w"> </span><span class="nn">java.util.stream.IntStream</span><span class="p">;</span>
+<a id="L-14" name="L-14"></a>
+<a id="L-15" name="L-15"></a><span class="kd">public</span><span class="w"> </span><span class="kd">final</span><span class="w"> </span><span class="kd">class</span> <span class="nc">Bessel</span><span class="w"> </span><span class="p">{</span>
+<a id="L-16" name="L-16"></a><span class="w">    </span><span class="kd">record</span> <span class="nc">Observation</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">j0</span><span class="p">,</span><span class="w"> </span><span class="kt">long</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-17" name="L-17"></a><span class="w">        </span><span class="cm">/*</span>
+<a id="L-18" name="L-18"></a><span class="cm">          Serialize this immutable observation using a stable decimal locale.</span>
+<a id="L-19" name="L-19"></a><span class="cm">          Inputs: The x, j0 and pid fields of this record.</span>
+<a id="L-20" name="L-20"></a><span class="cm">          Outputs: One newline-terminated CSV row.</span>
+<a id="L-21" name="L-21"></a><span class="cm">          Used by: run in worker mode when it sends a result to the parent JVM.</span>
+<a id="L-22" name="L-22"></a><span class="cm">        */</span>
+<a id="L-23" name="L-23"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="nf">csv</span><span class="p">()</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">String</span><span class="p">.</span><span class="na">format</span><span class="p">(</span><span class="n">Locale</span><span class="p">.</span><span class="na">ROOT</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;%.17g,%.17g,%d%n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">j0</span><span class="p">,</span><span class="w"> </span><span class="n">pid</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-24" name="L-24"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-25" name="L-25"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-26" name="L-26"></a><span class="cm">      Parse an entire numeric string and enforce the comparison domain.</span>
+<a id="L-27" name="L-27"></a><span class="cm">      Inputs: Text from a file, stdin, or worker argument.</span>
+<a id="L-28" name="L-28"></a><span class="cm">      Outputs: A finite double in [-1000,1000], or an argument exception.</span>
+<a id="L-29" name="L-29"></a><span class="cm">      Used by: run to validate observations before computing them.</span>
+<a id="L-30" name="L-30"></a><span class="cm">    */</span>
+<a id="L-31" name="L-31"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="nf">number</span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-32" name="L-32"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">parseDouble</span><span class="p">(</span><span class="n">text</span><span class="p">.</span><span class="na">strip</span><span class="p">());</span>
+<a id="L-33" name="L-33"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">Double</span><span class="p">.</span><span class="na">isFinite</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span>
+<a id="L-34" name="L-34"></a><span class="w">            </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;expected finite x in [-1000,1000]&quot;</span><span class="p">);</span>
+<a id="L-35" name="L-35"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">x</span><span class="p">;</span>
+<a id="L-36" name="L-36"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-37" name="L-37"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-38" name="L-38"></a><span class="cm">      Compute J0 through a checked numeric buffer and record the worker PID.</span>
+<a id="L-39" name="L-39"></a><span class="cm">      Inputs: One validated x value.</span>
+<a id="L-40" name="L-40"></a><span class="cm">      Outputs: An immutable Observation with the quadrature result.</span>
+<a id="L-41" name="L-41"></a><span class="cm">      Used by: run in the child JVM selected by --worker.</span>
+<a id="L-42" name="L-42"></a><span class="cm">    */</span>
+<a id="L-43" name="L-43"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="n">Observation</span><span class="w"> </span><span class="nf">observe</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-44" name="L-44"></a><span class="w">        </span><span class="cm">/*</span>
+<a id="L-45" name="L-45"></a><span class="cm">          Java exposes object references and checked byte offsets, not raw</span>
+<a id="L-46" name="L-46"></a><span class="cm">          pointers. The buffer is shared by reference with its reading lambda.</span>
+<a id="L-47" name="L-47"></a><span class="cm">        */</span>
+<a id="L-48" name="L-48"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ByteBuffer</span><span class="p">.</span><span class="na">allocate</span><span class="p">(</span><span class="mi">16384</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">BYTES</span><span class="p">).</span><span class="na">order</span><span class="p">(</span><span class="n">ByteOrder</span><span class="p">.</span><span class="na">nativeOrder</span><span class="p">());</span>
+<a id="L-49" name="L-49"></a><span class="w">        </span><span class="n">IntStream</span><span class="p">.</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">16384</span><span class="p">).</span><span class="na">forEach</span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">-&gt;</span>
+<a id="L-50" name="L-50"></a><span class="w">            </span><span class="n">samples</span><span class="p">.</span><span class="na">putDouble</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">cos</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">sin</span><span class="p">(</span><span class="n">Math</span><span class="p">.</span><span class="na">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">))));</span>
+<a id="L-51" name="L-51"></a><span class="w">        </span><span class="kt">double</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">IntStream</span><span class="p">.</span><span class="na">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="mi">16384</span><span class="p">)</span>
+<a id="L-52" name="L-52"></a><span class="w">            </span><span class="p">.</span><span class="na">mapToDouble</span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="n">samples</span><span class="p">.</span><span class="na">getDouble</span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">BYTES</span><span class="p">)).</span><span class="na">sum</span><span class="p">();</span>
+<a id="L-53" name="L-53"></a><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">Observation</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">,</span><span class="w"> </span><span class="n">ProcessHandle</span><span class="p">.</span><span class="na">current</span><span class="p">().</span><span class="na">pid</span><span class="p">());</span>
+<a id="L-54" name="L-54"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-55" name="L-55"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-56" name="L-56"></a><span class="cm">      Execute help, one child calculation, or the complete parent workflow.</span>
+<a id="L-57" name="L-57"></a><span class="cm">      Inputs: The program argument array and optional stdin.</span>
+<a id="L-58" name="L-58"></a><span class="cm">      Outputs: CSV and console output; exceptions describe failed operations.</span>
+<a id="L-59" name="L-59"></a><span class="cm">      Used by: main, which owns the final error-to-exit-status boundary.</span>
+<a id="L-60" name="L-60"></a><span class="cm">    */</span>
+<a id="L-61" name="L-61"></a><span class="w">    </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="kd">throws</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="p">{</span>
+<a id="L-62" name="L-62"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;--help&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="L-63" name="L-63"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Usage: java Bessel [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="L-64" name="L-64"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-65" name="L-65"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;--worker&quot;</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<a id="L-66" name="L-66"></a><span class="w">            </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">print</span><span class="p">(</span><span class="n">observe</span><span class="p">(</span><span class="n">number</span><span class="p">(</span><span class="n">args</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="p">)).</span><span class="na">csv</span><span class="p">());</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="L-67" name="L-67"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-68" name="L-68"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;too many arguments&quot;</span><span class="p">);</span>
+<a id="L-69" name="L-69"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">0</span><span class="o">]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">args</span><span class="o">[</span><span class="mi">1</span><span class="o">]</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s">&quot;results.csv&quot;</span><span class="p">;</span>
+<a id="L-70" name="L-70"></a><span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">jobs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">args</span><span class="p">.</span><span class="na">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">Integer</span><span class="p">.</span><span class="na">parseInt</span><span class="p">(</span><span class="n">args</span><span class="o">[</span><span class="mi">2</span><span class="o">]</span><span class="p">)</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<a id="L-71" name="L-71"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">jobs</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">jobs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;workers must be 1..16&quot;</span><span class="p">);</span>
+<a id="L-72" name="L-72"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">source</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">))</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;Enter one x per line; blank line or EOF finishes:&quot;</span><span class="p">);</span>
+<a id="L-73" name="L-73"></a><span class="w">        </span><span class="c1">// Accumulate only valid observations before creating any children.</span>
+<a id="L-74" name="L-74"></a><span class="w">        </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<a id="L-75" name="L-75"></a><span class="w">        </span><span class="c1">// Ensure a file or stdin reader is closed even if reading fails.</span>
+<a id="L-76" name="L-76"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">source</span><span class="p">.</span><span class="na">equals</span><span class="p">(</span><span class="s">&quot;-&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">BufferedReader</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">InputStreamReader</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">in</span><span class="p">))</span>
+<a id="L-77" name="L-77"></a><span class="w">                                           </span><span class="p">:</span><span class="w"> </span><span class="n">Files</span><span class="p">.</span><span class="na">newBufferedReader</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">source</span><span class="p">)))</span><span class="w"> </span><span class="p">{</span>
+<a id="L-78" name="L-78"></a><span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="n">String</span><span class="w"> </span><span class="n">line</span><span class="p">;</span><span class="w"> </span><span class="p">(</span><span class="n">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">input</span><span class="p">.</span><span class="na">readLine</span><span class="p">())</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="kc">null</span><span class="p">;)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-79" name="L-79"></a><span class="w">                </span><span class="n">String</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">line</span><span class="p">.</span><span class="na">strip</span><span class="p">();</span>
+<a id="L-80" name="L-80"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<a id="L-81" name="L-81"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">text</span><span class="p">.</span><span class="na">startsWith</span><span class="p">(</span><span class="s">&quot;#&quot;</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<a id="L-82" name="L-82"></a><span class="w">                </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="n">number</span><span class="p">(</span><span class="n">text</span><span class="p">));</span><span class="w"> </span><span class="p">}</span>
+<a id="L-83" name="L-83"></a><span class="w">                </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IllegalArgumentException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;warning: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&quot;; skipped&quot;</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-84" name="L-84"></a><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="na">size</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4096</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;at most 4096 values&quot;</span><span class="p">);</span>
+<a id="L-85" name="L-85"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-86" name="L-86"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-87" name="L-87"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">values</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IllegalArgumentException</span><span class="p">(</span><span class="s">&quot;no valid input values&quot;</span><span class="p">);</span>
+<a id="L-88" name="L-88"></a><span class="w">        </span><span class="kd">var</span><span class="w"> </span><span class="n">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">StringBuilder</span><span class="p">(</span><span class="s">&quot;x,j0,worker_pid\n&quot;</span><span class="p">);</span>
+<a id="L-89" name="L-89"></a><span class="w">        </span><span class="n">String</span><span class="w"> </span><span class="n">java</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.home&quot;</span><span class="p">),</span><span class="w"> </span><span class="s">&quot;bin&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;java&quot;</span><span class="p">).</span><span class="na">toString</span><span class="p">();</span>
+<a id="L-90" name="L-90"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="na">size</span><span class="p">();</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">jobs</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-91" name="L-91"></a><span class="w">            </span><span class="c1">// Keep the complete batch alive until it has all been launched and collected.</span>
+<a id="L-92" name="L-92"></a><span class="w">            </span><span class="n">List</span><span class="o">&lt;</span><span class="n">Process</span><span class="o">&gt;</span><span class="w"> </span><span class="n">children</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">ArrayList</span><span class="o">&lt;&gt;</span><span class="p">();</span>
+<a id="L-93" name="L-93"></a><span class="w">            </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="L-94" name="L-94"></a><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="na">subList</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">Math</span><span class="p">.</span><span class="na">min</span><span class="p">(</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">jobs</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="na">size</span><span class="p">())))</span>
+<a id="L-95" name="L-95"></a><span class="w">                    </span><span class="c1">// Start a separate JVM with the same classpath so it can load this program and its worker mode.</span>
+<a id="L-96" name="L-96"></a><span class="w">                    </span><span class="n">children</span><span class="p">.</span><span class="na">add</span><span class="p">(</span><span class="k">new</span><span class="w"> </span><span class="n">ProcessBuilder</span><span class="p">(</span><span class="n">java</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;-cp&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">getProperty</span><span class="p">(</span><span class="s">&quot;java.class.path&quot;</span><span class="p">),</span>
+<a id="L-97" name="L-97"></a><span class="w">                        </span><span class="s">&quot;Bessel&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;--worker&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Double</span><span class="p">.</span><span class="na">toString</span><span class="p">(</span><span class="n">x</span><span class="p">)).</span><span class="na">redirectError</span><span class="p">(</span><span class="n">ProcessBuilder</span><span class="p">.</span><span class="na">Redirect</span><span class="p">.</span><span class="na">INHERIT</span><span class="p">).</span><span class="na">start</span><span class="p">());</span>
+<a id="L-98" name="L-98"></a><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-99" name="L-99"></a><span class="w">                    </span><span class="c1">// Drain the small worker payload before waiting, then check that the child exited successfully.</span>
+<a id="L-100" name="L-100"></a><span class="w">                    </span><span class="n">String</span><span class="w"> </span><span class="n">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">String</span><span class="p">(</span><span class="n">child</span><span class="p">.</span><span class="na">getInputStream</span><span class="p">().</span><span class="na">readAllBytes</span><span class="p">(),</span><span class="w"> </span><span class="n">StandardCharsets</span><span class="p">.</span><span class="na">UTF_8</span><span class="p">);</span>
+<a id="L-101" name="L-101"></a><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="p">.</span><span class="na">waitFor</span><span class="p">()</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">row</span><span class="p">.</span><span class="na">isEmpty</span><span class="p">())</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">IOException</span><span class="p">(</span><span class="s">&quot;worker failed&quot;</span><span class="p">);</span>
+<a id="L-102" name="L-102"></a><span class="w">                    </span><span class="n">rows</span><span class="p">.</span><span class="na">append</span><span class="p">(</span><span class="n">row</span><span class="p">);</span>
+<a id="L-103" name="L-103"></a><span class="w">                </span><span class="p">}</span>
+<a id="L-104" name="L-104"></a><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span>
+<a id="L-105" name="L-105"></a><span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="n">child</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="n">children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-106" name="L-106"></a><span class="w">                    </span><span class="c1">// Terminate unfinished children when a batch fails and reap each process.</span>
+<a id="L-107" name="L-107"></a><span class="w">                    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">child</span><span class="p">.</span><span class="na">isAlive</span><span class="p">())</span><span class="w"> </span><span class="n">child</span><span class="p">.</span><span class="na">destroyForcibly</span><span class="p">();</span>
+<a id="L-108" name="L-108"></a><span class="w">                    </span><span class="n">child</span><span class="p">.</span><span class="na">waitFor</span><span class="p">();</span>
+<a id="L-109" name="L-109"></a><span class="w">                </span><span class="p">}</span>
+<a id="L-110" name="L-110"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-111" name="L-111"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-112" name="L-112"></a><span class="w">        </span><span class="c1">// Publish ordered CSV only after all children have returned valid rows.</span>
+<a id="L-113" name="L-113"></a><span class="w">        </span><span class="n">Files</span><span class="p">.</span><span class="na">writeString</span><span class="p">(</span><span class="n">Path</span><span class="p">.</span><span class="na">of</span><span class="p">(</span><span class="n">target</span><span class="p">),</span><span class="w"> </span><span class="n">rows</span><span class="p">);</span>
+<a id="L-114" name="L-114"></a><span class="w">        </span><span class="n">System</span><span class="p">.</span><span class="na">out</span><span class="p">.</span><span class="na">printf</span><span class="p">(</span><span class="s">&quot;Wrote %d observations to %s%n&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">values</span><span class="p">.</span><span class="na">size</span><span class="p">(),</span><span class="w"> </span><span class="n">target</span><span class="p">);</span>
+<a id="L-115" name="L-115"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-116" name="L-116"></a><span class="w">    </span><span class="cm">/*</span>
+<a id="L-117" name="L-117"></a><span class="cm">      Start the Java edition and keep ordinary failures readable.</span>
+<a id="L-118" name="L-118"></a><span class="cm">      Inputs: The argument array supplied by the JVM.</span>
+<a id="L-119" name="L-119"></a><span class="cm">      Outputs: A normal return on success or process status 1 on error.</span>
+<a id="L-120" name="L-120"></a><span class="cm">      Used by: The Java launcher.</span>
+<a id="L-121" name="L-121"></a><span class="cm">    */</span>
+<a id="L-122" name="L-122"></a><span class="w">    </span><span class="kd">public</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="kt">void</span><span class="w"> </span><span class="nf">main</span><span class="p">(</span><span class="n">String</span><span class="o">[]</span><span class="w"> </span><span class="n">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-123" name="L-123"></a><span class="w">        </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">run</span><span class="p">(</span><span class="n">args</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-124" name="L-124"></a><span class="w">        </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">Exception</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">err</span><span class="p">.</span><span class="na">println</span><span class="p">(</span><span class="s">&quot;error: &quot;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">e</span><span class="p">.</span><span class="na">getMessage</span><span class="p">());</span><span class="w"> </span><span class="n">System</span><span class="p">.</span><span class="na">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-125" name="L-125"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-126" name="L-126"></a><span class="p">}</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/*
+  Bessel Observatory: read x values, compute the same midpoint integral in OS workers, and write CSV.
+  The normal argument order is input file (or -), output file, then worker limit.
+  User input is validated before workers start; malformed numeric lines are reported and skipped.
+  Java 17+: records, streams, try-with-resources, and ProcessBuilder.
+*/
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.*;
+import java.util.stream.IntStream;
+
+public final class Bessel {
+    record Observation(double x, double j0, long pid) {
+        /*
+          Serialize this immutable observation using a stable decimal locale.
+          Inputs: The x, j0 and pid fields of this record.
+          Outputs: One newline-terminated CSV row.
+          Used by: run in worker mode when it sends a result to the parent JVM.
+        */
+        String csv() { return String.format(Locale.ROOT, &quot;%.17g,%.17g,%d%n&quot;, x, j0, pid); }
+    }
+    /*
+      Parse an entire numeric string and enforce the comparison domain.
+      Inputs: Text from a file, stdin, or worker argument.
+      Outputs: A finite double in [-1000,1000], or an argument exception.
+      Used by: run to validate observations before computing them.
+    */
+    static double number(String text) {
+        double x = Double.parseDouble(text.strip());
+        if (!Double.isFinite(x) || Math.abs(x) &gt; 1000)
+            throw new IllegalArgumentException(&quot;expected finite x in [-1000,1000]&quot;);
+        return x;
+    }
+    /*
+      Compute J0 through a checked numeric buffer and record the worker PID.
+      Inputs: One validated x value.
+      Outputs: An immutable Observation with the quadrature result.
+      Used by: run in the child JVM selected by --worker.
+    */
+    static Observation observe(double x) {
+        /*
+          Java exposes object references and checked byte offsets, not raw
+          pointers. The buffer is shared by reference with its reading lambda.
+        */
+        var samples = ByteBuffer.allocate(16384 * Double.BYTES).order(ByteOrder.nativeOrder());
+        IntStream.range(0, 16384).forEach(k -&gt;
+            samples.putDouble(Math.cos(x * Math.sin(Math.PI * (k + 0.5) / 16384))));
+        double sum = IntStream.range(0, 16384)
+            .mapToDouble(k -&gt; samples.getDouble(k * Double.BYTES)).sum();
+        return new Observation(x, sum / 16384, ProcessHandle.current().pid());
+    }
+    /*
+      Execute help, one child calculation, or the complete parent workflow.
+      Inputs: The program argument array and optional stdin.
+      Outputs: CSV and console output; exceptions describe failed operations.
+      Used by: main, which owns the final error-to-exit-status boundary.
+    */
+    static void run(String[] args) throws Exception {
+        if (args.length == 1 &amp;&amp; args[0].equals(&quot;--help&quot;)) {
+            System.out.println(&quot;Usage: java Bessel [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;); return;
+        }
+        if (args.length == 2 &amp;&amp; args[0].equals(&quot;--worker&quot;)) {
+            System.out.print(observe(number(args[1])).csv()); return;
+        }
+        if (args.length &gt; 3) throw new IllegalArgumentException(&quot;too many arguments&quot;);
+        String source = args.length &gt; 0 ? args[0] : &quot;-&quot;, target = args.length &gt; 1 ? args[1] : &quot;results.csv&quot;;
+        int jobs = args.length &gt; 2 ? Integer.parseInt(args[2]) : 2;
+        if (jobs &lt; 1 || jobs &gt; 16) throw new IllegalArgumentException(&quot;workers must be 1..16&quot;);
+        if (source.equals(&quot;-&quot;)) System.err.println(&quot;Enter one x per line; blank line or EOF finishes:&quot;);
+        // Accumulate only valid observations before creating any children.
+        List&lt;Double&gt; values = new ArrayList&lt;&gt;();
+        // Ensure a file or stdin reader is closed even if reading fails.
+        try (var input = source.equals(&quot;-&quot;) ? new BufferedReader(new InputStreamReader(System.in))
+                                           : Files.newBufferedReader(Path.of(source))) {
+            for (String line; (line = input.readLine()) != null;) {
+                String text = line.strip();
+                if (text.isEmpty()) break;
+                if (text.startsWith(&quot;#&quot;)) continue;
+                try { values.add(number(text)); }
+                catch (IllegalArgumentException e) { System.err.println(&quot;warning: &quot; + e.getMessage() + &quot;; skipped&quot;); }
+                if (values.size() &gt; 4096) throw new IllegalArgumentException(&quot;at most 4096 values&quot;);
+            }
+        }
+        if (values.isEmpty()) throw new IllegalArgumentException(&quot;no valid input values&quot;);
+        var rows = new StringBuilder(&quot;x,j0,worker_pid\n&quot;);
+        String java = Path.of(System.getProperty(&quot;java.home&quot;), &quot;bin&quot;, &quot;java&quot;).toString();
+        for (int i = 0; i &lt; values.size(); i += jobs) {
+            // Keep the complete batch alive until it has all been launched and collected.
+            List&lt;Process&gt; children = new ArrayList&lt;&gt;();
+            try {
+                for (double x : values.subList(i, Math.min(i + jobs, values.size())))
+                    // Start a separate JVM with the same classpath so it can load this program and its worker mode.
+                    children.add(new ProcessBuilder(java, &quot;-cp&quot;, System.getProperty(&quot;java.class.path&quot;),
+                        &quot;Bessel&quot;, &quot;--worker&quot;, Double.toString(x)).redirectError(ProcessBuilder.Redirect.INHERIT).start());
+                for (var child : children) {
+                    // Drain the small worker payload before waiting, then check that the child exited successfully.
+                    String row = new String(child.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                    if (child.waitFor() != 0 || row.isEmpty()) throw new IOException(&quot;worker failed&quot;);
+                    rows.append(row);
+                }
+            } finally {
+                for (var child : children) {
+                    // Terminate unfinished children when a batch fails and reap each process.
+                    if (child.isAlive()) child.destroyForcibly();
+                    child.waitFor();
+                }
+            }
+        }
+        // Publish ordered CSV only after all children have returned valid rows.
+        Files.writeString(Path.of(target), rows);
+        System.out.printf(&quot;Wrote %d observations to %s%n&quot;, values.size(), target);
+    }
+    /*
+      Start the Java edition and keep ordinary failures readable.
+      Inputs: The argument array supplied by the JVM.
+      Outputs: A normal return on success or process status 1 on error.
+      Used by: The Java launcher.
+    */
+    public static void main(String[] args) {
+        try { run(args); }
+        catch (Exception e) { System.err.println(&quot;error: &quot; + e.getMessage()); System.exit(1); }
+    }
+}
+</textarea>
+<footer>Highlighted with Pygments using the Java lexer. All assets are local. SHA-256: <code>3fa37b4726a9d5cc48296880913e1a87d9961501478683be093c9fa0da82cd4a</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

@@ -1,0 +1,738 @@
+{
+  "title": "Bessel Observatory",
+  "created": "2026-11-04",
+  "language_count": 30,
+  "description": "One numerical observatory, expressed independently and idiomatically in 30 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
+  "goals": [
+    "Make language differences visible through equivalent observable behavior.",
+    "Exercise file and console I/O, interactive input, command-line arguments, graceful error handling, actual OS multiprocessing, and special-function mathematics.",
+    "Keep each numerical kernel in its language; Bash explicitly uses its conventional awk floating-point utility. Low-level adapters provide missing OS services, never a shared Bessel implementation.",
+    "Make setup requirements and validation evidence explicit.",
+    "Compare pointers, references, byte/element offsets and string manipulation honestly across memory models."
+  ],
+  "methodology": [
+    "Specify a shared input/output and failure contract before writing implementations.",
+    "Use midpoint quadrature of the same integral with 16384 samples in every version.",
+    "Choose native idioms and standard libraries; use a named dialect or OS extension when a language lacks process APIs.",
+    "Use bounded process batches, or native process pools, preserving input order.",
+    "Validate numerical answers against independent high-precision reference values, not just against another translation.",
+    "Check invalid input, stdin, worker limits, file failures, empty input and argument misuse. Record unavailable toolchains as untested.",
+    "Document SQL input/argument adaptations, process startup overhead, and floating-point differences.",
+    "Keep unsafe memory demonstrations isolated; preserve allocation lifetime and bounds, then rerun the behavioral checks. Display an explicit memory/string feature map for every language.",
+    "Use functional comments and purpose/input/output/caller contracts; use native block comments where available, # comments for Python, and ERA blocks for Perligata."
+  ],
+  "contract": {
+    "usage": "PROGRAM [INPUT|- [OUTPUT [WORKERS]]]",
+    "defaults": {
+      "input": "-",
+      "output": "results.csv",
+      "workers": 2
+    },
+    "workers": "Integer from 1 through 16; maximum simultaneous numeric worker processes, not total lifetime process count.",
+    "input": "UTF-8/ASCII text, one decimal real per line; leading/trailing whitespace ignored; lines beginning # are comments. First blank line or EOF finishes in both file and interactive modes.",
+    "domain": "Finite real x in [-1000,1000]; at most 4096 accepted values.",
+    "errors": "Invalid value lines produce diagnostics on stderr and are skipped. No valid values, excess values, bad arguments, I/O failures or worker failures terminate nonzero. Ordinary exceptions become readable diagnostics.",
+    "output": "CSV columns x,j0,worker_pid; one row per accepted value in original order. Output is written after all calculations succeed, and replaces an existing target. OS PIDs and numeric formatting vary.",
+    "help": "--help prints usage. Hidden --worker modes, where present, are implementation details.",
+    "portability": "Linux/POSIX is the comparison baseline. Ada/Fortran bindings assume LP64; BASIC/COBOL target Linux x86-64. Some process-launch implementations also work on macOS/Windows. Native numeric parsers may accept additional literal spellings; the common format is ordinary decimal or e-notation. RPG uses IBM i CALL parameters, DSPLY and IFS paths; its separate integration contract is rpg_setup.txt. Oberon bounds line length to 4095 bytes."
+  },
+  "mathematics": {
+    "function": "Bessel function of the first kind, order zero: J0(x)",
+    "integral": "J0(x) = (1/pi) integral_0^pi cos(x sin(theta)) dtheta",
+    "approximation": "J0(x) ~= (1/N) sum_{k=0}^{N-1} cos(x sin(pi (k+1/2)/N)), N=16384",
+    "samples": 16384,
+    "motivation": "An oscillating radial wave profile; Bessel functions arise in circular vibration and wave problems.",
+    "reference": "https://dlmf.nist.gov/10.9#E1",
+    "validation_absolute_tolerance": 1e-10,
+    "caveats": "This is a finite quadrature demonstration, not a certified special-function library. Domain and sample count are fixed to keep comparisons well resolved. Reduction order, compensated summation and sinpi cause tiny differences; no bitwise equivalence or speed ranking is claimed."
+  },
+  "sql_adapter": {
+    "arguments": "psql -X -d observatory -v values=0,1,5 -v workers=2 -v output=results.csv -f bessel.sql",
+    "interactive": "Omit values and input to receive a psql prompt for a comma-separated list.",
+    "file_input": "-v input=/absolute/server/path/values.txt; pg_read_file reads on the database server and needs its file-read privileges. Output is local to the psql client.",
+    "setup": "Use a dedicated database with dblink installed or extension creation privileges. Connections must authenticate to the same database; optional -v conn=... uses a libpq connection string or service. Do not pass -1/--single-transaction: new backend connections must see the committed extension.",
+    "state": "Creates dblink if absent and session-local temporary tables; workers execute SQL aggregates without shared functions. Backend PID is the worker_pid."
+  },
+  "limitations": [
+    "This is a language study, not a process-startup benchmark: some versions reuse workers, others launch one child per value.",
+    "Runtime startup often costs more than the calculation; large JVM/BEAM runs are intentionally not optimized for throughput.",
+    "Error cleanup covers ordinary I/O and worker failures; signal handling is runtime-dependent. The examples do not promise transactional output under disk-full failures or process termination.",
+    "GNU Smalltalk must be launched from the project directory because its workers use the relative bessel.st path.",
+    "SQL requires a running PostgreSQL server; it cannot be executed as a standalone portable SQL file in SQLite/MySQL.",
+    "Use the supplied BASIC build helper: FreeBASIC generates a C intermediate, so compiling the same basename in the source directory can collide with the C edition.",
+    "Bash orchestrates the embedded awk numerical kernel because Bash arithmetic is integer-only.",
+    "Oberon-2 uses the supplied C adapter for checked OS and stdio interfaces; its quadrature and raw-address traversal are Oberon.",
+    "Perligata uses an explicitly marked Perl prelude for regex validation, lexical filehandles, and checked process services; the Latin portion owns quadrature and scheduling.",
+    "RPG requires IBM i setup described in rpg_setup.txt; failed or timed-out runs retain work rows, and submitted jobs may finish after parent failure.",
+    "Raw pointer arithmetic is unavailable in several listed languages; their native reference/offset models are documented instead."
+  ],
+  "validation": {
+    "report": "tests/report.json",
+    "runner": "python3 tests/verify.py",
+    "references": "tests/reference.json",
+    "status": "See per-language report; source review is not a substitute for compilation/execution.",
+    "source_browser": "30 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
+  },
+  "sources": [
+    {
+      "title": "NIST DLMF \u2014 Bessel integral",
+      "url": "https://dlmf.nist.gov/10.9#E1"
+    },
+    {
+      "title": "Free Pascal TProcess",
+      "url": "https://www.freepascal.org/docs-html/fcl/process/tprocess.html"
+    },
+    {
+      "title": "GnuCOBOL system routines",
+      "url": "https://gnucobol.sourceforge.io/doc/gnucobol.html"
+    },
+    {
+      "title": "GNU Smalltalk library",
+      "url": "https://www.gnu.org/software/smalltalk/manual-base/gst-base.html"
+    },
+    {
+      "title": "luaposix",
+      "url": "https://luaposix.github.io/luaposix/"
+    },
+    {
+      "title": "Erlang ports",
+      "url": "https://www.erlang.org/doc/apps/erts/erlang.html"
+    },
+    {
+      "title": "SBCL manual",
+      "url": "https://www.sbcl.org/manual/"
+    },
+    {
+      "title": "PostgreSQL dblink",
+      "url": "https://www.postgresql.org/docs/current/dblink.html"
+    },
+    {
+      "title": "PostgreSQL psql",
+      "url": "https://www.postgresql.org/docs/18/app-psql.html"
+    },
+    {
+      "title": "Julia GC.@preserve",
+      "url": "https://docs.julialang.org/en/v1.11/base/base/#Base.GC.@preserve"
+    },
+    {
+      "title": "GnuCOBOL pointer arithmetic",
+      "url": "https://gnucobol.sourceforge.io/faq/"
+    },
+    {
+      "title": "Oxford Oberon-2 compiler and library sources",
+      "url": "https://github.com/Spivoxity/obc-3"
+    },
+    {
+      "title": "Perligata grammar and CPAN distribution",
+      "url": "https://metacpan.org/pod/Lingua::Romana::Perligata"
+    },
+    {
+      "title": "GNU Bash manual",
+      "url": "https://www.gnu.org/software/bash/manual/bash.html"
+    },
+    {
+      "title": "IBM i IFS UTF-8 file services",
+      "url": "https://www.ibm.com/docs/en/i/7.5.0?topic=is-ifs-write-ifs-write-binary-ifs-write-utf8-procedures"
+    },
+    {
+      "title": "IBM ILE RPG reference",
+      "url": "https://www.ibm.com/docs/en/i/7.4.0?topic=rpg-ile-reference"
+    }
+  ],
+  "languages": [
+    {
+      "id": "pascal",
+      "name": "Pascal",
+      "source": "bessel.pas",
+      "runtime": "Free Pascal 3.2+",
+      "build": [
+        "fpc",
+        "-O2",
+        "-FUbuild/pascal",
+        "-obuild/bessel-pascal",
+        "bessel.pas"
+      ],
+      "run": [
+        "build/bessel-pascal"
+      ],
+      "idioms": "Procedures, dynamic arrays, try/except and try/finally, TProcess ownership.",
+      "multiprocessing": "TProcess child executables in bounded batches",
+      "memory": "PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.",
+      "strings": "Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.",
+      "highlighted": "code/bessel.pas.html"
+    },
+    {
+      "id": "ada",
+      "name": "Ada",
+      "source": "bessel.adb",
+      "runtime": "GNAT / Ada 2012 on POSIX LP64",
+      "build": [
+        "gnatmake",
+        "-gnat2012",
+        "-O2",
+        "-D",
+        "build/ada",
+        "bessel.adb",
+        "-o",
+        "build/bessel-ada"
+      ],
+      "run": [
+        "build/bessel-ada"
+      ],
+      "idioms": "Strong types, range checks, generic Float_IO, exception handlers, explicit C imports.",
+      "multiprocessing": "POSIX fork, pipe and waitpid",
+      "memory": "Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.",
+      "strings": "Trim, string slices, argument strings, image conversion and diagnostic concatenation.",
+      "highlighted": "code/bessel.adb.html"
+    },
+    {
+      "id": "basic",
+      "name": "BASIC",
+      "source": "bessel.bas",
+      "runtime": "FreeBASIC 1.10 on Linux x86-64",
+      "build": [
+        "sh",
+        "tools/build_basic.sh"
+      ],
+      "run": [
+        "build/bessel-basic"
+      ],
+      "idioms": "Structured BASIC, typed arrays, line input and explicit return-code checks.",
+      "multiprocessing": "POSIX fork and binary pipes via C ABI",
+      "memory": "ByRef parameters, Double Ptr, dereference and cursor += 1 across a locally owned numeric array.",
+      "strings": "Trim, Left, StrPtr, C-string end-pointer validation and CSV concatenation.",
+      "highlighted": "code/bessel.bas.html",
+      "build_prerequisites": [
+        "fbc"
+      ]
+    },
+    {
+      "id": "cobol",
+      "name": "COBOL",
+      "source": "bessel.cob",
+      "runtime": "GnuCOBOL 3.2 on Linux x86-64",
+      "build": [
+        "cobc",
+        "-A",
+        "-std=gnu17",
+        "-x",
+        "-free",
+        "bessel.cob",
+        "-o",
+        "build/bessel-cobol"
+      ],
+      "run": [
+        "build/bessel-cobol"
+      ],
+      "idioms": "Divisions, paragraphs, PICTURE fields, EVALUATE, file status and ON SIZE ERROR.",
+      "multiprocessing": "CBL_GC_FORK with POSIX pipes and waitpid",
+      "memory": "USAGE POINTER, ADDRESS OF, a LINKAGE reference, and SET pointer UP BY LENGTH OF current-sample.",
+      "strings": "FUNCTION TRIM, reference modification, TEST-NUMVAL-F, STRING and edited PICTURE output.",
+      "highlighted": "code/bessel.cob.html"
+    },
+    {
+      "id": "fortran",
+      "name": "Fortran",
+      "source": "bessel.f90",
+      "runtime": "Fortran 2008 / gfortran on POSIX LP64",
+      "build": [
+        "gfortran",
+        "-std=f2008",
+        "-O2",
+        "-Jbuild/fortran",
+        "bessel.f90",
+        "-o",
+        "build/bessel-fortran"
+      ],
+      "run": [
+        "build/bessel-fortran"
+      ],
+      "idioms": "Modules, numeric kinds, typed array pointers, IEEE checks, IOSTAT and ISO_C_BINDING.",
+      "multiprocessing": "POSIX fork and pipes through ISO_C_BINDING",
+      "memory": "C_LOC / C_F_POINTER produce typed array pointers; pointer sections shift the view using array descriptors. Raw address addition is not portable standard Fortran.",
+      "strings": "TRIM, ADJUSTL, VERIFY, character slices, concatenation, internal numeric READ and formatted WRITE.",
+      "highlighted": "code/bessel.f90.html"
+    },
+    {
+      "id": "c",
+      "name": "C",
+      "source": "bessel.c",
+      "runtime": "C17 + POSIX",
+      "build": [
+        "cc",
+        "-std=c17",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "bessel.c",
+        "-lm",
+        "-o",
+        "build/bessel-c"
+      ],
+      "run": [
+        "build/bessel-c"
+      ],
+      "idioms": "Structs, explicit ownership, checked return codes, complete pipe transfers.",
+      "multiprocessing": "POSIX fork, pipe and waitpid",
+      "memory": "Pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked IPC transfers.",
+      "strings": "strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted CSV.",
+      "highlighted": "code/bessel.c.html"
+    },
+    {
+      "id": "objc",
+      "name": "Objective-C",
+      "source": "bessel.m",
+      "runtime": "Foundation: macOS or GNUstep",
+      "build": null,
+      "run": [
+        "build/bessel-objc"
+      ],
+      "idioms": "Objective-C class messages, Foundation collections, NSTask, NSError and @try/@finally.",
+      "multiprocessing": "NSTask child executables",
+      "memory": "Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.",
+      "strings": "NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.",
+      "highlighted": "code/bessel.m.html"
+    },
+    {
+      "id": "smalltalk",
+      "name": "Smalltalk",
+      "source": "bessel.st",
+      "runtime": "GNU Smalltalk 3.2+ / POSIX",
+      "build": null,
+      "run": [
+        "gst",
+        "-f",
+        "bessel.st"
+      ],
+      "idioms": "Message sends, blocks, inject:into:, OrderedCollection, on:do: and ensure:.",
+      "multiprocessing": "External GNU Smalltalk VMs via FileStream popen:",
+      "memory": "Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.",
+      "strings": "trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.",
+      "highlighted": "code/bessel.st.html"
+    },
+    {
+      "id": "cpp",
+      "name": "C++",
+      "source": "bessel.cpp",
+      "runtime": "C++20 + POSIX",
+      "build": [
+        "c++",
+        "-std=c++20",
+        "-O2",
+        "-Wall",
+        "-Wextra",
+        "bessel.cpp",
+        "-o",
+        "build/bessel-cpp"
+      ],
+      "run": [
+        "build/bessel-cpp"
+      ],
+      "idioms": "RAII, unique_ptr, structured bindings, standard exceptions and std::numbers.",
+      "multiprocessing": "RAII-managed POSIX fork workers",
+      "memory": "C++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references.",
+      "strings": "std::string searches, substring position validation, stoi/stod and stream formatting.",
+      "highlighted": "code/bessel.cpp.html"
+    },
+    {
+      "id": "rust",
+      "name": "Rust",
+      "source": "bessel.rs",
+      "runtime": "Rust 2021 / standard library",
+      "build": [
+        "rustc",
+        "--edition=2021",
+        "-O",
+        "bessel.rs",
+        "-o",
+        "build/bessel-rust"
+      ],
+      "run": [
+        "build/bessel-rust"
+      ],
+      "idioms": "Result and ?, exhaustive match, iterators, ownership and Drop cleanup.",
+      "multiprocessing": "std::process::Command child executables",
+      "memory": "Borrowed &[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.",
+      "strings": "trim, starts_with, parse, String accumulation and UTF-8 validation.",
+      "highlighted": "code/bessel.rs.html"
+    },
+    {
+      "id": "java",
+      "name": "Java",
+      "source": "Bessel.java",
+      "runtime": "JDK 17+",
+      "build": [
+        "javac",
+        "-d",
+        "build",
+        "Bessel.java"
+      ],
+      "run": [
+        "java",
+        "-cp",
+        "build",
+        "Bessel"
+      ],
+      "idioms": "Records, streams, try-with-resources and ProcessBuilder.",
+      "multiprocessing": "Separate JVM worker processes",
+      "memory": "Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.",
+      "strings": "strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.",
+      "highlighted": "code/Bessel.java.html"
+    },
+    {
+      "id": "ruby",
+      "name": "Ruby",
+      "source": "bessel.rb",
+      "runtime": "Ruby 3.x / POSIX",
+      "build": null,
+      "run": [
+        "ruby",
+        "bessel.rb"
+      ],
+      "idioms": "Blocks, Enumerable sum and each_slice, rescue/ensure, CSV library.",
+      "multiprocessing": "fork with IO.pipe",
+      "memory": "Object references plus Fiddle::Pointer over a retained packed string; pointer + byte offset and native-double reads.",
+      "strings": "strip, start_with?, pack/unpack, interpolation, numeric conversion and CSV serialization.",
+      "highlighted": "code/bessel.rb.html"
+    },
+    {
+      "id": "javascript",
+      "name": "JavaScript",
+      "source": "bessel.mjs",
+      "runtime": "Node.js 20+",
+      "build": null,
+      "run": [
+        "node",
+        "bessel.mjs"
+      ],
+      "idioms": "ES modules, async iteration, promises, Promise.all, try/finally.",
+      "multiprocessing": "child_process.fork with IPC messages, not worker threads",
+      "memory": "ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.",
+      "strings": "trim, startsWith, regex validation, template strings and array joining.",
+      "highlighted": "code/bessel.mjs.html"
+    },
+    {
+      "id": "python",
+      "name": "Python",
+      "source": "bessel.py",
+      "runtime": "Python 3.10+",
+      "build": null,
+      "run": [
+        "python3",
+        "bessel.py"
+      ],
+      "idioms": "Structural match/case, type hints, generators, context managers, argparse, fsum. A small ctypes example demonstrates pointer offsets.",
+      "multiprocessing": "ProcessPoolExecutor with spawn context",
+      "memory": "ctypes array ownership, byref(array, byte_offset), POINTER(c_double) casts and contents dereference. math.fsum remains the reducer.",
+      "strings": "strip, startswith, float parsing, f-strings and csv.writer serialization.",
+      "highlighted": "code/bessel.py.html"
+    },
+    {
+      "id": "lua",
+      "name": "Lua",
+      "source": "bessel.lua",
+      "runtime": "Lua 5.4 + luaposix",
+      "build": null,
+      "run": [
+        "lua",
+        "bessel.lua"
+      ],
+      "idioms": "Tables, closures, protected calls, to-be-closed local, small explicit modules.",
+      "multiprocessing": "luaposix fork, pipes and wait",
+      "memory": "Tables are passed by reference and process pipes are handles. Standard Lua 5.4 has no raw-pointer arithmetic; no LuaJIT FFI is assumed.",
+      "strings": "Lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct CSV.",
+      "highlighted": "code/bessel.lua.html"
+    },
+    {
+      "id": "julia",
+      "name": "Julia",
+      "source": "bessel.jl",
+      "runtime": "Julia 1.10+ / Distributed standard library",
+      "build": null,
+      "run": [
+        "julia",
+        "--startup-file=no",
+        "bessel.jl"
+      ],
+      "idioms": "Multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap.",
+      "multiprocessing": "Distributed.addprocs / pmap on OS workers",
+      "memory": "Ptr byte arithmetic and unsafe_load within GC.@preserve; the owning Float64 array stays alive and unmodified.",
+      "strings": "strip, startswith, parse, interpolation and Printf output.",
+      "highlighted": "code/bessel.jl.html"
+    },
+    {
+      "id": "perl",
+      "name": "Perl",
+      "source": "bessel.pl",
+      "runtime": "Perl 5.20+ / POSIX",
+      "build": null,
+      "run": [
+        "perl",
+        "bessel.pl"
+      ],
+      "idioms": "Lexical filehandles, regexes, eval/die, list processing and POSIX module.",
+      "multiprocessing": "fork with pipe handles",
+      "memory": "Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.",
+      "strings": "Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.",
+      "highlighted": "code/bessel.pl.html"
+    },
+    {
+      "id": "swift",
+      "name": "Swift",
+      "source": "bessel.swift",
+      "runtime": "Swift 5.9+ / Foundation",
+      "build": [
+        "swiftc",
+        "bessel.swift",
+        "-o",
+        "build/bessel-swift"
+      ],
+      "run": [
+        "build/bessel-swift"
+      ],
+      "idioms": "Value types, typed error enum, guard, defer and Foundation Process.",
+      "multiprocessing": "Foundation Process child executables",
+      "memory": "Foundation class references plus withUnsafeBufferPointer, advanced(by:) and pointee inside the buffer lifetime.",
+      "strings": "Trimming, hasPrefix, UTF-8 conversion, splitting lines and interpolation.",
+      "highlighted": "code/bessel.swift.html"
+    },
+    {
+      "id": "erlang",
+      "name": "Erlang",
+      "source": "bessel.erl",
+      "runtime": "Erlang/OTP 25+",
+      "build": null,
+      "run": [
+        "escript",
+        "bessel.erl"
+      ],
+      "idioms": "Pattern matching, tail recursion, mailbox receive, ports and try/after.",
+      "multiprocessing": "Ports start separate escript OS VMs; not just BEAM processes",
+      "memory": "Immutable values and opaque port handles. BEAM terms do not expose raw memory pointers or pointer arithmetic.",
+      "strings": "string:trim, string:to_float/to_integer, float_to_list and io:format.",
+      "highlighted": "code/bessel.erl.html"
+    },
+    {
+      "id": "haskell",
+      "name": "Haskell",
+      "source": "bessel.hs",
+      "runtime": "GHC 9.x + process and unix packages",
+      "build": [
+        "ghc",
+        "-O2",
+        "-outputdir",
+        "build/haskell",
+        "bessel.hs",
+        "-o",
+        "build/bessel-haskell"
+      ],
+      "run": [
+        "build/bessel-haskell"
+      ],
+      "idioms": "Pure sample generation, Either, pattern matching, scoped foreign memory, explicit IO and bracketed child lifetimes.",
+      "multiprocessing": "System.Process child executables",
+      "memory": "withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.",
+      "strings": "Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.",
+      "highlighted": "code/bessel.hs.html"
+    },
+    {
+      "id": "ocaml",
+      "name": "OCaml",
+      "source": "bessel.ml",
+      "runtime": "OCaml 4.14+ + Unix",
+      "build": [
+        "ocamlopt",
+        "-I",
+        "+unix",
+        "unix.cmxa",
+        "bessel.ml",
+        "-o",
+        "build/bessel-ocaml"
+      ],
+      "run": [
+        "build/bessel-ocaml"
+      ],
+      "idioms": "Algebraic variants, pattern matching, recursive list processing, Fun.protect.",
+      "multiprocessing": "Unix.fork and pipes",
+      "memory": "ref cells, shared values and mutable array/channel handles. Portable OCaml does not expose raw address arithmetic.",
+      "strings": "String.trim, prefix indexing, float_of_string, concatenation and Printf.",
+      "highlighted": "code/bessel.ml.html"
+    },
+    {
+      "id": "lisp",
+      "name": "Lisp",
+      "source": "bessel.lisp",
+      "runtime": "Common Lisp / SBCL 2.x",
+      "build": null,
+      "run": [
+        "sbcl",
+        "--script",
+        "bessel.lisp"
+      ],
+      "idioms": "Conditions, a skip-value restart, LOOP, WITH-OPEN-FILE and UNWIND-PROTECT.",
+      "multiprocessing": "SBCL run-program with asynchronous OS processes",
+      "memory": "SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.",
+      "strings": "STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.",
+      "highlighted": "code/bessel.lisp.html"
+    },
+    {
+      "id": "prolog",
+      "name": "Prolog",
+      "source": "bessel.pro",
+      "runtime": "SWI-Prolog 9.x",
+      "build": null,
+      "run": [
+        "swipl",
+        "-q",
+        "-s",
+        "bessel.pro",
+        "--"
+      ],
+      "idioms": "Relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3.",
+      "multiprocessing": "library(process) creates separate SWI-Prolog OS workers",
+      "memory": "Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.",
+      "strings": "normalize_space, sub_string, number_string, atom/string conversion and format.",
+      "highlighted": "code/bessel.pro.html"
+    },
+    {
+      "id": "kotlin",
+      "name": "Kotlin",
+      "source": "Bessel.kt",
+      "runtime": "Kotlin 1.9+ + JVM 17",
+      "build": [
+        "kotlinc",
+        "Bessel.kt",
+        "-include-runtime",
+        "-d",
+        "build/bessel-kotlin.jar"
+      ],
+      "run": [
+        "java",
+        "-jar",
+        "build/bessel-kotlin.jar"
+      ],
+      "idioms": "Data classes, when, collection pipelines, use, require and finally.",
+      "multiprocessing": "ProcessBuilder starts separate JVMs",
+      "memory": "JVM object references and ByteBuffer getDouble at checked byte offsets; raw pointers are not available on this target.",
+      "strings": "trim, startsWith, conversions, string interpolation and Locale.ROOT formatting.",
+      "highlighted": "code/Bessel.kt.html"
+    },
+    {
+      "id": "go",
+      "name": "Go",
+      "source": "bessel.go",
+      "runtime": "Go 1.22+",
+      "build": [
+        "go",
+        "build",
+        "-o",
+        "build/bessel-go",
+        "bessel.go"
+      ],
+      "run": [
+        "build/bessel-go"
+      ],
+      "idioms": "Explicit errors, defer, small structs, interfaces and standard-library process APIs.",
+      "multiprocessing": "os/exec child executables; goroutines only support pipe I/O",
+      "memory": "A slice owns samples; unsafe.SliceData, unsafe.Add and typed dereference show byte arithmetic, with runtime.KeepAlive.",
+      "strings": "TrimSpace, HasPrefix, ParseFloat, FormatFloat, bytes.Buffer and formatted CSV.",
+      "highlighted": "code/bessel.go.html"
+    },
+    {
+      "id": "sql",
+      "name": "SQL",
+      "source": "bessel.sql",
+      "runtime": "PostgreSQL 14+ + psql + dblink",
+      "build": null,
+      "run": [
+        "psql",
+        "-X",
+        "-d",
+        "observatory",
+        "-f",
+        "bessel.sql"
+      ],
+      "idioms": "Set-based numeric aggregation, temporary relations, PL/pgSQL exceptions, psql variables.",
+      "multiprocessing": "dblink_send_query dispatches to separate PostgreSQL backend OS processes",
+      "memory": "Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.",
+      "strings": "btrim, regexp validation, replace, string_to_array, format and array operations.",
+      "highlighted": "code/bessel.sql.html"
+    },
+    {
+      "id": "oberon",
+      "name": "Oberon-2",
+      "source": "Bessel.Mod",
+      "runtime": "Oxford Oberon-2 OBC 3 + POSIX C toolchain",
+      "build": [
+        "sh",
+        "tools/build_oberon.sh"
+      ],
+      "run": [
+        "build/bessel-oberon"
+      ],
+      "idioms": "Modules, typed record pointers, VAR parameters, explicit error checks, LONGREAL quadrature.",
+      "multiprocessing": "Bounded fork/pipe batches through the supplied checked POSIX adapter.",
+      "memory": "Typed pointer owns a sample record; SYSTEM.ADR/GET and byte offsets traverse it without intervening allocations.",
+      "strings": "VAR-based in-place whitespace trimming, CHAR scanning, NUL-terminated CLI strings, checked numeric conversion.",
+      "support": [
+        "bessel-oberon-posix.c",
+        "tools/build_oberon.sh"
+      ],
+      "highlighted": "code/Bessel.Mod.html"
+    },
+    {
+      "id": "rpg",
+      "name": "RPG",
+      "source": "bessel.sqlrpgle",
+      "runtime": "IBM i 7.5, ILE RPG + Db2 SQL + QC2LE; see rpg_setup.txt",
+      "build": null,
+      "run": [
+        "system",
+        "CALL PGM(BESSELAB/BESSEL) PARM('/tmp/values.txt' '/tmp/results.csv' '2')"
+      ],
+      "idioms": "Fully free RPG, MONITOR/ON-ERROR, prototyped calls, embedded SQL, native job messages.",
+      "multiprocessing": "SBMJOB creates bounded IBM i batch jobs; dedicated queue must permit concurrent execution.",
+      "memory": "POINTER, %ADDR, BASED aliases, by-reference parameters, and byte-wise pointer advancement by %SIZE.",
+      "strings": "%TRIM, %CHECK, %SUBST, %SCANRPL, %CHAR, concatenation and CCSID-aware IFS services.",
+      "support": [
+        "rpg_setup.txt",
+        "rpg_setup.sql"
+      ],
+      "integration_required": "Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.",
+      "highlighted": "code/bessel.sqlrpgle.html"
+    },
+    {
+      "id": "bash",
+      "name": "Bash",
+      "source": "bessel.sh",
+      "runtime": "Bash 4.3+ with awk and POSIX utilities",
+      "build": null,
+      "run": [
+        "bash",
+        "bessel.sh"
+      ],
+      "idioms": "Arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec.",
+      "multiprocessing": "Background Bash workers exec awk; BASHPID remains the OS PID performing the numerical calculation.",
+      "memory": "Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.",
+      "strings": "Whitespace parameter expansion, substring offsets, regex validation and printf.",
+      "highlighted": "code/bessel.sh.html"
+    },
+    {
+      "id": "perligata",
+      "name": "Lingua::Romana::Perligata",
+      "source": "bessel-perligata.pl",
+      "runtime": "POSIX Perl + CPAN Lingua::Romana::Perligata 0.605",
+      "build": null,
+      "run": [
+        "perl",
+        "bessel-perligata.pl"
+      ],
+      "idioms": "Latin declensions, Roman numerals, sic/cis blocks, adnota comments and ecce documentation; explicit small Perl compatibility prelude.",
+      "multiprocessing": "Latin scheduling loop uses a Perl fork bridge, bounded PID batches and private per-observation files.",
+      "memory": "Latin ad creates a scalar reference for in-place trim; Perl references preserve owners. No raw pointer arithmetic.",
+      "strings": "Latin excerpementum (substr), serementum (concatenation), chr punctuation, and a regex-based Perl validation bridge.",
+      "highlighted": "code/bessel-perligata.pl.html"
+    }
+  ],
+  "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics."
+}

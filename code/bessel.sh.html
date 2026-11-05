@@ -1,0 +1,336 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="1b64897a9e444bd8d0cbc32a419b90f60d1ee4d245329398f4917cbf8aa2ab4b">
+<title>Bash — bessel.sh — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.sqlrpgle.html">← RPG</a><a href="bessel-perligata.pl.html">Lingua::Romana::Perligata →</a></nav>
+<h1>Bash <code>bessel.sh</code></h1>
+<p>Bash 4.3+ with awk and POSIX utilities · Arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec.</p>
+<p><strong>Memory:</strong> Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.<br><strong>Strings:</strong> Whitespace parameter expansion, substring offsets, regex validation and printf.</p>
+<div class="actions"><a href="../bessel.sh">Open raw source</a>
+<a href="../bessel.sh" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/usr/bin/env bash</span>
+<a id="L-2" name="L-2"></a><span class="c1"># Bessel Observatory: Bash 4.3+ orchestrates independent awk processes.</span>
+<a id="L-3" name="L-3"></a><span class="c1"># Bash has integer arithmetic; awk supplies the floating-point kernel below.</span>
+<a id="L-4" name="L-4"></a><span class="c1"># Every result carries the PID of the process that actually calculated it.</span>
+<a id="L-5" name="L-5"></a><span class="nb">set</span><span class="w"> </span>-uo<span class="w"> </span>pipefail
+<a id="L-6" name="L-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LC_ALL</span><span class="o">=</span>C
+<a id="L-7" name="L-7"></a><span class="nb">declare</span><span class="w"> </span>-a<span class="w"> </span><span class="nv">values</span><span class="o">=()</span><span class="w"> </span><span class="nv">pids</span><span class="o">=()</span><span class="w"> </span><span class="nv">rows</span><span class="o">=()</span>
+<a id="L-8" name="L-8"></a><span class="nv">temporary</span><span class="o">=</span><span class="s1">&#39;&#39;</span>
+<a id="L-9" name="L-9"></a>
+<a id="L-10" name="L-10"></a><span class="c1"># Report an unrecoverable error and let the EXIT trap release resources.</span>
+<a id="L-11" name="L-11"></a><span class="c1"># Inputs: Diagnostic words. Outputs: stderr and exit status 1.</span>
+<a id="L-12" name="L-12"></a><span class="c1"># Used by: argument, input, worker, and output checks throughout this script.</span>
+<a id="L-13" name="L-13"></a>fail<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;bessel: %s\n&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$*</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<a id="L-14" name="L-14"></a>
+<a id="L-15" name="L-15"></a><span class="c1"># Reap outstanding workers and remove this invocation&#39;s private row files.</span>
+<a id="L-16" name="L-16"></a><span class="c1"># Inputs: Global pids and temporary directory. Outputs: released resources.</span>
+<a id="L-17" name="L-17"></a><span class="c1"># Used by: EXIT and signal traps so ordinary failures leave no child jobs.</span>
+<a id="L-18" name="L-18"></a>cleanup<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="L-19" name="L-19"></a><span class="w">    </span><span class="nb">local</span><span class="w"> </span>pid
+<a id="L-20" name="L-20"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span>pid<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">pids</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">kill</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pid</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>:<span class="p">;</span><span class="w"> </span><span class="k">done</span>
+<a id="L-21" name="L-21"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span>pid<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">pids</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pid</span><span class="s2">&quot;</span><span class="w"> </span><span class="m">2</span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>:<span class="p">;</span><span class="w"> </span><span class="k">done</span>
+<a id="L-22" name="L-22"></a><span class="w">    </span><span class="o">[[</span><span class="w"> </span>-z<span class="w"> </span><span class="nv">$temporary</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>rm<span class="w"> </span>-rf<span class="w"> </span>--<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$temporary</span><span class="s2">&quot;</span>
+<a id="L-23" name="L-23"></a><span class="o">}</span>
+<a id="L-24" name="L-24"></a><span class="nb">trap</span><span class="w"> </span>cleanup<span class="w"> </span>EXIT
+<a id="L-25" name="L-25"></a><span class="nb">trap</span><span class="w"> </span><span class="s1">&#39;exit 130&#39;</span><span class="w"> </span>INT
+<a id="L-26" name="L-26"></a><span class="nb">trap</span><span class="w"> </span><span class="s1">&#39;exit 143&#39;</span><span class="w"> </span>TERM
+<a id="L-27" name="L-27"></a>
+<a id="L-28" name="L-28"></a><span class="c1"># Trim whitespace through a nameref, illustrating Bash&#39;s reference model.</span>
+<a id="L-29" name="L-29"></a><span class="c1"># Inputs: Name of a caller-owned string variable. Outputs: modified variable.</span>
+<a id="L-30" name="L-30"></a><span class="c1"># Used by: the input loop before comment, blank-line, and numeric checks.</span>
+<a id="L-31" name="L-31"></a>trim<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="L-32" name="L-32"></a><span class="w">    </span><span class="nb">local</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">target</span><span class="o">=</span><span class="nv">$1</span>
+<a id="L-33" name="L-33"></a><span class="w">    </span><span class="nv">target</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">target</span><span class="p">#</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">target</span><span class="p">%%[![:</span><span class="nv">space</span><span class="p">:]]*</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="L-34" name="L-34"></a><span class="w">    </span><span class="nv">target</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">target</span><span class="p">%</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">target</span><span class="p">##*[![:</span><span class="nv">space</span><span class="p">:]]</span><span class="si">}</span><span class="s2">&quot;</span><span class="si">}</span><span class="s2">&quot;</span>
+<a id="L-35" name="L-35"></a><span class="o">}</span>
+<a id="L-36" name="L-36"></a>
+<a id="L-37" name="L-37"></a><span class="c1"># Compute one observation in the child that exec replaces with awk.</span>
+<a id="L-38" name="L-38"></a><span class="c1"># Inputs: Decimal x and private output path. Outputs: one CSV row, or failure.</span>
+<a id="L-39" name="L-39"></a><span class="c1"># Used by: the batch loop; BASHPID survives exec and identifies the math worker.</span>
+<a id="L-40" name="L-40"></a>observe<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="L-41" name="L-41"></a><span class="w">    </span><span class="nb">exec</span><span class="w"> </span>awk<span class="w"> </span>-v<span class="w"> </span><span class="nv">x</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$1</span><span class="s2">&quot;</span><span class="w"> </span>-v<span class="w"> </span><span class="nv">pid</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$BASHPID</span><span class="s2">&quot;</span><span class="w"> </span><span class="s1">&#39;</span>
+<a id="L-42" name="L-42"></a><span class="s1">        # Midpoint quadrature averages the oscillating Bessel integrand.</span>
+<a id="L-43" name="L-43"></a><span class="s1">        BEGIN {</span>
+<a id="L-44" name="L-44"></a><span class="s1">            n = 16384; pi = 4 * atan2(1, 1); sum = 0</span>
+<a id="L-45" name="L-45"></a><span class="s1">            for (k = 0; k &lt; n; k++) sum += cos(x * sin(pi * (k + .5) / n))</span>
+<a id="L-46" name="L-46"></a><span class="s1">            printf &quot;%.17g,%.17g,%d\n&quot;, x, sum / n, pid</span>
+<a id="L-47" name="L-47"></a><span class="s1">        }</span>
+<a id="L-48" name="L-48"></a><span class="s1">    &#39;</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$2</span><span class="s2">&quot;</span>
+<a id="L-49" name="L-49"></a><span class="o">}</span>
+<a id="L-50" name="L-50"></a>
+<a id="L-51" name="L-51"></a><span class="c1"># Wait for a whole bounded batch before scheduling another one.</span>
+<a id="L-52" name="L-52"></a><span class="c1"># Inputs: Global pids. Outputs: empty pid array, or a readable fatal error.</span>
+<a id="L-53" name="L-53"></a><span class="c1"># Used by: the scheduling loop and its final partly filled batch.</span>
+<a id="L-54" name="L-54"></a>join_batch<span class="o">()</span><span class="w"> </span><span class="o">{</span>
+<a id="L-55" name="L-55"></a><span class="w">    </span><span class="nb">local</span><span class="w"> </span>pid<span class="w"> </span><span class="nv">failed</span><span class="o">=</span><span class="m">0</span>
+<a id="L-56" name="L-56"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span>pid<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">pids</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">wait</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$pid</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nv">failed</span><span class="o">=</span><span class="m">1</span><span class="p">;</span><span class="w"> </span><span class="k">done</span>
+<a id="L-57" name="L-57"></a><span class="w">    </span><span class="nv">pids</span><span class="o">=()</span>
+<a id="L-58" name="L-58"></a><span class="w">    </span><span class="o">((</span><span class="w"> </span><span class="nv">failed</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;a numeric worker failed&#39;</span>
+<a id="L-59" name="L-59"></a><span class="o">}</span>
+<a id="L-60" name="L-60"></a>
+<a id="L-61" name="L-61"></a><span class="c1"># Validate the public positional interface before acquiring any resources.</span>
+<a id="L-62" name="L-62"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$1</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>--help<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="L-63" name="L-63"></a><span class="w">    </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;Usage: bash bessel.sh [INPUT|- [OUTPUT [WORKERS]]]\n&#39;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="m">0</span>
+<a id="L-64" name="L-64"></a><span class="k">fi</span>
+<a id="L-65" name="L-65"></a><span class="o">((</span><span class="w"> </span><span class="nv">$#</span><span class="w"> </span>&lt;<span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;expected at most three arguments; use --help&#39;</span>
+<a id="L-66" name="L-66"></a><span class="nv">input</span><span class="o">=</span><span class="si">${</span><span class="nv">1</span><span class="k">:-</span><span class="p">-</span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="nv">output</span><span class="o">=</span><span class="si">${</span><span class="nv">2</span><span class="k">:-</span><span class="nv">results</span><span class="p">.csv</span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="nv">workers</span><span class="o">=</span><span class="si">${</span><span class="nv">3</span><span class="k">:-</span><span class="nv">2</span><span class="si">}</span>
+<a id="L-67" name="L-67"></a><span class="o">[[</span><span class="w"> </span><span class="nv">$workers</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>^<span class="o">[</span><span class="m">0</span>-9<span class="o">]</span>+$<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="si">${#</span><span class="nv">workers</span><span class="si">}</span><span class="w"> </span>-le<span class="w"> </span><span class="m">2</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;WORKERS must be an integer from 1 to 16&#39;</span>
+<a id="L-68" name="L-68"></a><span class="nv">workers</span><span class="o">=</span><span class="k">$((</span><span class="m">10#</span><span class="nv">$workers</span><span class="k">))</span>
+<a id="L-69" name="L-69"></a><span class="o">((</span><span class="w"> </span>workers<span class="w"> </span>&gt;<span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>workers<span class="w"> </span>&lt;<span class="o">=</span><span class="w"> </span><span class="m">16</span><span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;WORKERS must be from 1 to 16&#39;</span>
+<a id="L-70" name="L-70"></a><span class="nb">command</span><span class="w"> </span>-v<span class="w"> </span>awk<span class="w"> </span>&gt;/dev/null<span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;awk is required for floating-point mathematics&#39;</span>
+<a id="L-71" name="L-71"></a>
+<a id="L-72" name="L-72"></a><span class="c1"># Use a dedicated descriptor so console and file input share the same loop.</span>
+<a id="L-73" name="L-73"></a><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span><span class="nv">$input</span><span class="w"> </span><span class="o">==</span><span class="w"> </span>-<span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="nb">exec</span><span class="w"> </span><span class="m">3</span>&lt;<span class="p">&amp;</span><span class="m">0</span>
+<a id="L-75" name="L-75"></a><span class="w">    </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span>-t<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;Enter x values; blank line finishes.\n&#39;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span>
+<a id="L-76" name="L-76"></a><span class="k">else</span>
+<a id="L-77" name="L-77"></a><span class="w">    </span><span class="o">[[</span><span class="w"> </span>-f<span class="w"> </span><span class="nv">$input</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>-r<span class="w"> </span><span class="nv">$input</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s2">&quot;cannot read </span><span class="nv">$input</span><span class="s2">&quot;</span>
+<a id="L-78" name="L-78"></a><span class="w">    </span><span class="nb">exec</span><span class="w"> </span><span class="m">3</span>&lt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$input</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s2">&quot;cannot open </span><span class="nv">$input</span><span class="s2">&quot;</span>
+<a id="L-79" name="L-79"></a><span class="k">fi</span>
+<a id="L-80" name="L-80"></a><span class="k">while</span><span class="w"> </span><span class="nv">IFS</span><span class="o">=</span><span class="w"> </span><span class="nb">read</span><span class="w"> </span>-r<span class="w"> </span>line<span class="w"> </span>&lt;<span class="p">&amp;</span><span class="m">3</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">$line</span><span class="w"> </span><span class="o">]]</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="L-81" name="L-81"></a><span class="w">    </span>trim<span class="w"> </span>line
+<a id="L-82" name="L-82"></a><span class="w">    </span><span class="o">[[</span><span class="w"> </span>-n<span class="w"> </span><span class="nv">$line</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">break</span>
+<a id="L-83" name="L-83"></a><span class="w">    </span><span class="c1"># Substring offsets operate on characters; Bash has no raw address arithmetic.</span>
+<a id="L-84" name="L-84"></a><span class="w">    </span><span class="o">[[</span><span class="w"> </span><span class="si">${</span><span class="nv">line</span><span class="p">:</span><span class="nv">0</span><span class="p">:</span><span class="nv">1</span><span class="si">}</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s1">&#39;#&#39;</span><span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="k">continue</span>
+<a id="L-85" name="L-85"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="o">[[</span><span class="w"> </span>!<span class="w"> </span><span class="nv">$line</span><span class="w"> </span><span class="o">=</span>~<span class="w"> </span>^<span class="o">[</span>+-<span class="o">]</span>?<span class="o">([</span><span class="m">0</span>-9<span class="o">]</span>+<span class="o">([</span>.<span class="o">][</span><span class="m">0</span>-9<span class="o">]</span>*<span class="o">)</span>?<span class="p">|</span><span class="o">[</span>.<span class="o">][</span><span class="m">0</span>-9<span class="o">]</span>+<span class="o">)([</span>eE<span class="o">][</span>+-<span class="o">]</span>?<span class="o">[</span><span class="m">0</span>-9<span class="o">]</span>+<span class="o">)</span>?$<span class="w"> </span><span class="o">]]</span><span class="w"> </span><span class="o">||</span>
+<a id="L-86" name="L-86"></a><span class="w">       </span>!<span class="w"> </span>awk<span class="w"> </span>-v<span class="w"> </span><span class="nv">x</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span><span class="w"> </span><span class="s1">&#39;BEGIN {exit !(x+0 &gt;= -1000 &amp;&amp; x+0 &lt;= 1000)}&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<a id="L-87" name="L-87"></a><span class="w">        </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;Skipping invalid value: %s\n&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span><span class="w"> </span>&gt;<span class="p">&amp;</span><span class="m">2</span><span class="p">;</span><span class="w"> </span><span class="k">continue</span>
+<a id="L-88" name="L-88"></a><span class="w">    </span><span class="k">fi</span>
+<a id="L-89" name="L-89"></a><span class="w">    </span><span class="o">((</span><span class="w"> </span><span class="si">${#</span><span class="nv">values</span><span class="p">[@]</span><span class="si">}</span><span class="w"> </span>&lt;<span class="w"> </span><span class="m">4096</span><span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;at most 4096 observations are allowed&#39;</span>
+<a id="L-90" name="L-90"></a><span class="w">    </span><span class="nv">values</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$line</span><span class="s2">&quot;</span><span class="o">)</span>
+<a id="L-91" name="L-91"></a><span class="k">done</span>
+<a id="L-92" name="L-92"></a><span class="nb">exec</span><span class="w"> </span><span class="m">3</span>&lt;<span class="p">&amp;</span>-
+<a id="L-93" name="L-93"></a><span class="o">((</span><span class="w"> </span><span class="si">${#</span><span class="nv">values</span><span class="p">[@]</span><span class="si">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;no valid observations&#39;</span>
+<a id="L-94" name="L-94"></a><span class="nv">temporary</span><span class="o">=</span><span class="k">$(</span>mktemp<span class="w"> </span>-d<span class="k">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s1">&#39;cannot create temporary directory&#39;</span>
+<a id="L-95" name="L-95"></a>
+<a id="L-96" name="L-96"></a><span class="c1"># Private files avoid pipe deadlocks and preserve input order across batches.</span>
+<a id="L-97" name="L-97"></a><span class="k">for</span><span class="w"> </span>index<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="p">!values[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="L-98" name="L-98"></a><span class="w">    </span><span class="nv">rows</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$temporary</span><span class="s2">/</span><span class="nv">$index</span><span class="s2">.csv&quot;</span><span class="o">)</span>
+<a id="L-99" name="L-99"></a><span class="w">    </span>observe<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">values</span><span class="p">[index]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">rows</span><span class="p">[index]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="L-100" name="L-100"></a><span class="w">    </span><span class="nv">pids</span><span class="o">+=(</span><span class="s2">&quot;</span><span class="nv">$!</span><span class="s2">&quot;</span><span class="o">)</span>
+<a id="L-101" name="L-101"></a><span class="w">    </span><span class="o">((</span><span class="w"> </span><span class="si">${#</span><span class="nv">pids</span><span class="p">[@]</span><span class="si">}</span><span class="w"> </span>&lt;<span class="w"> </span>workers<span class="w"> </span><span class="o">))</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>join_batch
+<a id="L-102" name="L-102"></a><span class="k">done</span>
+<a id="L-103" name="L-103"></a>join_batch
+<a id="L-104" name="L-104"></a><span class="o">{</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;x,j0,worker_pid\n&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>cat<span class="w"> </span>--<span class="w"> </span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">rows</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">;</span><span class="w"> </span><span class="o">}</span><span class="w"> </span>&gt;<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$output</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">||</span><span class="w"> </span>fail<span class="w"> </span><span class="s2">&quot;cannot write </span><span class="nv">$output</span><span class="s2">&quot;</span>
+<a id="L-105" name="L-105"></a><span class="nb">printf</span><span class="w"> </span><span class="s1">&#39;Wrote %d observations to %s\n&#39;</span><span class="w"> </span><span class="s2">&quot;</span><span class="si">${#</span><span class="nv">values</span><span class="p">[@]</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$output</span><span class="s2">&quot;</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#!/usr/bin/env bash
+# Bessel Observatory: Bash 4.3+ orchestrates independent awk processes.
+# Bash has integer arithmetic; awk supplies the floating-point kernel below.
+# Every result carries the PID of the process that actually calculated it.
+set -uo pipefail
+export LC_ALL=C
+declare -a values=() pids=() rows=()
+temporary=&#x27;&#x27;
+
+# Report an unrecoverable error and let the EXIT trap release resources.
+# Inputs: Diagnostic words. Outputs: stderr and exit status 1.
+# Used by: argument, input, worker, and output checks throughout this script.
+fail() { printf &#x27;bessel: %s\n&#x27; &quot;$*&quot; &gt;&amp;2; exit 1; }
+
+# Reap outstanding workers and remove this invocation&#x27;s private row files.
+# Inputs: Global pids and temporary directory. Outputs: released resources.
+# Used by: EXIT and signal traps so ordinary failures leave no child jobs.
+cleanup() {
+    local pid
+    for pid in &quot;${pids[@]}&quot;; do kill &quot;$pid&quot; 2&gt;/dev/null || :; done
+    for pid in &quot;${pids[@]}&quot;; do wait &quot;$pid&quot; 2&gt;/dev/null || :; done
+    [[ -z $temporary ]] || rm -rf -- &quot;$temporary&quot;
+}
+trap cleanup EXIT
+trap &#x27;exit 130&#x27; INT
+trap &#x27;exit 143&#x27; TERM
+
+# Trim whitespace through a nameref, illustrating Bash&#x27;s reference model.
+# Inputs: Name of a caller-owned string variable. Outputs: modified variable.
+# Used by: the input loop before comment, blank-line, and numeric checks.
+trim() {
+    local -n target=$1
+    target=&quot;${target#&quot;${target%%[![:space:]]*}&quot;}&quot;
+    target=&quot;${target%&quot;${target##*[![:space:]]}&quot;}&quot;
+}
+
+# Compute one observation in the child that exec replaces with awk.
+# Inputs: Decimal x and private output path. Outputs: one CSV row, or failure.
+# Used by: the batch loop; BASHPID survives exec and identifies the math worker.
+observe() {
+    exec awk -v x=&quot;$1&quot; -v pid=&quot;$BASHPID&quot; &#x27;
+        # Midpoint quadrature averages the oscillating Bessel integrand.
+        BEGIN {
+            n = 16384; pi = 4 * atan2(1, 1); sum = 0
+            for (k = 0; k &lt; n; k++) sum += cos(x * sin(pi * (k + .5) / n))
+            printf &quot;%.17g,%.17g,%d\n&quot;, x, sum / n, pid
+        }
+    &#x27; &gt; &quot;$2&quot;
+}
+
+# Wait for a whole bounded batch before scheduling another one.
+# Inputs: Global pids. Outputs: empty pid array, or a readable fatal error.
+# Used by: the scheduling loop and its final partly filled batch.
+join_batch() {
+    local pid failed=0
+    for pid in &quot;${pids[@]}&quot;; do wait &quot;$pid&quot; || failed=1; done
+    pids=()
+    (( failed == 0 )) || fail &#x27;a numeric worker failed&#x27;
+}
+
+# Validate the public positional interface before acquiring any resources.
+if [[ $# == 1 &amp;&amp; $1 == --help ]]; then
+    printf &#x27;Usage: bash bessel.sh [INPUT|- [OUTPUT [WORKERS]]]\n&#x27;; exit 0
+fi
+(( $# &lt;= 3 )) || fail &#x27;expected at most three arguments; use --help&#x27;
+input=${1:--}; output=${2:-results.csv}; workers=${3:-2}
+[[ $workers =~ ^[0-9]+$ &amp;&amp; ${#workers} -le 2 ]] || fail &#x27;WORKERS must be an integer from 1 to 16&#x27;
+workers=$((10#$workers))
+(( workers &gt;= 1 &amp;&amp; workers &lt;= 16 )) || fail &#x27;WORKERS must be from 1 to 16&#x27;
+command -v awk &gt;/dev/null || fail &#x27;awk is required for floating-point mathematics&#x27;
+
+# Use a dedicated descriptor so console and file input share the same loop.
+if [[ $input == - ]]; then
+    exec 3&lt;&amp;0
+    [[ ! -t 0 ]] || printf &#x27;Enter x values; blank line finishes.\n&#x27; &gt;&amp;2
+else
+    [[ -f $input &amp;&amp; -r $input ]] || fail &quot;cannot read $input&quot;
+    exec 3&lt; &quot;$input&quot; || fail &quot;cannot open $input&quot;
+fi
+while IFS= read -r line &lt;&amp;3 || [[ -n $line ]]; do
+    trim line
+    [[ -n $line ]] || break
+    # Substring offsets operate on characters; Bash has no raw address arithmetic.
+    [[ ${line:0:1} != &#x27;#&#x27; ]] || continue
+    if [[ ! $line =~ ^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$ ]] ||
+       ! awk -v x=&quot;$line&quot; &#x27;BEGIN {exit !(x+0 &gt;= -1000 &amp;&amp; x+0 &lt;= 1000)}&#x27;; then
+        printf &#x27;Skipping invalid value: %s\n&#x27; &quot;$line&quot; &gt;&amp;2; continue
+    fi
+    (( ${#values[@]} &lt; 4096 )) || fail &#x27;at most 4096 observations are allowed&#x27;
+    values+=(&quot;$line&quot;)
+done
+exec 3&lt;&amp;-
+(( ${#values[@]} &gt; 0 )) || fail &#x27;no valid observations&#x27;
+temporary=$(mktemp -d) || fail &#x27;cannot create temporary directory&#x27;
+
+# Private files avoid pipe deadlocks and preserve input order across batches.
+for index in &quot;${!values[@]}&quot;; do
+    rows+=(&quot;$temporary/$index.csv&quot;)
+    observe &quot;${values[index]}&quot; &quot;${rows[index]}&quot; &amp;
+    pids+=(&quot;$!&quot;)
+    (( ${#pids[@]} &lt; workers )) || join_batch
+done
+join_batch
+{ printf &#x27;x,j0,worker_pid\n&#x27; &amp;&amp; cat -- &quot;${rows[@]}&quot;; } &gt; &quot;$output&quot; || fail &quot;cannot write $output&quot;
+printf &#x27;Wrote %d observations to %s\n&#x27; &quot;${#values[@]}&quot; &quot;$output&quot;
+</textarea>
+<footer>Highlighted with Pygments using the Bash lexer. All assets are local. SHA-256: <code>1b64897a9e444bd8d0cbc32a419b90f60d1ee4d245329398f4917cbf8aa2ab4b</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

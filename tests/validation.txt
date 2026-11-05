@@ -1,0 +1,61 @@
+VALIDATION RECORD
+
+The current tests/report.json records 25 passed editions and five untested ones.
+Each passed edition completed all 11 behavioral checks against the sources
+identified by SHA-256 in that report. The final Perligata comment pass was
+followed by another complete run of its 11 checks.
+
+Checks cover help, ten independent numerical reference values, CSV schema,
+input ordering, OS worker PIDs distinct from the parent, invocation with one
+worker, malformed lines, stdin and blank termination, bad worker counts,
+missing input, an output path that is a directory, empty valid input, extra
+arguments, and the 4096-observation limit. Related cases are grouped into 11
+checks. References were computed with mpmath besselj at 80 decimal digits;
+the absolute error tolerance is 1e-10. The numerical kernel uses 16384 samples.
+
+Process IDs verify that computation leaves the parent process. The test suite
+does not trace peak simultaneous process counts or inject arbitrary worker
+crashes, signals, disk exhaustion, or resource limits. Bounded scheduling and
+ordinary cleanup are also reviewed in the sources. This is not a performance
+benchmark, nor a promise of transactional output in every language.
+
+Tested toolchains (Linux x86-64):
+  Free Pascal 3.2.2; GNAT 15; FreeBASIC 1.10.1; GnuCOBOL 3.2;
+  GNU Fortran/GCC/G++ 15; Clang 22 with GNUstep and libobjc;
+  Rust 1.96; Java 25; Ruby 3.3; Node.js 22.23.4; Python 3.14;
+  Lua 5.4 with luaposix; Perl with POSIX; Erlang/OTP 29;
+  GHC 9.10; OCaml 5.4; SBCL 2.6; SWI-Prolog 9.2;
+  Kotlin 2.2.21; Go 1.26; Bash with awk;
+  Oxford Oberon-2 OBC 3.4alpha (upstream source build);
+  Lingua::Romana::Perligata 0.605 on Perl.
+
+Several compilers were unpacked or built in an isolated temporary toolchain directory for
+validation, without a global install. Their temporary absolute paths are not
+project dependencies. Install the documented dialect/toolchain normally and
+use the manifest's commands. tests/verify.py --overrides JSON supports an
+alternative build/run/env mapping for isolated toolchains.
+
+The OBC source build used OCaml 5, custom-linked parser generators, and
+--disable-dynlink --disable-debugger --without-x. The program uses the checked
+bessel-oberon-posix.c adapter and its own Oberon LONGREAL kernel. The -C link
+needs -lm. tools/build_oberon.sh keeps all generated products under build/.
+
+FreeBASIC must use tools/build_basic.sh: its C backend otherwise creates and
+removes bessel.c beside bessel.bas, colliding with the actual C edition.
+
+Untested:
+  Smalltalk: GNU Smalltalk is unavailable.
+  Julia: Julia is unavailable.
+  Swift: swiftc is unavailable.
+  SQL: PostgreSQL 18 initialized locally, but sandbox socket creation is
+       denied, so the server and dblink integration could not be exercised.
+  RPG: no IBM i host/compiler/job subsystem is available. See rpg_setup.txt.
+These are source implementations, not runtime-verified claims.
+
+Offline HTML checks:
+  python3 tests/verify_catalog.py verifies all 30 language entries, all 33
+  highlighted main/support source views, embedded raw source equality,
+  SHA-256 hashes, report/source correspondence, and every local link/anchor.
+  Pygments supplies bundled lexers; tools/catalog_lexers.py covers Oberon-2,
+  free RPG, Perligata's Latin/Perl boundary, and FreeBASIC block comments.
+  Highlighting does not act as a compiler or syntax validator.

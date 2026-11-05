@@ -1,0 +1,675 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="8153e89f29c215458f455624142c5acffb1320a0ec51a9035b8d2ba69d6b2b1f">
+<title>Ada — bessel.adb — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.pas.html">← Pascal</a><a href="bessel.bas.html">BASIC →</a></nav>
+<h1>Ada <code>bessel.adb</code></h1>
+<p>GNAT / Ada 2012 on POSIX LP64 · Strong types, range checks, generic Float_IO, exception handlers, explicit C imports.</p>
+<p><strong>Memory:</strong> Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.<br><strong>Strings:</strong> Trim, string slices, argument strings, image conversion and diagnostic concatenation.</p>
+<div class="actions"><a href="../bessel.adb">Open raw source</a>
+<a href="../bessel.adb" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span>
+<span class="normal"><a href="#L-172">172</a></span>
+<span class="normal"><a href="#L-173">173</a></span>
+<span class="normal"><a href="#L-174">174</a></span>
+<span class="normal"><a href="#L-175">175</a></span>
+<span class="normal"><a href="#L-176">176</a></span>
+<span class="normal"><a href="#L-177">177</a></span>
+<span class="normal"><a href="#L-178">178</a></span>
+<span class="normal"><a href="#L-179">179</a></span>
+<span class="normal"><a href="#L-180">180</a></span>
+<span class="normal"><a href="#L-181">181</a></span>
+<span class="normal"><a href="#L-182">182</a></span>
+<span class="normal"><a href="#L-183">183</a></span>
+<span class="normal"><a href="#L-184">184</a></span>
+<span class="normal"><a href="#L-185">185</a></span>
+<span class="normal"><a href="#L-186">186</a></span>
+<span class="normal"><a href="#L-187">187</a></span>
+<span class="normal"><a href="#L-188">188</a></span>
+<span class="normal"><a href="#L-189">189</a></span>
+<span class="normal"><a href="#L-190">190</a></span>
+<span class="normal"><a href="#L-191">191</a></span>
+<span class="normal"><a href="#L-192">192</a></span>
+<span class="normal"><a href="#L-193">193</a></span>
+<span class="normal"><a href="#L-194">194</a></span>
+<span class="normal"><a href="#L-195">195</a></span>
+<span class="normal"><a href="#L-196">196</a></span>
+<span class="normal"><a href="#L-197">197</a></span>
+<span class="normal"><a href="#L-198">198</a></span>
+<span class="normal"><a href="#L-199">199</a></span>
+<span class="normal"><a href="#L-200">200</a></span>
+<span class="normal"><a href="#L-201">201</a></span>
+<span class="normal"><a href="#L-202">202</a></span>
+<span class="normal"><a href="#L-203">203</a></span>
+<span class="normal"><a href="#L-204">204</a></span>
+<span class="normal"><a href="#L-205">205</a></span>
+<span class="normal"><a href="#L-206">206</a></span>
+<span class="normal"><a href="#L-207">207</a></span>
+<span class="normal"><a href="#L-208">208</a></span>
+<span class="normal"><a href="#L-209">209</a></span>
+<span class="normal"><a href="#L-210">210</a></span>
+<span class="normal"><a href="#L-211">211</a></span>
+<span class="normal"><a href="#L-212">212</a></span>
+<span class="normal"><a href="#L-213">213</a></span>
+<span class="normal"><a href="#L-214">214</a></span>
+<span class="normal"><a href="#L-215">215</a></span>
+<span class="normal"><a href="#L-216">216</a></span>
+<span class="normal"><a href="#L-217">217</a></span>
+<span class="normal"><a href="#L-218">218</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="c1">-- Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.</span>
+<a id="L-2" name="L-2"></a><span class="c1">-- The parent owns file I/O and result ordering; children perform the numerical work.</span>
+<a id="L-3" name="L-3"></a><span class="c1">-- The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.</span>
+<a id="L-4" name="L-4"></a><span class="kn">with</span> <span class="n">Ada.Command_Line</span><span class="p">;</span>
+<a id="L-5" name="L-5"></a><span class="kn">with</span> <span class="n">Ada.Exceptions</span><span class="p">;</span>
+<a id="L-6" name="L-6"></a><span class="kn">with</span> <span class="n">Ada.Text_IO</span><span class="p">;</span>
+<a id="L-7" name="L-7"></a><span class="kn">with</span> <span class="n">Ada.Strings.Fixed</span><span class="p">;</span>
+<a id="L-8" name="L-8"></a><span class="kn">with</span> <span class="n">Ada.Numerics.Long_Elementary_Functions</span><span class="p">;</span>
+<a id="L-9" name="L-9"></a><span class="kn">with</span> <span class="n">Interfaces.C</span><span class="p">;</span>
+<a id="L-10" name="L-10"></a><span class="kn">with</span> <span class="n">System</span><span class="p">;</span>
+<a id="L-11" name="L-11"></a><span class="kn">with</span> <span class="n">System.Storage_Elements</span><span class="p">;</span>
+<a id="L-12" name="L-12"></a>
+<a id="L-13" name="L-13"></a><span class="kd">procedure</span> <span class="nf">Bessel</span> <span class="kr">is</span>
+<a id="L-14" name="L-14"></a>   <span class="c1">-- Ada 2012, POSIX LP64. C imports expose OS processes, not Ada tasks.</span>
+<a id="L-15" name="L-15"></a>   <span class="kn">use</span> <span class="n">Ada.Text_IO</span><span class="p">,</span> <span class="n">Ada</span><span class="p">.</span><span class="n">Command_Line</span><span class="p">;</span>
+<a id="L-16" name="L-16"></a>   <span class="kn">use</span> <span class="n">Ada.Numerics.Long_Elementary_Functions</span><span class="p">;</span>
+<a id="L-17" name="L-17"></a>   <span class="kn">use</span> <span class="n">type</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">int</span><span class="p">;</span>
+<a id="L-18" name="L-18"></a>   <span class="kn">use</span> <span class="n">type</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">long</span><span class="p">;</span>
+<a id="L-19" name="L-19"></a>   <span class="kn">use</span> <span class="n">type</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">size_t</span><span class="p">;</span>
+<a id="L-20" name="L-20"></a>   <span class="kn">use</span> <span class="n">System.Storage_Elements</span><span class="p">;</span>
+<a id="L-21" name="L-21"></a>   <span class="kd">subtype</span> <span class="kt">C_Int</span> <span class="kr">is</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">int</span><span class="p">;</span>
+<a id="L-22" name="L-22"></a>   <span class="kd">subtype</span> <span class="kt">C_Long</span> <span class="kr">is</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">long</span><span class="p">;</span>
+<a id="L-23" name="L-23"></a>   <span class="kd">type</span> <span class="kt">Pipe_Pair</span> <span class="kr">is</span> <span class="kr">array</span> <span class="p">(</span><span class="mi">0</span> <span class="p">..</span> <span class="mi">1</span><span class="p">)</span> <span class="kr">of</span> <span class="n">C_Int</span> <span class="kn">with</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">;</span>
+<a id="L-24" name="L-24"></a>   <span class="c1">-- Bind the OS operation that creates a one-way communication channel.</span>
+<a id="L-25" name="L-25"></a>   <span class="c1">-- Inputs: An output array with two descriptor slots.</span>
+<a id="L-26" name="L-26"></a>   <span class="c1">-- Outputs: A C status code and reading/writing descriptors.</span>
+<a id="L-27" name="L-27"></a>   <span class="c1">-- Used by: Batch before forking a worker.</span>
+<a id="L-28" name="L-28"></a>   <span class="kd">function</span> <span class="nf">Pipe</span> <span class="p">(</span><span class="nv">Fds</span> <span class="p">: </span><span class="nv">out</span> <span class="nv">Pipe_Pair</span><span class="p">)</span> <span class="kr">return</span> <span class="n">C_Int</span> <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;pipe&quot;</span><span class="p">;</span>
+<a id="L-29" name="L-29"></a>   <span class="c1">-- Bind the OS operation that duplicates the current process.</span>
+<a id="L-30" name="L-30"></a>   <span class="c1">-- Inputs: No explicit arguments; the current process state is copied.</span>
+<a id="L-31" name="L-31"></a>   <span class="c1">-- Outputs: Zero in the child, the child PID in the parent, or a negative error.</span>
+<a id="L-32" name="L-32"></a>   <span class="c1">-- Used by: Batch to create genuinely separate numerical workers.</span>
+<a id="L-33" name="L-33"></a>   <span class="kd">function</span> <span class="nf">Fork</span> <span class="nf">return</span> <span class="nf">C_Int</span> <span class="nf">with</span> <span class="nf">Import</span><span class="p">,</span> <span class="nf">Convention</span> <span class="p">=&gt;</span> <span class="nf">C</span><span class="p">,</span> <span class="nf">External_Name</span> <span class="p">=&gt;</span> <span class="nf">&quot;fork&quot;</span><span class="p">;</span>
+<a id="L-34" name="L-34"></a>   <span class="c1">-- Bind descriptor closure for owned pipe endpoints.</span>
+<a id="L-35" name="L-35"></a>   <span class="c1">-- Inputs: One C file descriptor.</span>
+<a id="L-36" name="L-36"></a>   <span class="c1">-- Outputs: A C success/failure status.</span>
+<a id="L-37" name="L-37"></a>   <span class="c1">-- Used by: Batch while transferring endpoint ownership and cleaning up.</span>
+<a id="L-38" name="L-38"></a>   <span class="kd">function</span> <span class="nf">Close</span> <span class="p">(</span><span class="nv">Fd</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">)</span> <span class="kr">return</span> <span class="n">C_Int</span> <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;close&quot;</span><span class="p">;</span>
+<a id="L-39" name="L-39"></a>   <span class="c1">-- Bind reading from an OS descriptor into borrowed storage.</span>
+<a id="L-40" name="L-40"></a>   <span class="c1">-- Inputs: A descriptor, destination address and maximum byte count.</span>
+<a id="L-41" name="L-41"></a>   <span class="c1">-- Outputs: The number of bytes received, zero for EOF, or a negative error.</span>
+<a id="L-42" name="L-42"></a>   <span class="c1">-- Used by: Transfer to assemble a complete worker result.</span>
+<a id="L-43" name="L-43"></a>   <span class="kd">function</span> <span class="nf">Read</span> <span class="p">(</span><span class="nv">Fd</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">;</span> <span class="nv">Buf</span> <span class="p">: </span><span class="nv">System</span><span class="p">.</span><span class="nv">Address</span><span class="p">;</span> <span class="nv">N</span> <span class="p">: </span><span class="nv">Interfaces</span><span class="p">.</span><span class="nv">C</span><span class="p">.</span><span class="nv">size_t</span><span class="p">)</span> <span class="kr">return</span> <span class="n">C_Long</span>
+<a id="L-44" name="L-44"></a>     <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;read&quot;</span><span class="p">;</span>
+<a id="L-45" name="L-45"></a>   <span class="c1">-- Bind writing borrowed storage to an OS descriptor.</span>
+<a id="L-46" name="L-46"></a>   <span class="c1">-- Inputs: A descriptor, source address and requested byte count.</span>
+<a id="L-47" name="L-47"></a>   <span class="c1">-- Outputs: The number of bytes sent, or a negative error.</span>
+<a id="L-48" name="L-48"></a>   <span class="c1">-- Used by: Transfer in the child to deliver its numerical result.</span>
+<a id="L-49" name="L-49"></a>   <span class="kd">function</span> <span class="nf">Write</span> <span class="p">(</span><span class="nv">Fd</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">;</span> <span class="nv">Buf</span> <span class="p">: </span><span class="nv">System</span><span class="p">.</span><span class="nv">Address</span><span class="p">;</span> <span class="nv">N</span> <span class="p">: </span><span class="nv">Interfaces</span><span class="p">.</span><span class="nv">C</span><span class="p">.</span><span class="nv">size_t</span><span class="p">)</span> <span class="kr">return</span> <span class="n">C_Long</span>
+<a id="L-50" name="L-50"></a>     <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;write&quot;</span><span class="p">;</span>
+<a id="L-51" name="L-51"></a>   <span class="c1">-- Bind waiting for one specific child process.</span>
+<a id="L-52" name="L-52"></a>   <span class="c1">-- Inputs: A child PID, output status slot and wait options.</span>
+<a id="L-53" name="L-53"></a>   <span class="c1">-- Outputs: The waited PID/status, or a negative error.</span>
+<a id="L-54" name="L-54"></a>   <span class="c1">-- Used by: Batch to reap workers and reject unsuccessful child exits.</span>
+<a id="L-55" name="L-55"></a>   <span class="kd">function</span> <span class="nf">Waitpid</span> <span class="p">(</span><span class="nv">Pid</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">;</span> <span class="nv">Status</span> <span class="p">: </span><span class="nv">out</span> <span class="nv">C_Int</span><span class="p">;</span> <span class="nv">Options</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">)</span> <span class="kr">return</span> <span class="n">C_Int</span>
+<a id="L-56" name="L-56"></a>     <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;waitpid&quot;</span><span class="p">;</span>
+<a id="L-57" name="L-57"></a>   <span class="c1">-- Bind immediate child termination without returning to the parent workflow.</span>
+<a id="L-58" name="L-58"></a>   <span class="c1">-- Inputs: The desired child exit code.</span>
+<a id="L-59" name="L-59"></a>   <span class="c1">-- Outputs: No return; the child process terminates.</span>
+<a id="L-60" name="L-60"></a>   <span class="c1">-- Used by: Batch after a child sends its result or detects a transfer failure.</span>
+<a id="L-61" name="L-61"></a>   <span class="kd">procedure</span> <span class="nf">Child_Exit</span> <span class="p">(</span><span class="nv">Code</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">)</span> <span class="kn">with</span> <span class="n">Import</span><span class="p">,</span> <span class="n">Convention</span> <span class="p">=&gt;</span> <span class="n">C</span><span class="p">,</span> <span class="n">External_Name</span> <span class="p">=&gt;</span> <span class="s">&quot;_exit&quot;</span><span class="p">,</span> <span class="n">No_Return</span><span class="p">;</span>
+<a id="L-62" name="L-62"></a>   <span class="c1">-- Instantiate type-specific formatting for Long_Float values in the final CSV.</span>
+<a id="L-63" name="L-63"></a>   <span class="kd">package</span> <span class="nc">Real_IO</span> <span class="kr">is new</span> <span class="nc">Float_IO</span> <span class="p">(</span>Long_Float<span class="p">);</span>
+<a id="L-64" name="L-64"></a>   <span class="kd">type</span> <span class="kt">Observation</span> <span class="kr">is</span> <span class="kr">record</span>
+<a id="L-65" name="L-65"></a>      <span class="n">X</span><span class="p">,</span> <span class="n">Y</span> <span class="p">:</span> <span class="kt">Long_Float</span><span class="p">;</span>
+<a id="L-66" name="L-66"></a>      <span class="n">Pid</span> <span class="p">:</span> <span class="n">C_Int</span><span class="p">;</span>
+<a id="L-67" name="L-67"></a>   <span class="kr">end record</span><span class="p">;</span>
+<a id="L-68" name="L-68"></a>   <span class="kd">type</span> <span class="kt">Table</span> <span class="kr">is</span> <span class="kr">array</span> <span class="p">(</span><span class="kt">Positive</span> <span class="kr">range</span> <span class="p">&lt;&gt;)</span> <span class="kr">of</span> <span class="n">Observation</span><span class="p">;</span>
+<a id="L-69" name="L-69"></a>   <span class="n">Rows</span> <span class="p">:</span> <span class="n">Table</span> <span class="p">(</span><span class="mi">1</span> <span class="p">..</span> <span class="mi">4096</span><span class="p">);</span>
+<a id="L-70" name="L-70"></a>   <span class="kt">Count</span> <span class="p">:</span> <span class="kt">Natural</span> <span class="p">:=</span> <span class="mi">0</span><span class="p">;</span>
+<a id="L-71" name="L-71"></a>   <span class="n">Jobs</span> <span class="p">:</span> <span class="kt">Positive</span> <span class="p">:=</span> <span class="mi">2</span><span class="p">;</span>
+<a id="L-72" name="L-72"></a>   <span class="n">Input_File</span><span class="p">,</span> <span class="n">Output_File</span> <span class="p">:</span> <span class="kt">File_Type</span><span class="p">;</span>
+<a id="L-73" name="L-73"></a>
+<a id="L-74" name="L-74"></a>   <span class="c1">-- Parse an Ada numeric value and enforce the shared observation range.</span>
+<a id="L-75" name="L-75"></a>   <span class="c1">-- Inputs: A candidate input string.</span>
+<a id="L-76" name="L-76"></a>   <span class="c1">-- Outputs: A finite Long_Float in range, or Constraint_Error.</span>
+<a id="L-77" name="L-77"></a>   <span class="c1">-- Used by: Read_Values for per-line validation.</span>
+<a id="L-78" name="L-78"></a>   <span class="kd">function</span> <span class="nf">Number</span> <span class="p">(</span><span class="nv">S</span> <span class="p">: </span><span class="nv">String</span><span class="p">)</span> <span class="kr">return</span> <span class="kt">Long_Float</span> <span class="kr">is</span>
+<a id="L-79" name="L-79"></a>      <span class="no">X</span> <span class="p">:</span> <span class="kr">constant</span> <span class="kt">Long_Float</span> <span class="p">:=</span> <span class="kt">Long_Float</span><span class="p">&#39;</span><span class="na">Value</span> <span class="p">(</span><span class="n">S</span><span class="p">);</span>
+<a id="L-80" name="L-80"></a>   <span class="kr">begin</span>
+<a id="L-81" name="L-81"></a>      <span class="kr">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">X</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mf">1000.0</span> <span class="ow">and</span> <span class="n">X</span> <span class="o">&lt;=</span> <span class="mf">1000.0</span><span class="p">)</span> <span class="kr">then</span>
+<a id="L-82" name="L-82"></a>         <span class="kr">raise</span> <span class="n">Constraint_Error</span> <span class="kn">with</span> <span class="s">&quot;expected finite x in [-1000,1000]&quot;</span><span class="p">;</span>
+<a id="L-83" name="L-83"></a>      <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-84" name="L-84"></a>      <span class="kr">return</span> <span class="n">X</span><span class="p">;</span>
+<a id="L-85" name="L-85"></a>   <span class="kr">end</span> <span class="nf">Number</span><span class="p">;</span>
+<a id="L-86" name="L-86"></a>   <span class="c1">-- Approximate the Bessel integral with uniformly spaced midpoint samples.</span>
+<a id="L-87" name="L-87"></a>   <span class="c1">-- Inputs: One validated Long_Float X.</span>
+<a id="L-88" name="L-88"></a>   <span class="c1">-- Outputs: The approximate J0 value.</span>
+<a id="L-89" name="L-89"></a>   <span class="c1">-- Used by: Batch in each child process.</span>
+<a id="L-90" name="L-90"></a>   <span class="kd">function</span> <span class="nf">J0</span> <span class="p">(</span><span class="nv">X</span> <span class="p">: </span><span class="nv">Long_Float</span><span class="p">)</span> <span class="kr">return</span> <span class="kt">Long_Float</span> <span class="kr">is</span>
+<a id="L-91" name="L-91"></a>      <span class="n">Sum</span> <span class="p">:</span> <span class="kt">Long_Float</span> <span class="p">:=</span> <span class="mf">0.0</span><span class="p">;</span>
+<a id="L-92" name="L-92"></a>   <span class="kr">begin</span>
+<a id="L-93" name="L-93"></a>      <span class="kr">for</span> <span class="n">K</span> <span class="ow">in</span> <span class="mi">0</span> <span class="p">..</span> <span class="mi">16383</span> <span class="kr">loop</span>
+<a id="L-94" name="L-94"></a>         <span class="n">Sum</span> <span class="p">:=</span> <span class="n">Sum</span> <span class="o">+</span> <span class="n">Cos</span> <span class="p">(</span><span class="n">X</span> <span class="o">*</span> <span class="n">Sin</span> <span class="p">(</span><span class="n">Ada</span><span class="p">.</span><span class="n">Numerics</span><span class="p">.</span><span class="n">Pi</span> <span class="o">*</span> <span class="p">(</span><span class="kt">Long_Float</span> <span class="p">(</span><span class="n">K</span><span class="p">)</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">16384.0</span><span class="p">));</span>
+<a id="L-95" name="L-95"></a>      <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-96" name="L-96"></a>      <span class="kr">return</span> <span class="n">Sum</span> <span class="o">/</span> <span class="mf">16384.0</span><span class="p">;</span>
+<a id="L-97" name="L-97"></a>   <span class="kr">end</span> <span class="nf">J0</span><span class="p">;</span>
+<a id="L-98" name="L-98"></a>   <span class="c1">-- Complete a pipe transfer while advancing within a referenced scalar.</span>
+<a id="L-99" name="L-99"></a>   <span class="c1">-- Inputs: A descriptor, an in-out Long_Float, and a direction flag.</span>
+<a id="L-100" name="L-100"></a>   <span class="c1">-- Outputs: True if every byte moved; False on EOF or an I/O error.</span>
+<a id="L-101" name="L-101"></a>   <span class="c1">-- Used by: Batch in the child writer and parent reader.</span>
+<a id="L-102" name="L-102"></a>   <span class="kd">function</span> <span class="nf">Transfer</span> <span class="p">(</span><span class="nv">Fd</span> <span class="p">: </span><span class="nv">C_Int</span><span class="p">;</span> <span class="nv">Value</span> <span class="p">: </span><span class="nv">in</span> <span class="nv">out</span> <span class="nv">Long_Float</span><span class="p">;</span> <span class="nv">Writing</span> <span class="p">: </span><span class="nv">Boolean</span><span class="p">)</span> <span class="kr">return</span> <span class="kt">Boolean</span> <span class="kr">is</span>
+<a id="L-103" name="L-103"></a>      <span class="no">Bytes</span> <span class="p">:</span> <span class="kr">constant</span> <span class="kt">Natural</span> <span class="p">:=</span> <span class="kt">Long_Float</span><span class="p">&#39;</span><span class="na">Size</span> <span class="o">/</span> <span class="n">System</span><span class="p">.</span><span class="n">Storage_Unit</span><span class="p">;</span>
+<a id="L-104" name="L-104"></a>      <span class="n">Offset</span> <span class="p">:</span> <span class="kt">Natural</span> <span class="p">:=</span> <span class="mi">0</span><span class="p">;</span>
+<a id="L-105" name="L-105"></a>      <span class="n">N</span> <span class="p">:</span> <span class="n">C_Long</span><span class="p">;</span>
+<a id="L-106" name="L-106"></a>   <span class="kr">begin</span>
+<a id="L-107" name="L-107"></a>      <span class="c1">-- Value is a borrowed reference. Address + Storage_Offset is BYTE</span>
+<a id="L-108" name="L-108"></a>      <span class="c1">-- arithmetic; all addresses stay inside this live scalar&#39;s storage.</span>
+<a id="L-109" name="L-109"></a>      <span class="kr">while</span> <span class="n">Offset</span> <span class="o">&lt;</span> <span class="n">Bytes</span> <span class="kr">loop</span>
+<a id="L-110" name="L-110"></a>         <span class="kr">if</span> <span class="n">Writing</span> <span class="kr">then</span>
+<a id="L-111" name="L-111"></a>            <span class="n">N</span> <span class="p">:=</span> <span class="n">Write</span> <span class="p">(</span><span class="n">Fd</span><span class="p">,</span> <span class="n">Value</span><span class="p">&#39;</span><span class="na">Address</span> <span class="o">+</span> <span class="n">Storage_Offset</span> <span class="p">(</span><span class="n">Offset</span><span class="p">),</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">size_t</span> <span class="p">(</span><span class="n">Bytes</span> <span class="o">-</span> <span class="n">Offset</span><span class="p">));</span>
+<a id="L-112" name="L-112"></a>         <span class="kr">else</span>
+<a id="L-113" name="L-113"></a>            <span class="n">N</span> <span class="p">:=</span> <span class="n">Read</span> <span class="p">(</span><span class="n">Fd</span><span class="p">,</span> <span class="n">Value</span><span class="p">&#39;</span><span class="na">Address</span> <span class="o">+</span> <span class="n">Storage_Offset</span> <span class="p">(</span><span class="n">Offset</span><span class="p">),</span> <span class="n">Interfaces</span><span class="p">.</span><span class="n">C</span><span class="p">.</span><span class="n">size_t</span> <span class="p">(</span><span class="n">Bytes</span> <span class="o">-</span> <span class="n">Offset</span><span class="p">));</span>
+<a id="L-114" name="L-114"></a>         <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-115" name="L-115"></a>         <span class="kr">if</span> <span class="n">N</span> <span class="o">&lt;=</span> <span class="mi">0</span> <span class="kr">then</span> <span class="kr">return</span> <span class="kc">False</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-116" name="L-116"></a>         <span class="n">Offset</span> <span class="p">:=</span> <span class="n">Offset</span> <span class="o">+</span> <span class="kt">Natural</span> <span class="p">(</span><span class="n">N</span><span class="p">);</span>
+<a id="L-117" name="L-117"></a>      <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-118" name="L-118"></a>      <span class="kr">return</span> <span class="kc">True</span><span class="p">;</span>
+<a id="L-119" name="L-119"></a>   <span class="kr">end</span> <span class="nf">Transfer</span><span class="p">;</span>
+<a id="L-120" name="L-120"></a>   <span class="c1">-- Collect valid observations using the currently selected Ada input stream.</span>
+<a id="L-121" name="L-121"></a>   <span class="c1">-- Inputs: Current input plus the enclosing Rows and Count storage.</span>
+<a id="L-122" name="L-122"></a>   <span class="c1">-- Outputs: Rows/Count filled in input order; recoverable bad lines are skipped.</span>
+<a id="L-123" name="L-123"></a>   <span class="c1">-- Used by: The main procedure before starting process batches.</span>
+<a id="L-124" name="L-124"></a>   <span class="kd">procedure</span> <span class="nf">Read_Values</span> <span class="kr">is</span>
+<a id="L-125" name="L-125"></a>   <span class="kr">begin</span>
+<a id="L-126" name="L-126"></a>      <span class="kr">while</span> <span class="ow">not</span> <span class="n">End_Of_File</span> <span class="kr">loop</span>
+<a id="L-127" name="L-127"></a>         <span class="kr">declare</span>
+<a id="L-128" name="L-128"></a>            <span class="no">S</span> <span class="p">:</span> <span class="kr">constant</span> <span class="kt">String</span> <span class="p">:=</span> <span class="n">Ada</span><span class="p">.</span><span class="n">Strings</span><span class="p">.</span><span class="n">Fixed</span><span class="p">.</span><span class="n">Trim</span> <span class="p">(</span><span class="n">Get_Line</span><span class="p">,</span> <span class="n">Ada</span><span class="p">.</span><span class="n">Strings</span><span class="p">.</span><span class="n">Both</span><span class="p">);</span>
+<a id="L-129" name="L-129"></a>            <span class="n">X</span> <span class="p">:</span> <span class="kt">Long_Float</span><span class="p">;</span>
+<a id="L-130" name="L-130"></a>         <span class="kr">begin</span>
+<a id="L-131" name="L-131"></a>            <span class="kr">exit</span> <span class="kr">when</span> <span class="n">S</span><span class="p">&#39;</span><span class="na">Length</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<a id="L-132" name="L-132"></a>            <span class="kr">if</span> <span class="n">S</span> <span class="p">(</span><span class="n">S</span><span class="p">&#39;</span><span class="na">First</span><span class="p">)</span> <span class="o">/=</span> <span class="s s-Character">&#39;#&#39;</span> <span class="kr">then</span>
+<a id="L-133" name="L-133"></a>               <span class="kr">begin</span>
+<a id="L-134" name="L-134"></a>                  <span class="n">X</span> <span class="p">:=</span> <span class="n">Number</span> <span class="p">(</span><span class="n">S</span><span class="p">);</span>
+<a id="L-135" name="L-135"></a>                  <span class="kr">if</span> <span class="kt">Count</span> <span class="o">=</span> <span class="n">Rows</span><span class="p">&#39;</span><span class="na">Length</span> <span class="kr">then</span> <span class="kr">raise</span> <span class="n">Program_Error</span> <span class="kn">with</span> <span class="s">&quot;at most 4096 values&quot;</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-136" name="L-136"></a>                  <span class="kt">Count</span> <span class="p">:=</span> <span class="kt">Count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span> <span class="n">Rows</span> <span class="p">(</span><span class="kt">Count</span><span class="p">).</span><span class="n">X</span> <span class="p">:=</span> <span class="n">X</span><span class="p">;</span>
+<a id="L-137" name="L-137"></a>               <span class="kr">exception</span>
+<a id="L-138" name="L-138"></a>                  <span class="kr">when</span> <span class="n">Constraint_Error</span> <span class="p">=&gt;</span> <span class="n">Put_Line</span> <span class="p">(</span><span class="n">Standard_Error</span><span class="p">,</span> <span class="s">&quot;warning: invalid number; skipped&quot;</span><span class="p">);</span>
+<a id="L-139" name="L-139"></a>               <span class="kr">end</span><span class="p">;</span>
+<a id="L-140" name="L-140"></a>            <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-141" name="L-141"></a>         <span class="kr">end</span><span class="p">;</span>
+<a id="L-142" name="L-142"></a>      <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-143" name="L-143"></a>   <span class="kr">end</span> <span class="nf">Read_Values</span><span class="p">;</span>
+<a id="L-144" name="L-144"></a>   <span class="c1">-- Run the specified slice of observations in separate child processes.</span>
+<a id="L-145" name="L-145"></a>   <span class="c1">-- Inputs: First and Last indexes into the enclosing Rows array.</span>
+<a id="L-146" name="L-146"></a>   <span class="c1">-- Outputs: Result values/PIDs stored in Rows; failure raises after started children are collected.</span>
+<a id="L-147" name="L-147"></a>   <span class="c1">-- Used by: The main procedure once per worker-sized slice.</span>
+<a id="L-148" name="L-148"></a>   <span class="kd">procedure</span> <span class="nf">Batch</span> <span class="p">(</span><span class="nv">First</span><span class="p">,</span> <span class="nv">Last</span> <span class="p">: </span><span class="nv">Positive</span><span class="p">)</span> <span class="kr">is</span>
+<a id="L-149" name="L-149"></a>      <span class="n">Pids</span><span class="p">,</span> <span class="n">Readers</span> <span class="p">:</span> <span class="kr">array</span> <span class="p">(</span><span class="n">First</span> <span class="p">..</span> <span class="n">Last</span><span class="p">)</span> <span class="kr">of</span> <span class="n">C_Int</span><span class="p">;</span>
+<a id="L-150" name="L-150"></a>      <span class="n">Fds</span> <span class="p">:</span> <span class="n">Pipe_Pair</span><span class="p">;</span>
+<a id="L-151" name="L-151"></a>      <span class="n">Started</span> <span class="p">:</span> <span class="kt">Natural</span> <span class="p">:=</span> <span class="mi">0</span><span class="p">;</span>
+<a id="L-152" name="L-152"></a>      <span class="n">Pid</span><span class="p">,</span> <span class="n">Ignored</span><span class="p">,</span> <span class="n">Status</span> <span class="p">:</span> <span class="n">C_Int</span><span class="p">;</span>
+<a id="L-153" name="L-153"></a>      <span class="n">Transferred</span> <span class="p">:</span> <span class="kt">Boolean</span><span class="p">;</span>
+<a id="L-154" name="L-154"></a>      <span class="n">Good</span> <span class="p">:</span> <span class="kt">Boolean</span> <span class="p">:=</span> <span class="kc">True</span><span class="p">;</span>
+<a id="L-155" name="L-155"></a>   <span class="kr">begin</span>
+<a id="L-156" name="L-156"></a>      <span class="kr">for</span> <span class="n">I</span> <span class="ow">in</span> <span class="n">First</span> <span class="p">..</span> <span class="n">Last</span> <span class="kr">loop</span>
+<a id="L-157" name="L-157"></a>         <span class="c1">-- Stop launching new workers if an OS resource cannot be acquired.</span>
+<a id="L-158" name="L-158"></a>         <span class="kr">if</span> <span class="n">Pipe</span> <span class="p">(</span><span class="n">Fds</span><span class="p">)</span> <span class="o">/=</span> <span class="mi">0</span> <span class="kr">then</span> <span class="n">Good</span> <span class="p">:=</span> <span class="kc">False</span><span class="p">;</span> <span class="kr">exit</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-159" name="L-159"></a>         <span class="n">Pid</span> <span class="p">:=</span> <span class="n">Fork</span><span class="p">;</span>
+<a id="L-160" name="L-160"></a>         <span class="c1">-- Select the child-only path: compute, transmit and terminate.</span>
+<a id="L-161" name="L-161"></a>         <span class="kr">if</span> <span class="n">Pid</span> <span class="o">=</span> <span class="mi">0</span> <span class="kr">then</span>
+<a id="L-162" name="L-162"></a>            <span class="n">Ignored</span> <span class="p">:=</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Fds</span> <span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+<a id="L-163" name="L-163"></a>            <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Y</span> <span class="p">:=</span> <span class="n">J0</span> <span class="p">(</span><span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">X</span><span class="p">);</span>
+<a id="L-164" name="L-164"></a>            <span class="n">Transferred</span> <span class="p">:=</span> <span class="n">Transfer</span> <span class="p">(</span><span class="n">Fds</span> <span class="p">(</span><span class="mi">1</span><span class="p">),</span> <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Y</span><span class="p">,</span> <span class="kc">True</span><span class="p">);</span>
+<a id="L-165" name="L-165"></a>            <span class="n">Ignored</span> <span class="p">:=</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Fds</span> <span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="L-166" name="L-166"></a>            <span class="kr">if</span> <span class="n">Transferred</span> <span class="kr">then</span> <span class="n">Child_Exit</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="kr">else</span> <span class="n">Child_Exit</span> <span class="p">(</span><span class="mi">1</span><span class="p">);</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-167" name="L-167"></a>         <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-168" name="L-168"></a>         <span class="n">Ignored</span> <span class="p">:=</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Fds</span> <span class="p">(</span><span class="mi">1</span><span class="p">));</span>
+<a id="L-169" name="L-169"></a>         <span class="kr">if</span> <span class="n">Pid</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="kr">then</span> <span class="n">Ignored</span> <span class="p">:=</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Fds</span> <span class="p">(</span><span class="mi">0</span><span class="p">));</span> <span class="n">Good</span> <span class="p">:=</span> <span class="kc">False</span><span class="p">;</span> <span class="kr">exit</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-170" name="L-170"></a>         <span class="n">Pids</span> <span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="p">:=</span> <span class="n">Pid</span><span class="p">;</span> <span class="n">Readers</span> <span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="p">:=</span> <span class="n">Fds</span> <span class="p">(</span><span class="mi">0</span><span class="p">);</span> <span class="n">Started</span> <span class="p">:=</span> <span class="n">Started</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+<a id="L-171" name="L-171"></a>      <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-172" name="L-172"></a>      <span class="c1">-- Collect only the processes actually launched, including a partially successful batch.</span>
+<a id="L-173" name="L-173"></a>      <span class="kr">for</span> <span class="n">Offset</span> <span class="ow">in</span> <span class="mi">1</span> <span class="p">..</span> <span class="n">Started</span> <span class="kr">loop</span>
+<a id="L-174" name="L-174"></a>         <span class="kr">declare</span> <span class="no">I</span> <span class="p">:</span> <span class="kr">constant</span> <span class="kt">Positive</span> <span class="p">:=</span> <span class="n">First</span> <span class="o">+</span> <span class="n">Offset</span> <span class="o">-</span> <span class="mi">1</span><span class="p">;</span> <span class="kr">begin</span>
+<a id="L-175" name="L-175"></a>            <span class="n">Transferred</span> <span class="p">:=</span> <span class="n">Transfer</span> <span class="p">(</span><span class="n">Readers</span> <span class="p">(</span><span class="n">I</span><span class="p">),</span> <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Y</span><span class="p">,</span> <span class="kc">False</span><span class="p">);</span>
+<a id="L-176" name="L-176"></a>            <span class="n">Ignored</span> <span class="p">:=</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Readers</span> <span class="p">(</span><span class="n">I</span><span class="p">));</span>
+<a id="L-177" name="L-177"></a>            <span class="n">Pid</span> <span class="p">:=</span> <span class="n">Waitpid</span> <span class="p">(</span><span class="n">Pids</span> <span class="p">(</span><span class="n">I</span><span class="p">),</span> <span class="n">Status</span><span class="p">,</span> <span class="mi">0</span><span class="p">);</span>
+<a id="L-178" name="L-178"></a>            <span class="n">Good</span> <span class="p">:=</span> <span class="n">Good</span> <span class="ow">and</span> <span class="n">Transferred</span> <span class="ow">and</span> <span class="n">Pid</span> <span class="o">=</span> <span class="n">Pids</span> <span class="p">(</span><span class="n">I</span><span class="p">)</span> <span class="ow">and</span> <span class="n">Status</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+<a id="L-179" name="L-179"></a>            <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Pid</span> <span class="p">:=</span> <span class="n">Pids</span> <span class="p">(</span><span class="n">I</span><span class="p">);</span>
+<a id="L-180" name="L-180"></a>         <span class="kr">end</span><span class="p">;</span>
+<a id="L-181" name="L-181"></a>      <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-182" name="L-182"></a>      <span class="kr">if</span> <span class="ow">not</span> <span class="n">Good</span> <span class="kr">then</span> <span class="kr">raise</span> <span class="n">Program_Error</span> <span class="kn">with</span> <span class="s">&quot;worker failed&quot;</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-183" name="L-183"></a>   <span class="kr">end</span> <span class="nf">Batch</span><span class="p">;</span>
+<a id="L-184" name="L-184"></a><span class="kr">begin</span>
+<a id="L-185" name="L-185"></a>   <span class="kr">if</span> <span class="n">Argument_Count</span> <span class="o">=</span> <span class="mi">1</span> <span class="ow">and then</span> <span class="n">Argument</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="s">&quot;--help&quot;</span> <span class="kr">then</span>
+<a id="L-186" name="L-186"></a>      <span class="n">Put_Line</span> <span class="p">(</span><span class="s">&quot;Usage: bessel-ada [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;</span><span class="p">);</span> <span class="kr">return</span><span class="p">;</span>
+<a id="L-187" name="L-187"></a>   <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-188" name="L-188"></a>   <span class="kr">if</span> <span class="n">Argument_Count</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="kr">then</span> <span class="kr">raise</span> <span class="n">Constraint_Error</span> <span class="kn">with</span> <span class="s">&quot;too many arguments&quot;</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-189" name="L-189"></a>   <span class="kr">if</span> <span class="n">Argument_Count</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="kr">then</span> <span class="n">Jobs</span> <span class="p">:=</span> <span class="kt">Positive</span><span class="p">&#39;</span><span class="na">Value</span> <span class="p">(</span><span class="n">Argument</span> <span class="p">(</span><span class="mi">3</span><span class="p">));</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-190" name="L-190"></a>   <span class="kr">if</span> <span class="n">Jobs</span> <span class="o">&gt;</span> <span class="mi">16</span> <span class="kr">then</span> <span class="kr">raise</span> <span class="n">Constraint_Error</span> <span class="kn">with</span> <span class="s">&quot;workers must be 1..16&quot;</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-191" name="L-191"></a>   <span class="kr">if</span> <span class="n">Argument_Count</span> <span class="o">&gt;=</span> <span class="mi">1</span> <span class="ow">and then</span> <span class="n">Argument</span> <span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">/=</span> <span class="s">&quot;-&quot;</span> <span class="kr">then</span>
+<a id="L-192" name="L-192"></a>      <span class="n">Open</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">,</span> <span class="n">In_File</span><span class="p">,</span> <span class="n">Argument</span> <span class="p">(</span><span class="mi">1</span><span class="p">));</span> <span class="n">Set_Input</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">);</span>
+<a id="L-193" name="L-193"></a>   <span class="kr">else</span> <span class="n">Put_Line</span> <span class="p">(</span><span class="n">Standard_Error</span><span class="p">,</span> <span class="s">&quot;Enter one x per line; blank line or EOF finishes:&quot;</span><span class="p">);</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-194" name="L-194"></a>   <span class="n">Read_Values</span><span class="p">;</span>
+<a id="L-195" name="L-195"></a>   <span class="c1">-- Restore the standard stream before closing the file that had replaced it.</span>
+<a id="L-196" name="L-196"></a>   <span class="n">Set_Input</span> <span class="p">(</span><span class="n">Standard_Input</span><span class="p">);</span>
+<a id="L-197" name="L-197"></a>   <span class="kr">if</span> <span class="n">Is_Open</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">)</span> <span class="kr">then</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">);</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-198" name="L-198"></a>   <span class="kr">if</span> <span class="kt">Count</span> <span class="o">=</span> <span class="mi">0</span> <span class="kr">then</span> <span class="kr">raise</span> <span class="n">Constraint_Error</span> <span class="kn">with</span> <span class="s">&quot;no valid input values&quot;</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-199" name="L-199"></a>   <span class="kr">declare</span> <span class="n">I</span> <span class="p">:</span> <span class="kt">Positive</span> <span class="p">:=</span> <span class="mi">1</span><span class="p">;</span> <span class="kr">begin</span>
+<a id="L-200" name="L-200"></a>      <span class="kr">while</span> <span class="n">I</span> <span class="o">&lt;=</span> <span class="kt">Count</span> <span class="kr">loop</span> <span class="n">Batch</span> <span class="p">(</span><span class="n">I</span><span class="p">,</span> <span class="kt">Natural</span><span class="p">&#39;</span><span class="na">Min</span> <span class="p">(</span><span class="n">I</span> <span class="o">+</span> <span class="n">Jobs</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="kt">Count</span><span class="p">));</span> <span class="n">I</span> <span class="p">:=</span> <span class="n">I</span> <span class="o">+</span> <span class="n">Jobs</span><span class="p">;</span> <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-201" name="L-201"></a>   <span class="kr">end</span><span class="p">;</span>
+<a id="L-202" name="L-202"></a>   <span class="c1">-- Create output only after all observation batches have succeeded.</span>
+<a id="L-203" name="L-203"></a>   <span class="n">Create</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="n">Out_File</span><span class="p">,</span> <span class="p">(</span><span class="kr">if</span> <span class="n">Argument_Count</span> <span class="o">&gt;=</span> <span class="mi">2</span> <span class="kr">then</span> <span class="n">Argument</span> <span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="kr">else</span> <span class="s">&quot;results.csv&quot;</span><span class="p">));</span>
+<a id="L-204" name="L-204"></a>   <span class="n">Put_Line</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="s">&quot;x,j0,worker_pid&quot;</span><span class="p">);</span>
+<a id="L-205" name="L-205"></a>   <span class="kr">for</span> <span class="n">I</span> <span class="ow">in</span> <span class="mi">1</span> <span class="p">..</span> <span class="kt">Count</span> <span class="kr">loop</span>
+<a id="L-206" name="L-206"></a>      <span class="n">Real_IO</span><span class="p">.</span><span class="n">Put</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">X</span><span class="p">,</span> <span class="n">Fore</span> <span class="p">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Aft</span> <span class="p">=&gt;</span> <span class="mi">16</span><span class="p">,</span> <span class="n">Exp</span> <span class="p">=&gt;</span> <span class="mi">3</span><span class="p">);</span> <span class="n">Put</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="s s-Character">&#39;,&#39;</span><span class="p">);</span>
+<a id="L-207" name="L-207"></a>      <span class="n">Real_IO</span><span class="p">.</span><span class="n">Put</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Y</span><span class="p">,</span> <span class="n">Fore</span> <span class="p">=&gt;</span> <span class="mi">1</span><span class="p">,</span> <span class="n">Aft</span> <span class="p">=&gt;</span> <span class="mi">16</span><span class="p">,</span> <span class="n">Exp</span> <span class="p">=&gt;</span> <span class="mi">3</span><span class="p">);</span> <span class="n">Put</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="s s-Character">&#39;,&#39;</span><span class="p">);</span>
+<a id="L-208" name="L-208"></a>      <span class="n">Put_Line</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">,</span> <span class="n">C_Int</span><span class="p">&#39;</span><span class="na">Image</span> <span class="p">(</span><span class="n">Rows</span> <span class="p">(</span><span class="n">I</span><span class="p">).</span><span class="n">Pid</span><span class="p">));</span>
+<a id="L-209" name="L-209"></a>   <span class="kr">end</span> <span class="kr">loop</span><span class="p">;</span>
+<a id="L-210" name="L-210"></a>   <span class="n">Close</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">);</span> <span class="n">Put_Line</span> <span class="p">(</span><span class="s">&quot;Wrote&quot;</span> <span class="o">&amp;</span> <span class="kt">Natural</span><span class="p">&#39;</span><span class="na">Image</span> <span class="p">(</span><span class="kt">Count</span><span class="p">)</span> <span class="o">&amp;</span> <span class="s">&quot; observations&quot;</span><span class="p">);</span>
+<a id="L-211" name="L-211"></a><span class="kr">exception</span>
+<a id="L-212" name="L-212"></a>   <span class="c1">-- Close remaining file resources and turn fatal exceptions into a readable failed run.</span>
+<a id="L-213" name="L-213"></a>   <span class="kr">when</span> <span class="n">E</span> <span class="p">:</span> <span class="kr">others</span> <span class="p">=&gt;</span>
+<a id="L-214" name="L-214"></a>      <span class="n">Set_Input</span> <span class="p">(</span><span class="n">Standard_Input</span><span class="p">);</span>
+<a id="L-215" name="L-215"></a>      <span class="kr">if</span> <span class="n">Is_Open</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">)</span> <span class="kr">then</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Input_File</span><span class="p">);</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-216" name="L-216"></a>      <span class="kr">if</span> <span class="n">Is_Open</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">)</span> <span class="kr">then</span> <span class="n">Close</span> <span class="p">(</span><span class="n">Output_File</span><span class="p">);</span> <span class="kr">end</span> <span class="kr">if</span><span class="p">;</span>
+<a id="L-217" name="L-217"></a>      <span class="n">Put_Line</span> <span class="p">(</span><span class="n">Standard_Error</span><span class="p">,</span> <span class="s">&quot;error: &quot;</span> <span class="o">&amp;</span> <span class="n">Ada</span><span class="p">.</span><span class="n">Exceptions</span><span class="p">.</span><span class="n">Exception_Message</span> <span class="p">(</span><span class="n">E</span><span class="p">));</span> <span class="n">Set_Exit_Status</span> <span class="p">(</span><span class="n">Failure</span><span class="p">);</span>
+<a id="L-218" name="L-218"></a><span class="kr">end</span> <span class="nf">Bessel</span><span class="p">;</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>-- Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.
+-- The parent owns file I/O and result ordering; children perform the numerical work.
+-- The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.
+with Ada.Command_Line;
+with Ada.Exceptions;
+with Ada.Text_IO;
+with Ada.Strings.Fixed;
+with Ada.Numerics.Long_Elementary_Functions;
+with Interfaces.C;
+with System;
+with System.Storage_Elements;
+
+procedure Bessel is
+   -- Ada 2012, POSIX LP64. C imports expose OS processes, not Ada tasks.
+   use Ada.Text_IO, Ada.Command_Line;
+   use Ada.Numerics.Long_Elementary_Functions;
+   use type Interfaces.C.int;
+   use type Interfaces.C.long;
+   use type Interfaces.C.size_t;
+   use System.Storage_Elements;
+   subtype C_Int is Interfaces.C.int;
+   subtype C_Long is Interfaces.C.long;
+   type Pipe_Pair is array (0 .. 1) of C_Int with Convention =&gt; C;
+   -- Bind the OS operation that creates a one-way communication channel.
+   -- Inputs: An output array with two descriptor slots.
+   -- Outputs: A C status code and reading/writing descriptors.
+   -- Used by: Batch before forking a worker.
+   function Pipe (Fds : out Pipe_Pair) return C_Int with Import, Convention =&gt; C, External_Name =&gt; &quot;pipe&quot;;
+   -- Bind the OS operation that duplicates the current process.
+   -- Inputs: No explicit arguments; the current process state is copied.
+   -- Outputs: Zero in the child, the child PID in the parent, or a negative error.
+   -- Used by: Batch to create genuinely separate numerical workers.
+   function Fork return C_Int with Import, Convention =&gt; C, External_Name =&gt; &quot;fork&quot;;
+   -- Bind descriptor closure for owned pipe endpoints.
+   -- Inputs: One C file descriptor.
+   -- Outputs: A C success/failure status.
+   -- Used by: Batch while transferring endpoint ownership and cleaning up.
+   function Close (Fd : C_Int) return C_Int with Import, Convention =&gt; C, External_Name =&gt; &quot;close&quot;;
+   -- Bind reading from an OS descriptor into borrowed storage.
+   -- Inputs: A descriptor, destination address and maximum byte count.
+   -- Outputs: The number of bytes received, zero for EOF, or a negative error.
+   -- Used by: Transfer to assemble a complete worker result.
+   function Read (Fd : C_Int; Buf : System.Address; N : Interfaces.C.size_t) return C_Long
+     with Import, Convention =&gt; C, External_Name =&gt; &quot;read&quot;;
+   -- Bind writing borrowed storage to an OS descriptor.
+   -- Inputs: A descriptor, source address and requested byte count.
+   -- Outputs: The number of bytes sent, or a negative error.
+   -- Used by: Transfer in the child to deliver its numerical result.
+   function Write (Fd : C_Int; Buf : System.Address; N : Interfaces.C.size_t) return C_Long
+     with Import, Convention =&gt; C, External_Name =&gt; &quot;write&quot;;
+   -- Bind waiting for one specific child process.
+   -- Inputs: A child PID, output status slot and wait options.
+   -- Outputs: The waited PID/status, or a negative error.
+   -- Used by: Batch to reap workers and reject unsuccessful child exits.
+   function Waitpid (Pid : C_Int; Status : out C_Int; Options : C_Int) return C_Int
+     with Import, Convention =&gt; C, External_Name =&gt; &quot;waitpid&quot;;
+   -- Bind immediate child termination without returning to the parent workflow.
+   -- Inputs: The desired child exit code.
+   -- Outputs: No return; the child process terminates.
+   -- Used by: Batch after a child sends its result or detects a transfer failure.
+   procedure Child_Exit (Code : C_Int) with Import, Convention =&gt; C, External_Name =&gt; &quot;_exit&quot;, No_Return;
+   -- Instantiate type-specific formatting for Long_Float values in the final CSV.
+   package Real_IO is new Float_IO (Long_Float);
+   type Observation is record
+      X, Y : Long_Float;
+      Pid : C_Int;
+   end record;
+   type Table is array (Positive range &lt;&gt;) of Observation;
+   Rows : Table (1 .. 4096);
+   Count : Natural := 0;
+   Jobs : Positive := 2;
+   Input_File, Output_File : File_Type;
+
+   -- Parse an Ada numeric value and enforce the shared observation range.
+   -- Inputs: A candidate input string.
+   -- Outputs: A finite Long_Float in range, or Constraint_Error.
+   -- Used by: Read_Values for per-line validation.
+   function Number (S : String) return Long_Float is
+      X : constant Long_Float := Long_Float&#x27;Value (S);
+   begin
+      if not (X &gt;= -1000.0 and X &lt;= 1000.0) then
+         raise Constraint_Error with &quot;expected finite x in [-1000,1000]&quot;;
+      end if;
+      return X;
+   end Number;
+   -- Approximate the Bessel integral with uniformly spaced midpoint samples.
+   -- Inputs: One validated Long_Float X.
+   -- Outputs: The approximate J0 value.
+   -- Used by: Batch in each child process.
+   function J0 (X : Long_Float) return Long_Float is
+      Sum : Long_Float := 0.0;
+   begin
+      for K in 0 .. 16383 loop
+         Sum := Sum + Cos (X * Sin (Ada.Numerics.Pi * (Long_Float (K) + 0.5) / 16384.0));
+      end loop;
+      return Sum / 16384.0;
+   end J0;
+   -- Complete a pipe transfer while advancing within a referenced scalar.
+   -- Inputs: A descriptor, an in-out Long_Float, and a direction flag.
+   -- Outputs: True if every byte moved; False on EOF or an I/O error.
+   -- Used by: Batch in the child writer and parent reader.
+   function Transfer (Fd : C_Int; Value : in out Long_Float; Writing : Boolean) return Boolean is
+      Bytes : constant Natural := Long_Float&#x27;Size / System.Storage_Unit;
+      Offset : Natural := 0;
+      N : C_Long;
+   begin
+      -- Value is a borrowed reference. Address + Storage_Offset is BYTE
+      -- arithmetic; all addresses stay inside this live scalar&#x27;s storage.
+      while Offset &lt; Bytes loop
+         if Writing then
+            N := Write (Fd, Value&#x27;Address + Storage_Offset (Offset), Interfaces.C.size_t (Bytes - Offset));
+         else
+            N := Read (Fd, Value&#x27;Address + Storage_Offset (Offset), Interfaces.C.size_t (Bytes - Offset));
+         end if;
+         if N &lt;= 0 then return False; end if;
+         Offset := Offset + Natural (N);
+      end loop;
+      return True;
+   end Transfer;
+   -- Collect valid observations using the currently selected Ada input stream.
+   -- Inputs: Current input plus the enclosing Rows and Count storage.
+   -- Outputs: Rows/Count filled in input order; recoverable bad lines are skipped.
+   -- Used by: The main procedure before starting process batches.
+   procedure Read_Values is
+   begin
+      while not End_Of_File loop
+         declare
+            S : constant String := Ada.Strings.Fixed.Trim (Get_Line, Ada.Strings.Both);
+            X : Long_Float;
+         begin
+            exit when S&#x27;Length = 0;
+            if S (S&#x27;First) /= &#x27;#&#x27; then
+               begin
+                  X := Number (S);
+                  if Count = Rows&#x27;Length then raise Program_Error with &quot;at most 4096 values&quot;; end if;
+                  Count := Count + 1; Rows (Count).X := X;
+               exception
+                  when Constraint_Error =&gt; Put_Line (Standard_Error, &quot;warning: invalid number; skipped&quot;);
+               end;
+            end if;
+         end;
+      end loop;
+   end Read_Values;
+   -- Run the specified slice of observations in separate child processes.
+   -- Inputs: First and Last indexes into the enclosing Rows array.
+   -- Outputs: Result values/PIDs stored in Rows; failure raises after started children are collected.
+   -- Used by: The main procedure once per worker-sized slice.
+   procedure Batch (First, Last : Positive) is
+      Pids, Readers : array (First .. Last) of C_Int;
+      Fds : Pipe_Pair;
+      Started : Natural := 0;
+      Pid, Ignored, Status : C_Int;
+      Transferred : Boolean;
+      Good : Boolean := True;
+   begin
+      for I in First .. Last loop
+         -- Stop launching new workers if an OS resource cannot be acquired.
+         if Pipe (Fds) /= 0 then Good := False; exit; end if;
+         Pid := Fork;
+         -- Select the child-only path: compute, transmit and terminate.
+         if Pid = 0 then
+            Ignored := Close (Fds (0));
+            Rows (I).Y := J0 (Rows (I).X);
+            Transferred := Transfer (Fds (1), Rows (I).Y, True);
+            Ignored := Close (Fds (1));
+            if Transferred then Child_Exit (0); else Child_Exit (1); end if;
+         end if;
+         Ignored := Close (Fds (1));
+         if Pid &lt; 0 then Ignored := Close (Fds (0)); Good := False; exit; end if;
+         Pids (I) := Pid; Readers (I) := Fds (0); Started := Started + 1;
+      end loop;
+      -- Collect only the processes actually launched, including a partially successful batch.
+      for Offset in 1 .. Started loop
+         declare I : constant Positive := First + Offset - 1; begin
+            Transferred := Transfer (Readers (I), Rows (I).Y, False);
+            Ignored := Close (Readers (I));
+            Pid := Waitpid (Pids (I), Status, 0);
+            Good := Good and Transferred and Pid = Pids (I) and Status = 0;
+            Rows (I).Pid := Pids (I);
+         end;
+      end loop;
+      if not Good then raise Program_Error with &quot;worker failed&quot;; end if;
+   end Batch;
+begin
+   if Argument_Count = 1 and then Argument (1) = &quot;--help&quot; then
+      Put_Line (&quot;Usage: bessel-ada [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;); return;
+   end if;
+   if Argument_Count &gt; 3 then raise Constraint_Error with &quot;too many arguments&quot;; end if;
+   if Argument_Count &gt;= 3 then Jobs := Positive&#x27;Value (Argument (3)); end if;
+   if Jobs &gt; 16 then raise Constraint_Error with &quot;workers must be 1..16&quot;; end if;
+   if Argument_Count &gt;= 1 and then Argument (1) /= &quot;-&quot; then
+      Open (Input_File, In_File, Argument (1)); Set_Input (Input_File);
+   else Put_Line (Standard_Error, &quot;Enter one x per line; blank line or EOF finishes:&quot;); end if;
+   Read_Values;
+   -- Restore the standard stream before closing the file that had replaced it.
+   Set_Input (Standard_Input);
+   if Is_Open (Input_File) then Close (Input_File); end if;
+   if Count = 0 then raise Constraint_Error with &quot;no valid input values&quot;; end if;
+   declare I : Positive := 1; begin
+      while I &lt;= Count loop Batch (I, Natural&#x27;Min (I + Jobs - 1, Count)); I := I + Jobs; end loop;
+   end;
+   -- Create output only after all observation batches have succeeded.
+   Create (Output_File, Out_File, (if Argument_Count &gt;= 2 then Argument (2) else &quot;results.csv&quot;));
+   Put_Line (Output_File, &quot;x,j0,worker_pid&quot;);
+   for I in 1 .. Count loop
+      Real_IO.Put (Output_File, Rows (I).X, Fore =&gt; 1, Aft =&gt; 16, Exp =&gt; 3); Put (Output_File, &#x27;,&#x27;);
+      Real_IO.Put (Output_File, Rows (I).Y, Fore =&gt; 1, Aft =&gt; 16, Exp =&gt; 3); Put (Output_File, &#x27;,&#x27;);
+      Put_Line (Output_File, C_Int&#x27;Image (Rows (I).Pid));
+   end loop;
+   Close (Output_File); Put_Line (&quot;Wrote&quot; &amp; Natural&#x27;Image (Count) &amp; &quot; observations&quot;);
+exception
+   -- Close remaining file resources and turn fatal exceptions into a readable failed run.
+   when E : others =&gt;
+      Set_Input (Standard_Input);
+      if Is_Open (Input_File) then Close (Input_File); end if;
+      if Is_Open (Output_File) then Close (Output_File); end if;
+      Put_Line (Standard_Error, &quot;error: &quot; &amp; Ada.Exceptions.Exception_Message (E)); Set_Exit_Status (Failure);
+end Bessel;
+</textarea>
+<footer>Highlighted with Pygments using the Ada lexer. All assets are local. SHA-256: <code>8153e89f29c215458f455624142c5acffb1320a0ec51a9035b8d2ba69d6b2b1f</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

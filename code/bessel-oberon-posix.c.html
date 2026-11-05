@@ -1,0 +1,414 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="7ae1a06845ea2cd3adebc76ab4223305bd4ca205b72064a89a2b4af7822daaca">
+<title>Oberon-2 support — bessel-oberon-posix.c — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel-perligata.pl.html">← Lingua::Romana::Perligata</a><a href="tools_build_oberon.sh.html">Oberon-2 support →</a></nav>
+<h1>Oberon-2 support <code>bessel-oberon-posix.c</code></h1>
+<p>Oxford Oberon-2 OBC 3 + POSIX C toolchain · Support interface for Bessel.Mod</p>
+<p><strong>Memory:</strong> See the source for data references and process buffers.<br><strong>Strings:</strong> Input cleanup, parsing, and CSV formatting.</p>
+<div class="actions"><a href="../bessel-oberon-posix.c">Open raw source</a>
+<a href="../bessel-oberon-posix.c" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/* Checked POSIX/stdio adapter for Bessel.Mod. No Bessel mathematics lives here.</span>
+<a id="L-2" name="L-2"></a><span class="cm">   OBC generates the primitive-call wrappers when linked with obc -C.</span>
+<a id="L-3" name="L-3"></a><span class="cm">   File descriptors and stream ownership stay in this adapter. */</span>
+<a id="L-4" name="L-4"></a><span class="cp">#define _POSIX_C_SOURCE 200809L</span>
+<a id="L-5" name="L-5"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;ctype.h&gt;</span>
+<a id="L-6" name="L-6"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;errno.h&gt;</span>
+<a id="L-7" name="L-7"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;math.h&gt;</span>
+<a id="L-8" name="L-8"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;signal.h&gt;</span>
+<a id="L-9" name="L-9"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdio.h&gt;</span>
+<a id="L-10" name="L-10"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;stdlib.h&gt;</span>
+<a id="L-11" name="L-11"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;string.h&gt;</span>
+<a id="L-12" name="L-12"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;sys/wait.h&gt;</span>
+<a id="L-13" name="L-13"></a><span class="cp">#include</span><span class="w"> </span><span class="cpf">&lt;unistd.h&gt;</span>
+<a id="L-14" name="L-14"></a>
+<a id="L-15" name="L-15"></a><span class="k">static</span><span class="w"> </span><span class="kt">FILE</span><span class="w"> </span><span class="o">*</span><span class="n">input</span><span class="p">,</span><span class="w"> </span><span class="o">*</span><span class="n">output</span><span class="p">;</span>
+<a id="L-16" name="L-16"></a><span class="k">static</span><span class="w"> </span><span class="k">struct</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">read</span><span class="p">,</span><span class="w"> </span><span class="n">write</span><span class="p">;</span><span class="w"> </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="p">;</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+<a id="L-17" name="L-17"></a><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">initialized</span><span class="p">;</span>
+<a id="L-18" name="L-18"></a>
+<a id="L-19" name="L-19"></a><span class="cm">/* Open input and initialize descriptor sentinels.</span>
+<a id="L-20" name="L-20"></a><span class="cm">   Input: path (&quot;-&quot; means stdin). Output: success flag. Called by OpenInput. */</span>
+<a id="L-21" name="L-21"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_input</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-22" name="L-22"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">&lt;</span><span class="mi">16</span><span class="p">;</span><span class="w"> </span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">read</span><span class="o">=</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">write</span><span class="o">=</span><span class="mi">-1</span><span class="p">;</span>
+<a id="L-23" name="L-23"></a><span class="w">    </span><span class="n">initialized</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+<a id="L-24" name="L-24"></a><span class="w">    </span><span class="n">input</span><span class="o">=</span><span class="n">strcmp</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s">&quot;-&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">fopen</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s">&quot;r&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stdin</span><span class="p">;</span>
+<a id="L-25" name="L-25"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="o">==</span><span class="n">stdin</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isatty</span><span class="p">(</span><span class="n">STDIN_FILENO</span><span class="p">))</span><span class="w"> </span><span class="n">fputs</span><span class="p">(</span><span class="s">&quot;Enter values; blank line finishes.</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">stderr</span><span class="p">);</span>
+<a id="L-26" name="L-26"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">input</span><span class="o">!=</span><span class="nb">NULL</span><span class="p">;</span>
+<a id="L-27" name="L-27"></a><span class="p">}</span>
+<a id="L-28" name="L-28"></a>
+<a id="L-29" name="L-29"></a><span class="cm">/* Fill one bounded line without silently splitting an overlong observation.</span>
+<a id="L-30" name="L-30"></a><span class="cm">   Inputs: destination and capacity. Output: length/-1 EOF/-2 failure.</span>
+<a id="L-31" name="L-31"></a><span class="cm">   Called by ReadLine; the Oberon Trim procedure handles string cleanup. */</span>
+<a id="L-32" name="L-32"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_line</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">capacity</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-33" name="L-33"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="n">fgets</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="n">capacity</span><span class="p">,</span><span class="n">input</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">ferror</span><span class="p">(</span><span class="n">input</span><span class="p">)</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">-2</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">-1</span><span class="p">;</span>
+<a id="L-34" name="L-34"></a><span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">line</span><span class="p">);</span>
+<a id="L-35" name="L-35"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">==</span><span class="p">(</span><span class="kt">size_t</span><span class="p">)</span><span class="n">capacity</span><span class="mi">-1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">line</span><span class="p">[</span><span class="n">n</span><span class="mi">-1</span><span class="p">]</span><span class="o">!=</span><span class="sc">&#39;\n&#39;</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">feof</span><span class="p">(</span><span class="n">input</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">-2</span><span class="p">;</span>
+<a id="L-36" name="L-36"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">n</span><span class="p">;</span>
+<a id="L-37" name="L-37"></a><span class="p">}</span>
+<a id="L-38" name="L-38"></a>
+<a id="L-39" name="L-39"></a><span class="cm">/* Parse the complete token into caller-owned storage.</span>
+<a id="L-40" name="L-40"></a><span class="cm">   Inputs: string and double pointer. Output: success flag and value.</span>
+<a id="L-41" name="L-41"></a><span class="cm">   Called by Parse because OBC&#39;s Conv.LongRealVal cannot report partial parses. */</span>
+<a id="L-42" name="L-42"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_parse</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">line</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-43" name="L-43"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">end</span><span class="p">;</span><span class="w"> </span><span class="n">errno</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="o">=</span><span class="n">strtod</span><span class="p">(</span><span class="n">line</span><span class="p">,</span><span class="o">&amp;</span><span class="n">end</span><span class="p">);</span>
+<a id="L-44" name="L-44"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">end</span><span class="o">!=</span><span class="n">line</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!*</span><span class="n">end</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">errno</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isfinite</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">fabs</span><span class="p">(</span><span class="o">*</span><span class="n">value</span><span class="p">)</span><span class="o">&lt;=</span><span class="mi">1000</span><span class="p">;</span>
+<a id="L-45" name="L-45"></a><span class="p">}</span>
+<a id="L-46" name="L-46"></a>
+<a id="L-47" name="L-47"></a><span class="cm">/* Reserve a pipe for a bounded slot.</span>
+<a id="L-48" name="L-48"></a><span class="cm">   Input: slot 0..15. Output: success flag. Called by Pipe before Fork. */</span>
+<a id="L-49" name="L-49"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_pipe</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">slot</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-50" name="L-50"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">pair</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pipe</span><span class="p">(</span><span class="n">pair</span><span class="p">))</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-51" name="L-51"></a><span class="w">    </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">read</span><span class="o">=</span><span class="n">pair</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">write</span><span class="o">=</span><span class="n">pair</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="L-52" name="L-52"></a><span class="p">}</span>
+<a id="L-53" name="L-53"></a>
+<a id="L-54" name="L-54"></a><span class="cm">/* Fork and close pipe ends that each process does not own.</span>
+<a id="L-55" name="L-55"></a><span class="cm">   Input: slot. Output: fork result. Called by Fork to create real OS workers. */</span>
+<a id="L-56" name="L-56"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_fork</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">slot</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-57" name="L-57"></a><span class="w">    </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">pid</span><span class="o">=</span><span class="n">fork</span><span class="p">();</span>
+<a id="L-58" name="L-58"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pid</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-59" name="L-59"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">16</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-60" name="L-60"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">read</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">read</span><span class="p">);</span>
+<a id="L-61" name="L-61"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">i</span><span class="o">!=</span><span class="n">slot</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">write</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">write</span><span class="p">);</span>
+<a id="L-62" name="L-62"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-63" name="L-63"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">pid</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-64" name="L-64"></a><span class="w">        </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">pid</span><span class="o">=</span><span class="n">pid</span><span class="p">;</span><span class="w"> </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">write</span><span class="p">);</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">write</span><span class="o">=</span><span class="mi">-1</span><span class="p">;</span>
+<a id="L-65" name="L-65"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-66" name="L-66"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="p">)</span><span class="n">pid</span><span class="p">;</span>
+<a id="L-67" name="L-67"></a><span class="p">}</span>
+<a id="L-68" name="L-68"></a>
+<a id="L-69" name="L-69"></a><span class="cm">/* Transfer exactly one native double, handling interrupts and short I/O.</span>
+<a id="L-70" name="L-70"></a><span class="cm">   Inputs: descriptor, memory pointer, direction. Output: success flag.</span>
+<a id="L-71" name="L-71"></a><span class="cm">   Called by Send and Collect; pointer arithmetic advances only within a double. */</span>
+<a id="L-72" name="L-72"></a><span class="k">static</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="nf">transfer</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">fd</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">sending</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-73" name="L-73"></a><span class="w">    </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">p</span><span class="o">=</span><span class="p">(</span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="p">)</span><span class="n">value</span><span class="p">;</span><span class="w"> </span><span class="kt">size_t</span><span class="w"> </span><span class="n">left</span><span class="o">=</span><span class="k">sizeof</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="p">;</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">left</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-75" name="L-75"></a><span class="w">        </span><span class="kt">ssize_t</span><span class="w"> </span><span class="n">n</span><span class="o">=</span><span class="n">sending</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">write</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">left</span><span class="p">)</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">read</span><span class="p">(</span><span class="n">fd</span><span class="p">,</span><span class="n">p</span><span class="p">,</span><span class="n">left</span><span class="p">);</span>
+<a id="L-76" name="L-76"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">&lt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">errno</span><span class="o">==</span><span class="n">EINTR</span><span class="p">)</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<a id="L-77" name="L-77"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">&lt;=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-78" name="L-78"></a><span class="w">        </span><span class="n">p</span><span class="o">+=</span><span class="n">n</span><span class="p">;</span><span class="w"> </span><span class="n">left</span><span class="o">-=</span><span class="p">(</span><span class="kt">size_t</span><span class="p">)</span><span class="n">n</span><span class="p">;</span>
+<a id="L-79" name="L-79"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-80" name="L-80"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span>
+<a id="L-81" name="L-81"></a><span class="p">}</span>
+<a id="L-82" name="L-82"></a>
+<a id="L-83" name="L-83"></a><span class="cm">/* Send a computed value and terminate without flushing inherited streams.</span>
+<a id="L-84" name="L-84"></a><span class="cm">   Inputs: slot and value. Output: child exit code. Called by Send only in child. */</span>
+<a id="L-85" name="L-85"></a><span class="kt">void</span><span class="w"> </span><span class="nf">bo_send</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">slot</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-86" name="L-86"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ok</span><span class="o">=</span><span class="n">transfer</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">write</span><span class="p">,</span><span class="o">&amp;</span><span class="n">value</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+<a id="L-87" name="L-87"></a><span class="w">    </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">write</span><span class="p">);</span><span class="w"> </span><span class="n">_exit</span><span class="p">(</span><span class="n">ok</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="L-88" name="L-88"></a><span class="p">}</span>
+<a id="L-89" name="L-89"></a>
+<a id="L-90" name="L-90"></a><span class="cm">/* Receive a result and reap its child even if the read fails.</span>
+<a id="L-91" name="L-91"></a><span class="cm">   Inputs: slot and result pointer. Output: success flag and double.</span>
+<a id="L-92" name="L-92"></a><span class="cm">   Called by Collect at batch boundaries; failed status remains a parent error. */</span>
+<a id="L-93" name="L-93"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_collect</span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">slot</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="o">*</span><span class="n">value</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-94" name="L-94"></a><span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">ok</span><span class="o">=</span><span class="n">transfer</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">read</span><span class="p">,</span><span class="n">value</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">status</span><span class="p">;</span><span class="w"> </span><span class="kt">pid_t</span><span class="w"> </span><span class="n">got</span><span class="p">;</span>
+<a id="L-95" name="L-95"></a><span class="w">    </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">read</span><span class="p">);</span><span class="w"> </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">read</span><span class="o">=</span><span class="mi">-1</span><span class="p">;</span>
+<a id="L-96" name="L-96"></a><span class="w">    </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">got</span><span class="o">=</span><span class="n">waitpid</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">pid</span><span class="p">,</span><span class="o">&amp;</span><span class="n">status</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">got</span><span class="o">&lt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">errno</span><span class="o">==</span><span class="n">EINTR</span><span class="p">);</span>
+<a id="L-97" name="L-97"></a><span class="w">    </span><span class="n">slots</span><span class="p">[</span><span class="n">slot</span><span class="p">].</span><span class="n">pid</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+<a id="L-98" name="L-98"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">ok</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">got</span><span class="o">&gt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">WIFEXITED</span><span class="p">(</span><span class="n">status</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">!</span><span class="n">WEXITSTATUS</span><span class="p">(</span><span class="n">status</span><span class="p">);</span>
+<a id="L-99" name="L-99"></a><span class="p">}</span>
+<a id="L-100" name="L-100"></a>
+<a id="L-101" name="L-101"></a><span class="cm">/* Open the target and write its CSV schema.</span>
+<a id="L-102" name="L-102"></a><span class="cm">   Input: path. Output: success flag. Called by OpenOutput after computation. */</span>
+<a id="L-103" name="L-103"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_output</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">path</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-104" name="L-104"></a><span class="w">    </span><span class="n">output</span><span class="o">=</span><span class="n">fopen</span><span class="p">(</span><span class="n">path</span><span class="p">,</span><span class="s">&quot;w&quot;</span><span class="p">);</span>
+<a id="L-105" name="L-105"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">fputs</span><span class="p">(</span><span class="s">&quot;x,j0,worker_pid</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">output</span><span class="p">)</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">;</span>
+<a id="L-106" name="L-106"></a><span class="p">}</span>
+<a id="L-107" name="L-107"></a><span class="cm">/* Format one ordered row at double precision.</span>
+<a id="L-108" name="L-108"></a><span class="cm">   Inputs: x, J0, PID. Output: success flag. Called by Row in the parent. */</span>
+<a id="L-109" name="L-109"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_row</span><span class="p">(</span><span class="kt">double</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="kt">double</span><span class="w"> </span><span class="n">y</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="n">output</span><span class="p">,</span><span class="s">&quot;%.17g,%.17g,%d</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">pid</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-110" name="L-110"></a><span class="cm">/* Check final buffered output. Input: output stream. Output: success flag.</span>
+<a id="L-111" name="L-111"></a><span class="cm">   Called by CloseOutput so disk errors cannot be reported as success. */</span>
+<a id="L-112" name="L-112"></a><span class="kt">int</span><span class="w"> </span><span class="nf">bo_close_output</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ok</span><span class="o">=</span><span class="n">fclose</span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">output</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="n">ok</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-113" name="L-113"></a><span class="cm">/* Release adapter-owned resources after ordinary completion or failure.</span>
+<a id="L-114" name="L-114"></a><span class="cm">   Input: static state. Output: no surviving child/descriptor. Called by Cleanup. */</span>
+<a id="L-115" name="L-115"></a><span class="kt">void</span><span class="w"> </span><span class="nf">bo_cleanup</span><span class="p">(</span><span class="kt">void</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-116" name="L-116"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">initialized</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">16</span><span class="p">;</span><span class="o">++</span><span class="n">i</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-117" name="L-117"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">read</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">read</span><span class="p">);</span>
+<a id="L-118" name="L-118"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">write</span><span class="o">&gt;=</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="n">close</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">write</span><span class="p">);</span>
+<a id="L-119" name="L-119"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pid</span><span class="o">&gt;</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-120" name="L-120"></a><span class="w">            </span><span class="n">kill</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pid</span><span class="p">,</span><span class="n">SIGTERM</span><span class="p">);</span>
+<a id="L-121" name="L-121"></a><span class="w">            </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="n">waitpid</span><span class="p">(</span><span class="n">slots</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">pid</span><span class="p">,</span><span class="nb">NULL</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="o">&lt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">errno</span><span class="o">==</span><span class="n">EINTR</span><span class="p">)</span><span class="w"> </span><span class="p">{}</span>
+<a id="L-122" name="L-122"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-123" name="L-123"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-124" name="L-124"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">input</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">input</span><span class="o">!=</span><span class="n">stdin</span><span class="p">)</span><span class="w"> </span><span class="n">fclose</span><span class="p">(</span><span class="n">input</span><span class="p">);</span>
+<a id="L-125" name="L-125"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">output</span><span class="p">)</span><span class="w"> </span><span class="n">fclose</span><span class="p">(</span><span class="n">output</span><span class="p">);</span>
+<a id="L-126" name="L-126"></a><span class="w">    </span><span class="n">input</span><span class="o">=</span><span class="n">output</span><span class="o">=</span><span class="nb">NULL</span><span class="p">;</span>
+<a id="L-127" name="L-127"></a><span class="p">}</span>
+<a id="L-128" name="L-128"></a>
+<a id="L-129" name="L-129"></a><span class="cm">/* Print one terminal line. Inputs: text and stderr flag. Output: text.</span>
+<a id="L-130" name="L-130"></a><span class="cm">   Called by Message for usage, progress, invalid observations, and errors. */</span>
+<a id="L-131" name="L-131"></a><span class="kt">void</span><span class="w"> </span><span class="nf">bo_message</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">char</span><span class="w"> </span><span class="o">*</span><span class="n">text</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">fprintf</span><span class="p">(</span><span class="n">error</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="n">stderr</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="n">stdout</span><span class="p">,</span><span class="s">&quot;%s</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">,</span><span class="n">text</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/* Checked POSIX/stdio adapter for Bessel.Mod. No Bessel mathematics lives here.
+   OBC generates the primitive-call wrappers when linked with obc -C.
+   File descriptors and stream ownership stay in this adapter. */
+#define _POSIX_C_SOURCE 200809L
+#include &lt;ctype.h&gt;
+#include &lt;errno.h&gt;
+#include &lt;math.h&gt;
+#include &lt;signal.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;string.h&gt;
+#include &lt;sys/wait.h&gt;
+#include &lt;unistd.h&gt;
+
+static FILE *input, *output;
+static struct { int read, write; pid_t pid; } slots[16];
+static int initialized;
+
+/* Open input and initialize descriptor sentinels.
+   Input: path (&quot;-&quot; means stdin). Output: success flag. Called by OpenInput. */
+int bo_input(const char *path) {
+    for (int i=0; i&lt;16; ++i) slots[i].read=slots[i].write=-1;
+    initialized=1;
+    input=strcmp(path,&quot;-&quot;) ? fopen(path,&quot;r&quot;) : stdin;
+    if (input==stdin &amp;&amp; isatty(STDIN_FILENO)) fputs(&quot;Enter values; blank line finishes.\n&quot;,stderr);
+    return input!=NULL;
+}
+
+/* Fill one bounded line without silently splitting an overlong observation.
+   Inputs: destination and capacity. Output: length/-1 EOF/-2 failure.
+   Called by ReadLine; the Oberon Trim procedure handles string cleanup. */
+int bo_line(char *line, int capacity) {
+    if (!fgets(line,capacity,input)) return ferror(input) ? -2 : -1;
+    size_t n=strlen(line);
+    if (n==(size_t)capacity-1 &amp;&amp; line[n-1]!=&#x27;\n&#x27; &amp;&amp; !feof(input)) return -2;
+    return (int)n;
+}
+
+/* Parse the complete token into caller-owned storage.
+   Inputs: string and double pointer. Output: success flag and value.
+   Called by Parse because OBC&#x27;s Conv.LongRealVal cannot report partial parses. */
+int bo_parse(const char *line, double *value) {
+    char *end; errno=0; *value=strtod(line,&amp;end);
+    return end!=line &amp;&amp; !*end &amp;&amp; !errno &amp;&amp; isfinite(*value) &amp;&amp; fabs(*value)&lt;=1000;
+}
+
+/* Reserve a pipe for a bounded slot.
+   Input: slot 0..15. Output: success flag. Called by Pipe before Fork. */
+int bo_pipe(int slot) {
+    int pair[2]; if (pipe(pair)) return 0;
+    slots[slot].read=pair[0]; slots[slot].write=pair[1]; return 1;
+}
+
+/* Fork and close pipe ends that each process does not own.
+   Input: slot. Output: fork result. Called by Fork to create real OS workers. */
+int bo_fork(int slot) {
+    pid_t pid=fork();
+    if (pid==0) {
+        for (int i=0;i&lt;16;++i) {
+            if (slots[i].read&gt;=0) close(slots[i].read);
+            if (i!=slot &amp;&amp; slots[i].write&gt;=0) close(slots[i].write);
+        }
+    } else if (pid&gt;0) {
+        slots[slot].pid=pid; close(slots[slot].write); slots[slot].write=-1;
+    }
+    return (int)pid;
+}
+
+/* Transfer exactly one native double, handling interrupts and short I/O.
+   Inputs: descriptor, memory pointer, direction. Output: success flag.
+   Called by Send and Collect; pointer arithmetic advances only within a double. */
+static int transfer(int fd, double *value, int sending) {
+    char *p=(char *)value; size_t left=sizeof *value;
+    while (left) {
+        ssize_t n=sending ? write(fd,p,left) : read(fd,p,left);
+        if (n&lt;0 &amp;&amp; errno==EINTR) continue;
+        if (n&lt;=0) return 0;
+        p+=n; left-=(size_t)n;
+    }
+    return 1;
+}
+
+/* Send a computed value and terminate without flushing inherited streams.
+   Inputs: slot and value. Output: child exit code. Called by Send only in child. */
+void bo_send(int slot, double value) {
+    int ok=transfer(slots[slot].write,&amp;value,1);
+    close(slots[slot].write); _exit(ok ? 0 : 1);
+}
+
+/* Receive a result and reap its child even if the read fails.
+   Inputs: slot and result pointer. Output: success flag and double.
+   Called by Collect at batch boundaries; failed status remains a parent error. */
+int bo_collect(int slot, double *value) {
+    int ok=transfer(slots[slot].read,value,0), status; pid_t got;
+    close(slots[slot].read); slots[slot].read=-1;
+    do { got=waitpid(slots[slot].pid,&amp;status,0); } while (got&lt;0 &amp;&amp; errno==EINTR);
+    slots[slot].pid=0;
+    return ok &amp;&amp; got&gt;0 &amp;&amp; WIFEXITED(status) &amp;&amp; !WEXITSTATUS(status);
+}
+
+/* Open the target and write its CSV schema.
+   Input: path. Output: success flag. Called by OpenOutput after computation. */
+int bo_output(const char *path) {
+    output=fopen(path,&quot;w&quot;);
+    return output &amp;&amp; fputs(&quot;x,j0,worker_pid\n&quot;,output)&gt;=0;
+}
+/* Format one ordered row at double precision.
+   Inputs: x, J0, PID. Output: success flag. Called by Row in the parent. */
+int bo_row(double x, double y, int pid) { return fprintf(output,&quot;%.17g,%.17g,%d\n&quot;,x,y,pid)&gt;0; }
+/* Check final buffered output. Input: output stream. Output: success flag.
+   Called by CloseOutput so disk errors cannot be reported as success. */
+int bo_close_output(void) { int ok=fclose(output)==0; output=NULL; return ok; }
+/* Release adapter-owned resources after ordinary completion or failure.
+   Input: static state. Output: no surviving child/descriptor. Called by Cleanup. */
+void bo_cleanup(void) {
+    if (initialized) for (int i=0;i&lt;16;++i) {
+        if (slots[i].read&gt;=0) close(slots[i].read);
+        if (slots[i].write&gt;=0) close(slots[i].write);
+        if (slots[i].pid&gt;0) {
+            kill(slots[i].pid,SIGTERM);
+            while (waitpid(slots[i].pid,NULL,0)&lt;0 &amp;&amp; errno==EINTR) {}
+        }
+    }
+    if (input &amp;&amp; input!=stdin) fclose(input);
+    if (output) fclose(output);
+    input=output=NULL;
+}
+
+/* Print one terminal line. Inputs: text and stderr flag. Output: text.
+   Called by Message for usage, progress, invalid observations, and errors. */
+void bo_message(const char *text, int error) { fprintf(error ? stderr : stdout,&quot;%s\n&quot;,text); }
+</textarea>
+<footer>Highlighted with Pygments using the C lexer. All assets are local. SHA-256: <code>7ae1a06845ea2cd3adebc76ab4223305bd4ca205b72064a89a2b4af7822daaca</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

@@ -1,0 +1,48 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="534f67cebae4536c52a88abe6bfeaa462fdccafbd1d674a3ce85b0bf468f21cc">
+<title>Oberon-2 support — tools/build_oberon.sh — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel-oberon-posix.c.html">← Oberon-2 support</a><a href="rpg_setup.sql.html">RPG support →</a></nav>
+<h1>Oberon-2 support <code>tools/build_oberon.sh</code></h1>
+<p>Oxford Oberon-2 OBC 3 + POSIX C toolchain · Support interface for Bessel.Mod</p>
+<p><strong>Memory:</strong> See the source for data references and process buffers.<br><strong>Strings:</strong> Input cleanup, parsing, and CSV formatting.</p>
+<div class="actions"><a href="../tools/build_oberon.sh">Open raw source</a>
+<a href="../tools/build_oberon.sh" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">1</a></span>
+<span class="normal"><a href="#L-2">2</a></span>
+<span class="normal"><a href="#L-3">3</a></span>
+<span class="normal"><a href="#L-4">4</a></span>
+<span class="normal"><a href="#L-5">5</a></span>
+<span class="normal"><a href="#L-6">6</a></span>
+<span class="normal"><a href="#L-7">7</a></span>
+<span class="normal"><a href="#L-8">8</a></span>
+<span class="normal"><a href="#L-9">9</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/bin/sh</span>
+<a id="L-2" name="L-2"></a><span class="c1"># Compile OBC&#39;s required .m filename in an isolated directory, keeping the</span>
+<a id="L-3" name="L-3"></a><span class="c1"># Objective-C bessel.m source and generated compiler products separate.</span>
+<a id="L-4" name="L-4"></a><span class="nb">set</span><span class="w"> </span>-eu
+<a id="L-5" name="L-5"></a><span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>dirname<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$0</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">/..&quot;</span>
+<a id="L-6" name="L-6"></a>mkdir<span class="w"> </span>-p<span class="w"> </span>build/oberon
+<a id="L-7" name="L-7"></a>cp<span class="w"> </span>Bessel.Mod<span class="w"> </span>build/oberon/Bessel.m
+<a id="L-8" name="L-8"></a><span class="nb">cd</span><span class="w"> </span>build/oberon
+<a id="L-9" name="L-9"></a><span class="s2">&quot;</span><span class="si">${</span><span class="nv">OBC</span><span class="k">:-</span><span class="nv">obc</span><span class="si">}</span><span class="s2">&quot;</span><span class="w"> </span>-C<span class="w"> </span>-lm<span class="w"> </span>-o<span class="w"> </span>../bessel-oberon<span class="w"> </span>Bessel.m<span class="w"> </span>../../bessel-oberon-posix.c
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#!/bin/sh
+# Compile OBC&#x27;s required .m filename in an isolated directory, keeping the
+# Objective-C bessel.m source and generated compiler products separate.
+set -eu
+cd &quot;$(dirname &quot;$0&quot;)/..&quot;
+mkdir -p build/oberon
+cp Bessel.Mod build/oberon/Bessel.m
+cd build/oberon
+&quot;${OBC:-obc}&quot; -C -lm -o ../bessel-oberon Bessel.m ../../bessel-oberon-posix.c
+</textarea>
+<footer>Highlighted with Pygments using the Bash lexer. All assets are local. SHA-256: <code>534f67cebae4536c52a88abe6bfeaa462fdccafbd1d674a3ce85b0bf468f21cc</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

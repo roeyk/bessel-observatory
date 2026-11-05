@@ -1,0 +1,10 @@
+# Bad rows should be reported and skipped; valid rows retain their order.
+0
+not-a-number
+NaN
+Infinity
+1001
+-1001
+1
+1 2
+5

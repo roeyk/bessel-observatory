@@ -1,0 +1,375 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="c198db8a94990f0b358672f905600a30f9a7592f1c0b0e2a99b4c4e143ee9a5c">
+<title>Perl — bessel.pl — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.jl.html">← Julia</a><a href="bessel.swift.html">Swift →</a></nav>
+<h1>Perl <code>bessel.pl</code></h1>
+<p>Perl 5.20+ / POSIX · Lexical filehandles, regexes, eval/die, list processing and POSIX module.</p>
+<p><strong>Memory:</strong> Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.<br><strong>Strings:</strong> Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.</p>
+<div class="actions"><a href="../bessel.pl">Open raw source</a>
+<a href="../bessel.pl" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/usr/bin/env perl</span>
+<a id="L-2" name="L-2"></a>
+<a id="L-3" name="L-3"></a><span class="cm">=pod</span>
+<a id="L-4" name="L-4"></a>
+<a id="L-5" name="L-5"></a><span class="cm">Bessel Observatory: read numeric observations, compute J0 in child processes, and save ordered CSV.</span>
+<a id="L-6" name="L-6"></a><span class="cm">J0 is approximated by averaging cos(x*sin(theta)) at 16,384 midpoint angles.</span>
+<a id="L-7" name="L-7"></a><span class="cm">Normal use: PROGRAM [INPUT|- [OUTPUT [WORKERS]]]. Invalid value lines are reported and skipped.</span>
+<a id="L-8" name="L-8"></a>
+<a id="L-9" name="L-9"></a><span class="cm">=cut</span>
+<a id="L-10" name="L-10"></a>
+<a id="L-11" name="L-11"></a><span class="k">use</span><span class="w"> </span><span class="nn">v5</span><span class="mf">.20</span><span class="p">;</span>
+<a id="L-12" name="L-12"></a><span class="k">use</span><span class="w"> </span><span class="nn">strict</span><span class="p">;</span>
+<a id="L-13" name="L-13"></a><span class="k">use</span><span class="w"> </span><span class="nn">warnings</span><span class="p">;</span>
+<a id="L-14" name="L-14"></a><span class="k">use</span><span class="w"> </span><span class="nn">POSIX</span><span class="w"> </span><span class="sx">qw(cos sin isfinite _exit)</span><span class="p">;</span>
+<a id="L-15" name="L-15"></a><span class="k">use</span><span class="w"> </span><span class="nn">Scalar::Util</span><span class="w"> </span><span class="sx">qw(looks_like_number)</span><span class="p">;</span>
+<a id="L-16" name="L-16"></a>
+<a id="L-17" name="L-17"></a>
+<a id="L-18" name="L-18"></a><span class="cm">=pod</span>
+<a id="L-19" name="L-19"></a>
+<a id="L-20" name="L-20"></a><span class="cm">Validate one scalar token as a finite supported observation.</span>
+<a id="L-21" name="L-21"></a><span class="cm">Inputs: The token passed as the first subroutine argument.</span>
+<a id="L-22" name="L-22"></a><span class="cm">Outputs: A numeric scalar, or a die exception describing invalid input.</span>
+<a id="L-23" name="L-23"></a><span class="cm">Used by: The top-level reading loop, inside eval so one bad line is recoverable.</span>
+<a id="L-24" name="L-24"></a>
+<a id="L-25" name="L-25"></a><span class="cm">=cut</span>
+<a id="L-26" name="L-26"></a>
+<a id="L-27" name="L-27"></a><span class="k">sub</span><span class="w"> </span><span class="nf">number</span><span class="w"> </span><span class="p">{</span>
+<a id="L-28" name="L-28"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="p">(</span><span class="nv">$s</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">@_</span><span class="p">;</span>
+<a id="L-29" name="L-29"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;expected a finite x in [-1000,1000]\n&quot;</span>
+<a id="L-30" name="L-30"></a><span class="w">        </span><span class="k">unless</span><span class="w"> </span><span class="n">looks_like_number</span><span class="p">(</span><span class="nv">$s</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">isfinite</span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">$s</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="nv">$s</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">1000</span><span class="p">;</span>
+<a id="L-31" name="L-31"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">$s</span><span class="p">;</span>
+<a id="L-32" name="L-32"></a><span class="p">}</span>
+<a id="L-33" name="L-33"></a>
+<a id="L-34" name="L-34"></a>
+<a id="L-35" name="L-35"></a><span class="cm">=pod</span>
+<a id="L-36" name="L-36"></a>
+<a id="L-37" name="L-37"></a><span class="cm">Compute a group in independent processes and return their results in order.</span>
+<a id="L-38" name="L-38"></a><span class="cm">Inputs: The list of x values for one bounded batch.</span>
+<a id="L-39" name="L-39"></a><span class="cm">Outputs: CSV row strings; pipe or worker failures die after cleanup.</span>
+<a id="L-40" name="L-40"></a><span class="cm">Used by: The top-level splice loop, once per worker-sized group.</span>
+<a id="L-41" name="L-41"></a>
+<a id="L-42" name="L-42"></a><span class="cm">=cut</span>
+<a id="L-43" name="L-43"></a>
+<a id="L-44" name="L-44"></a><span class="k">sub</span><span class="w"> </span><span class="nf">batch</span><span class="w"> </span><span class="p">{</span>
+<a id="L-45" name="L-45"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@children</span><span class="p">;</span>
+<a id="L-46" name="L-46"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@rows</span><span class="p">;</span>
+<a id="L-47" name="L-47"></a><span class="w">    </span><span class="c1"># Capture failures while launching or collecting so already-started children can still be reaped.</span>
+<a id="L-48" name="L-48"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$ok</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="p">{</span>
+<a id="L-49" name="L-49"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$x</span><span class="w"> </span><span class="p">(</span><span class="nv">@_</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-50" name="L-50"></a><span class="w">            </span><span class="nb">pipe</span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$reader</span><span class="p">,</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$writer</span><span class="p">)</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;pipe: $!\n&quot;</span><span class="p">;</span>
+<a id="L-51" name="L-51"></a><span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$pid</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">fork</span><span class="p">();</span>
+<a id="L-52" name="L-52"></a><span class="w">            </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;fork: $!\n&quot;</span><span class="w"> </span><span class="k">unless</span><span class="w"> </span><span class="nb">defined</span><span class="w"> </span><span class="nv">$pid</span><span class="p">;</span>
+<a id="L-53" name="L-53"></a><span class="w">            </span><span class="c1"># Perform the numerical work only in the forked child and terminate it with _exit.</span>
+<a id="L-54" name="L-54"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nv">$pid</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-55" name="L-55"></a><span class="w">                </span><span class="nb">close</span><span class="w"> </span><span class="nv">$reader</span><span class="p">;</span>
+<a id="L-56" name="L-56"></a><span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-57" name="L-57"></a><span class="w">                </span><span class="nv">$sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nb">cos</span><span class="p">(</span><span class="nv">$x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">sin</span><span class="p">(</span><span class="mi">4</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">atan2</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nv">$_</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">))</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="mi">0</span><span class="o">..</span><span class="mi">16383</span><span class="p">;</span>
+<a id="L-58" name="L-58"></a><span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$written</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">printf</span><span class="w"> </span><span class="p">{</span><span class="nv">$writer</span><span class="p">}</span><span class="w"> </span><span class="s">&quot;%.17g,%.17g,%d\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">$x</span><span class="p">,</span><span class="w"> </span><span class="nv">$sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">,</span><span class="w"> </span><span class="vg">$$</span><span class="p">;</span>
+<a id="L-59" name="L-59"></a><span class="w">                </span><span class="k">my</span><span class="w"> </span><span class="nv">$closed</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">close</span><span class="w"> </span><span class="nv">$writer</span><span class="p">;</span>
+<a id="L-60" name="L-60"></a><span class="w">                </span><span class="n">_exit</span><span class="p">(</span><span class="nv">$written</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$closed</span><span class="w"> </span><span class="p">?</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">);</span>
+<a id="L-61" name="L-61"></a><span class="w">            </span><span class="p">}</span>
+<a id="L-62" name="L-62"></a><span class="w">            </span><span class="nb">close</span><span class="w"> </span><span class="nv">$writer</span><span class="p">;</span>
+<a id="L-63" name="L-63"></a><span class="w">            </span><span class="nb">push</span><span class="w"> </span><span class="nv">@children</span><span class="p">,</span><span class="w"> </span><span class="p">[</span><span class="nv">$pid</span><span class="p">,</span><span class="w"> </span><span class="nv">$reader</span><span class="p">];</span>
+<a id="L-64" name="L-64"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-65" name="L-65"></a><span class="w">        </span><span class="c1"># Drain and validate every child after the whole batch has been launched.</span>
+<a id="L-66" name="L-66"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$child</span><span class="w"> </span><span class="p">(</span><span class="nv">@children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-67" name="L-67"></a><span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="p">(</span><span class="nv">$pid</span><span class="p">,</span><span class="w"> </span><span class="nv">$reader</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nv">@$child</span><span class="p">;</span>
+<a id="L-68" name="L-68"></a><span class="w">            </span><span class="k">my</span><span class="w"> </span><span class="nv">$row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">local</span><span class="w"> </span><span class="vg">$/</span><span class="p">;</span><span class="w"> </span><span class="sr">&lt;$reader&gt;</span><span class="w"> </span><span class="p">};</span>
+<a id="L-69" name="L-69"></a><span class="w">            </span><span class="nb">waitpid</span><span class="p">(</span><span class="nv">$pid</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">$pid</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;waitpid: $!\n&quot;</span><span class="p">;</span>
+<a id="L-70" name="L-70"></a><span class="w">            </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;worker $pid failed\n&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="vg">$?</span><span class="w"> </span><span class="o">!=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nb">length</span><span class="p">(</span><span class="nv">$row</span><span class="w"> </span><span class="sr">//</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">);</span>
+<a id="L-71" name="L-71"></a><span class="w">            </span><span class="nb">push</span><span class="w"> </span><span class="nv">@rows</span><span class="p">,</span><span class="w"> </span><span class="nv">$row</span><span class="p">;</span>
+<a id="L-72" name="L-72"></a><span class="w">        </span><span class="p">}</span>
+<a id="L-73" name="L-73"></a><span class="w">        </span><span class="mi">1</span><span class="p">;</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="p">};</span>
+<a id="L-75" name="L-75"></a><span class="w">    </span><span class="c1"># Save the original exception before cleanup calls can disturb Perl error state.</span>
+<a id="L-76" name="L-76"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$error</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">$@</span><span class="p">;</span>
+<a id="L-77" name="L-77"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$child</span><span class="w"> </span><span class="p">(</span><span class="nv">@children</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">close</span><span class="w"> </span><span class="nv">$child</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span><span class="w"> </span><span class="nb">waitpid</span><span class="p">(</span><span class="nv">$child</span><span class="o">-&gt;</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-78" name="L-78"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="nv">$error</span><span class="w"> </span><span class="k">unless</span><span class="w"> </span><span class="nv">$ok</span><span class="p">;</span>
+<a id="L-79" name="L-79"></a><span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="nv">@rows</span><span class="p">;</span>
+<a id="L-80" name="L-80"></a><span class="p">}</span>
+<a id="L-81" name="L-81"></a>
+<a id="L-82" name="L-82"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nv">@ARGV</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;--help&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-83" name="L-83"></a><span class="w">    </span><span class="n">say</span><span class="w"> </span><span class="s">&#39;Usage: perl bessel.pl [INPUT|- [OUTPUT [WORKERS 1..16]]]&#39;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-84" name="L-84"></a><span class="p">}</span>
+<a id="L-85" name="L-85"></a><span class="nb">eval</span><span class="w"> </span><span class="p">{</span>
+<a id="L-86" name="L-86"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;too many arguments\n&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">@ARGV</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<a id="L-87" name="L-87"></a><span class="w">    </span><span class="c1"># Apply defaults and keep CLI values local to this run.</span>
+<a id="L-88" name="L-88"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="p">(</span><span class="nv">$source</span><span class="p">,</span><span class="w"> </span><span class="nv">$target</span><span class="p">,</span><span class="w"> </span><span class="nv">$jobs</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">(</span><span class="nv">$ARGV</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="sr">//</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="sr">//</span><span class="w"> </span><span class="s">&#39;results.csv&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="w"> </span><span class="sr">//</span><span class="w"> </span><span class="s">&#39;2&#39;</span><span class="p">);</span>
+<a id="L-89" name="L-89"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;workers must be 1..16\n&quot;</span><span class="w"> </span><span class="k">unless</span><span class="w"> </span><span class="nv">$jobs</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^\d+$/</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$jobs</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$jobs</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">16</span><span class="p">;</span>
+<a id="L-90" name="L-90"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$input</span><span class="p">;</span>
+<a id="L-91" name="L-91"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nv">$source</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="o">*</span><span class="bp">STDIN</span><span class="p">;</span><span class="w"> </span><span class="n">say</span><span class="w"> </span><span class="bp">STDERR</span><span class="w"> </span><span class="s">&#39;Enter one x per line; blank line or EOF finishes:&#39;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-92" name="L-92"></a><span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">open</span><span class="w"> </span><span class="nv">$input</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$source</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;open $source: $!\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-93" name="L-93"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@values</span><span class="p">;</span>
+<a id="L-94" name="L-94"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
+<a id="L-95" name="L-95"></a><span class="w">    </span><span class="c1"># Strip surrounding whitespace, stop on a blank line, and skip comment lines.</span>
+<a id="L-96" name="L-96"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="p">(</span><span class="k">my</span><span class="w"> </span><span class="nv">$text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="sr">&lt;$input&gt;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-97" name="L-97"></a><span class="w">        </span><span class="o">++</span><span class="nv">$line</span><span class="p">;</span><span class="w"> </span><span class="nv">$text</span><span class="w"> </span><span class="o">=~</span><span class="w"> </span><span class="sr">s/^\s+|\s+$//g</span><span class="p">;</span>
+<a id="L-98" name="L-98"></a><span class="w">        </span><span class="k">last</span><span class="w"> </span><span class="k">unless</span><span class="w"> </span><span class="nb">length</span><span class="w"> </span><span class="nv">$text</span><span class="p">;</span>
+<a id="L-99" name="L-99"></a><span class="w">        </span><span class="k">next</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">$text</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^#/</span><span class="p">;</span>
+<a id="L-100" name="L-100"></a><span class="w">        </span><span class="c1"># Treat malformed numeric input as a skipped line rather than a fatal program error.</span>
+<a id="L-101" name="L-101"></a><span class="w">        </span><span class="k">my</span><span class="w"> </span><span class="nv">$x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">eval</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">number</span><span class="p">(</span><span class="nv">$text</span><span class="p">)</span><span class="w"> </span><span class="p">};</span>
+<a id="L-102" name="L-102"></a><span class="w">        </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="vg">$@</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">warn</span><span class="w"> </span><span class="s">&quot;warning: line $line: invalid number; skipped\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="k">next</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
+<a id="L-103" name="L-103"></a><span class="w">        </span><span class="nb">push</span><span class="w"> </span><span class="nv">@values</span><span class="p">,</span><span class="w"> </span><span class="nv">$x</span><span class="p">;</span>
+<a id="L-104" name="L-104"></a><span class="w">        </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;at most 4096 values\n&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">@values</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4096</span><span class="p">;</span>
+<a id="L-105" name="L-105"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-106" name="L-106"></a><span class="w">    </span><span class="nb">close</span><span class="w"> </span><span class="nv">$input</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">$source</span><span class="w"> </span><span class="ow">ne</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="p">;</span>
+<a id="L-107" name="L-107"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;no valid input values\n&quot;</span><span class="w"> </span><span class="k">unless</span><span class="w"> </span><span class="nv">@values</span><span class="p">;</span>
+<a id="L-108" name="L-108"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">@rows</span><span class="p">;</span>
+<a id="L-109" name="L-109"></a><span class="w">    </span><span class="c1"># Remove one bounded slice at a time while keeping output rows in the same sequence.</span>
+<a id="L-110" name="L-110"></a><span class="w">    </span><span class="nb">push</span><span class="w"> </span><span class="nv">@rows</span><span class="p">,</span><span class="w"> </span><span class="n">batch</span><span class="p">(</span><span class="nb">splice</span><span class="w"> </span><span class="nv">@values</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w"> </span><span class="nv">$jobs</span><span class="p">)</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nv">@values</span><span class="p">;</span>
+<a id="L-111" name="L-111"></a><span class="w">    </span><span class="c1"># Open the target only after all values have been computed.</span>
+<a id="L-112" name="L-112"></a><span class="w">    </span><span class="nb">open</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$output</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$target</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;open $target: $!\n&quot;</span><span class="p">;</span>
+<a id="L-113" name="L-113"></a><span class="w">    </span><span class="k">print</span><span class="w"> </span><span class="p">{</span><span class="nv">$output</span><span class="p">}</span><span class="w"> </span><span class="s">&quot;x,j0,worker_pid\n&quot;</span><span class="p">,</span><span class="w"> </span><span class="nv">@rows</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;write: $!\n&quot;</span><span class="p">;</span>
+<a id="L-114" name="L-114"></a><span class="w">    </span><span class="nb">close</span><span class="w"> </span><span class="nv">$output</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;close: $!\n&quot;</span><span class="p">;</span>
+<a id="L-115" name="L-115"></a><span class="w">    </span><span class="n">say</span><span class="w"> </span><span class="s">&#39;Wrote &#39;</span><span class="w"> </span><span class="o">.</span><span class="w"> </span><span class="nb">scalar</span><span class="p">(</span><span class="nv">@rows</span><span class="p">)</span><span class="w"> </span><span class="o">.</span><span class="w"> </span><span class="s">&quot; observations to $target&quot;</span><span class="p">;</span>
+<a id="L-116" name="L-116"></a><span class="w">    </span><span class="mi">1</span><span class="p">;</span>
+<a id="L-117" name="L-117"></a><span class="c1"># Convert a fatal top-level exception into a concise diagnostic and failure status.</span>
+<a id="L-118" name="L-118"></a><span class="p">}</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">warn</span><span class="w"> </span><span class="s">&quot;error: $@&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">};</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#!/usr/bin/env perl
+
+=pod
+
+Bessel Observatory: read numeric observations, compute J0 in child processes, and save ordered CSV.
+J0 is approximated by averaging cos(x*sin(theta)) at 16,384 midpoint angles.
+Normal use: PROGRAM [INPUT|- [OUTPUT [WORKERS]]]. Invalid value lines are reported and skipped.
+
+=cut
+
+use v5.20;
+use strict;
+use warnings;
+use POSIX qw(cos sin isfinite _exit);
+use Scalar::Util qw(looks_like_number);
+
+
+=pod
+
+Validate one scalar token as a finite supported observation.
+Inputs: The token passed as the first subroutine argument.
+Outputs: A numeric scalar, or a die exception describing invalid input.
+Used by: The top-level reading loop, inside eval so one bad line is recoverable.
+
+=cut
+
+sub number {
+    my ($s) = @_;
+    die &quot;expected a finite x in [-1000,1000]\n&quot;
+        unless looks_like_number($s) &amp;&amp; isfinite(0 + $s) &amp;&amp; abs($s) &lt;= 1000;
+    return 0 + $s;
+}
+
+
+=pod
+
+Compute a group in independent processes and return their results in order.
+Inputs: The list of x values for one bounded batch.
+Outputs: CSV row strings; pipe or worker failures die after cleanup.
+Used by: The top-level splice loop, once per worker-sized group.
+
+=cut
+
+sub batch {
+    my @children;
+    my @rows;
+    # Capture failures while launching or collecting so already-started children can still be reaped.
+    my $ok = eval {
+        for my $x (@_) {
+            pipe(my $reader, my $writer) or die &quot;pipe: $!\n&quot;;
+            my $pid = fork();
+            die &quot;fork: $!\n&quot; unless defined $pid;
+            # Perform the numerical work only in the forked child and terminate it with _exit.
+            if (!$pid) {
+                close $reader;
+                my $sum = 0;
+                $sum += cos($x * sin(4 * atan2(1, 1) * ($_ + 0.5) / 16384)) for 0..16383;
+                my $written = printf {$writer} &quot;%.17g,%.17g,%d\n&quot;, $x, $sum / 16384, $$;
+                my $closed = close $writer;
+                _exit($written &amp;&amp; $closed ? 0 : 1);
+            }
+            close $writer;
+            push @children, [$pid, $reader];
+        }
+        # Drain and validate every child after the whole batch has been launched.
+        for my $child (@children) {
+            my ($pid, $reader) = @$child;
+            my $row = do { local $/; &lt;$reader&gt; };
+            waitpid($pid, 0) == $pid or die &quot;waitpid: $!\n&quot;;
+            die &quot;worker $pid failed\n&quot; if $? != 0 || !length($row // &#x27;&#x27;);
+            push @rows, $row;
+        }
+        1;
+    };
+    # Save the original exception before cleanup calls can disturb Perl error state.
+    my $error = $@;
+    for my $child (@children) { close $child-&gt;[1]; waitpid($child-&gt;[0], 0); }
+    die $error unless $ok;
+    return @rows;
+}
+
+if (@ARGV == 1 &amp;&amp; $ARGV[0] eq &#x27;--help&#x27;) {
+    say &#x27;Usage: perl bessel.pl [INPUT|- [OUTPUT [WORKERS 1..16]]]&#x27;; exit 0;
+}
+eval {
+    die &quot;too many arguments\n&quot; if @ARGV &gt; 3;
+    # Apply defaults and keep CLI values local to this run.
+    my ($source, $target, $jobs) = ($ARGV[0] // &#x27;-&#x27;, $ARGV[1] // &#x27;results.csv&#x27;, $ARGV[2] // &#x27;2&#x27;);
+    die &quot;workers must be 1..16\n&quot; unless $jobs =~ /^\d+$/ &amp;&amp; $jobs &gt;= 1 &amp;&amp; $jobs &lt;= 16;
+    my $input;
+    if ($source eq &#x27;-&#x27;) { $input = *STDIN; say STDERR &#x27;Enter one x per line; blank line or EOF finishes:&#x27;; }
+    else { open $input, &#x27;&lt;&#x27;, $source or die &quot;open $source: $!\n&quot;; }
+    my @values;
+    my $line = 0;
+    # Strip surrounding whitespace, stop on a blank line, and skip comment lines.
+    while (my $text = &lt;$input&gt;) {
+        ++$line; $text =~ s/^\s+|\s+$//g;
+        last unless length $text;
+        next if $text =~ /^#/;
+        # Treat malformed numeric input as a skipped line rather than a fatal program error.
+        my $x = eval { number($text) };
+        if ($@) { warn &quot;warning: line $line: invalid number; skipped\n&quot;; next; }
+        push @values, $x;
+        die &quot;at most 4096 values\n&quot; if @values &gt; 4096;
+    }
+    close $input if $source ne &#x27;-&#x27;;
+    die &quot;no valid input values\n&quot; unless @values;
+    my @rows;
+    # Remove one bounded slice at a time while keeping output rows in the same sequence.
+    push @rows, batch(splice @values, 0, $jobs) while @values;
+    # Open the target only after all values have been computed.
+    open my $output, &#x27;&gt;&#x27;, $target or die &quot;open $target: $!\n&quot;;
+    print {$output} &quot;x,j0,worker_pid\n&quot;, @rows or die &quot;write: $!\n&quot;;
+    close $output or die &quot;close: $!\n&quot;;
+    say &#x27;Wrote &#x27; . scalar(@rows) . &quot; observations to $target&quot;;
+    1;
+# Convert a fatal top-level exception into a concise diagnostic and failure status.
+} or do { warn &quot;error: $@&quot;; exit 1; };
+</textarea>
+<footer>Highlighted with Pygments using the Perl lexer. All assets are local. SHA-256: <code>c198db8a94990f0b358672f905600a30f9a7592f1c0b0e2a99b4c4e143ee9a5c</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

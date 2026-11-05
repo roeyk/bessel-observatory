@@ -1,0 +1,44 @@
+IBM i edition: fully free ILE RPG, embedded SQL, IBM i 7.5
+
+This source has been reviewed but not compiled or executed: no IBM i system is
+available here. Check the installed Db2 group PTF level for IFS_READ and
+IFS_WRITE_UTF8. It intentionally uses native jobs and database records.
+
+In a dedicated library:
+  CRTLIB LIB(BESSELAB)
+Run rpg_setup.sql with ACS Run SQL Scripts (system naming is not required).
+Transfer bessel.sqlrpgle as a text stream file with its CCSID correctly tagged,
+then compile (replace /your/path with its actual IFS location):
+  CRTSQLRPGI OBJ(BESSELAB/BESSEL) SRCSTMF('/your/path/bessel.sqlrpgle') +
+    OBJTYPE(*PGM) COMMIT(*NONE) DBGVIEW(*SOURCE)
+
+Create a dedicated job queue:
+  CRTJOBQ JOBQ(BESSELAB/BESSELQ)
+Have the IBM i administrator attach it to an appropriate active subsystem
+using ADDJOBQE, a free sequence number, and MAXACT(16). Do not change an
+existing production queue's settings just for this demonstration. Queue and
+subsystem limits determine actual parallelism; MAXACT(1) serializes the jobs.
+The user submitting jobs needs access to the program, queue, table, and IFS.
+Use DECFMT(*BLANK) for decimal-point CSV formatting in the parent job.
+
+Public interface (each character literal is passed in CL's padded 32 bytes):
+  CALL PGM(BESSELAB/BESSEL) PARM('/tmp/values.txt' '/tmp/results.csv' '2')
+  CALL PGM(BESSELAB/BESSEL) PARM('-' '/tmp/results.csv' '2')
+  CALL PGM(BESSELAB/BESSEL) PARM('--help')
+An interactive 5250 job is required for DSPLY input. Batch runs need a file.
+Paths are limited to 32 characters by this explicit CL interface. Numeric
+input is decimal/e-notation; each file line is limited to 4096 characters.
+Blank lines end input; lines beginning # are comments; bad values are skipped.
+Output is UTF-8 CSV; errors use job messages and escape status, rather than
+Unix stderr. The pid column is getpid() from the numeric batch job.
+
+Each batch has a 600-second timeout, including time waiting in the job queue.
+Success deletes its work rows. Failure keeps them (Q=queued, D=done, E=error),
+and reports the run ID. Already submitted jobs may finish after parent failure.
+Inspect jobs and rows before deleting an abandoned run; this example does not
+cancel unrelated jobs or claim transactional IFS output. Only delete records
+for a run whose submitted jobs are all finished.
+
+The RPG kernel calls C sin/cos from QC2LE, just as most language math libraries
+do. All quadrature loops and pointer traversal are RPG. SQL supplies file
+services, numeric spelling validation, and communication between jobs.

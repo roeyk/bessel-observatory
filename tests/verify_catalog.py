@@ -1,0 +1,99 @@
+#!/usr/bin/env python3
+# Verify that the offline source catalogue faithfully represents its source files.
+import hashlib
+import json
+from functools import lru_cache
+from html.parser import HTMLParser
+from pathlib import Path
+from urllib.parse import unquote, urlsplit
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+# Collect links, table rows, raw text and source hashes without rendering a page.
+# Inputs: HTML supplied to feed. Outputs: parsed attributes on this instance.
+# Used by: the checks below to validate every generated page using only stdlib.
+class Page(HTMLParser):
+    def __init__(self):
+        super().__init__(convert_charrefs=True)
+        self.links = []
+        self.ids = set()
+        self.rows = 0
+        self.digest = None
+        self.raw = ''
+        self.reading_raw = False
+
+    # Capture navigation and source-integrity metadata; input is one start tag.
+    # Output: updated page fields. Called by HTMLParser while consuming HTML.
+    def handle_starttag(self, tag, attributes):
+        attrs = dict(attributes)
+        if 'id' in attrs:
+            self.ids.add(attrs['id'])
+        if tag == 'tr' and 'data-search' in attrs:
+            self.rows += 1
+        if tag in ('a', 'link', 'script'):
+            self.links.append(attrs.get('href', attrs.get('src', '')))
+        if tag == 'meta' and attrs.get('name') == 'source-sha256':
+            self.digest = attrs['content']
+        if tag == 'textarea' and attrs.get('id') == 'raw':
+            self.reading_raw = True
+
+    # Stop raw-source capture at its container boundary.
+    # Input: closing tag. Output: capture flag. Called by HTMLParser.
+    def handle_endtag(self, tag):
+        if tag == 'textarea':
+            self.reading_raw = False
+
+    # Retain exact raw text, including whitespace and decoded HTML entities.
+    # Input: text node. Output: accumulated source. Called by HTMLParser.
+    def handle_data(self, data):
+        if self.reading_raw:
+            self.raw += data
+
+
+# Parse a local HTML document for the integrity checks.
+# Input: path. Output: populated Page. Used by the catalogue and per-source loops.
+@lru_cache(maxsize=None)
+def read_page(path):
+    page = Page()
+    page.feed(path.read_text())
+    return page
+
+
+manifest = json.loads((ROOT / 'manifest.json').read_text())
+report = json.loads((ROOT / 'tests/report.json').read_text())
+entries = manifest['languages']
+assert len(entries) == manifest['language_count'] == 30
+assert len({entry['id'] for entry in entries}) == 30
+index = read_page(ROOT / 'index.html')
+assert index.rows == 30
+evidence = {result['id']: result for result in report['results']}
+assert set(evidence) == {entry['id'] for entry in entries}
+sources = []
+for entry in entries:
+    source = entry['source']
+    assert source in index.links and entry['highlighted'] in index.links
+    digest = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+    assert evidence[entry['id']]['source_sha256'] == digest, f'stale evidence: {source}'
+    sources.append(source)
+    sources.extend(file for file in entry.get('support', []) if not file.endswith('.txt'))
+
+# Raw text inside the highlighted page must be an exact copy of the source.
+for source in sources:
+    page = read_page(ROOT / 'code' / (source.replace('/', '_') + '.html'))
+    assert page.raw == (ROOT / source).read_text(), f'text mismatch: {source}'
+    assert page.digest == hashlib.sha256(page.raw.encode()).hexdigest()
+
+# Resolve every local navigation, stylesheet and download path offline.
+for file in [ROOT / 'index.html', *sorted((ROOT / 'code').glob('*.html'))]:
+    page = read_page(file)
+    for link in page.links:
+        url = urlsplit(link)
+        if url.scheme or url.netloc:
+            continue
+        target = (file.parent / unquote(url.path)).resolve() if url.path else file
+        assert target.is_relative_to(ROOT), f'escaped catalogue: {file}: {link}'
+        assert target.is_file(), f'broken local link: {file}: {link}'
+        if url.fragment and target.suffix == '.html':
+            assert url.fragment in read_page(target).ids, f'missing anchor: {link}'
+print(f'Catalog passed: {len(entries)} languages, {len(sources)} exact source views, all local links valid.')

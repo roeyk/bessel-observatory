@@ -1,0 +1,60 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="f5b1fb3646507d1e665a6bc5f5060e267bf22b63c1c9dc886b5c72290f4dc0bf">
+<title>RPG support — rpg_setup.sql — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="tools_build_oberon.sh.html">← Oberon-2 support</a><a href="bessel.pas.html">Pascal →</a></nav>
+<h1>RPG support <code>rpg_setup.sql</code></h1>
+<p>IBM i 7.5, ILE RPG + Db2 SQL + QC2LE; see rpg_setup.txt · Support interface for bessel.sqlrpgle</p>
+<p><strong>Memory:</strong> See the source for data references and process buffers.<br><strong>Strings:</strong> Input cleanup, parsing, and CSV formatting.</p>
+<div class="actions"><a href="../rpg_setup.sql">Open raw source</a>
+<a href="../rpg_setup.sql" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1"> 1</a></span>
+<span class="normal"><a href="#L-2"> 2</a></span>
+<span class="normal"><a href="#L-3"> 3</a></span>
+<span class="normal"><a href="#L-4"> 4</a></span>
+<span class="normal"><a href="#L-5"> 5</a></span>
+<span class="normal"><a href="#L-6"> 6</a></span>
+<span class="normal"><a href="#L-7"> 7</a></span>
+<span class="normal"><a href="#L-8"> 8</a></span>
+<span class="normal"><a href="#L-9"> 9</a></span>
+<span class="normal"><a href="#L-10">10</a></span>
+<span class="normal"><a href="#L-11">11</a></span>
+<span class="normal"><a href="#L-12">12</a></span>
+<span class="normal"><a href="#L-13">13</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/* Run once in the dedicated BESSELAB library after CRTLIB.</span>
+<a id="L-2" name="L-2"></a><span class="cm">   Input: an IBM i SQL session with CREATE TABLE authority.</span>
+<a id="L-3" name="L-3"></a><span class="cm">   Output: durable cross-job work storage. Used by parent and batch RPG jobs.</span>
+<a id="L-4" name="L-4"></a><span class="cm">   Each generated run ID isolates concurrent invocations of the observatory. */</span>
+<a id="L-5" name="L-5"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">BESSELAB</span><span class="mf">.</span><span class="n">WORK_ITEMS</span><span class="w"> </span><span class="p">(</span>
+<a id="L-6" name="L-6"></a><span class="w">    </span><span class="n">run_id</span><span class="w"> </span><span class="nb">VARCHAR</span><span class="p">(</span><span class="mf">32</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="L-7" name="L-7"></a><span class="w">    </span><span class="n">ordinal</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="L-8" name="L-8"></a><span class="w">    </span><span class="n">x</span><span class="w"> </span><span class="k">DOUBLE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="p">,</span>
+<a id="L-9" name="L-9"></a><span class="w">    </span><span class="n">y</span><span class="w"> </span><span class="k">DOUBLE</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<a id="L-10" name="L-10"></a><span class="w">    </span><span class="n">pid</span><span class="w"> </span><span class="nb">INTEGER</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="mf">0</span><span class="p">,</span>
+<a id="L-11" name="L-11"></a><span class="w">    </span><span class="n">state</span><span class="w"> </span><span class="nb">CHAR</span><span class="p">(</span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">NULL</span><span class="w"> </span><span class="k">DEFAULT</span><span class="w"> </span><span class="s1">&#39;Q&#39;</span><span class="w"> </span><span class="k">CHECK</span><span class="w"> </span><span class="p">(</span><span class="n">state</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;Q&#39;</span><span class="p">,</span><span class="s1">&#39;D&#39;</span><span class="p">,</span><span class="s1">&#39;E&#39;</span><span class="p">)),</span>
+<a id="L-12" name="L-12"></a><span class="w">    </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="w"> </span><span class="p">(</span><span class="n">run_id</span><span class="p">,</span><span class="w"> </span><span class="n">ordinal</span><span class="p">)</span>
+<a id="L-13" name="L-13"></a><span class="p">);</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/* Run once in the dedicated BESSELAB library after CRTLIB.
+   Input: an IBM i SQL session with CREATE TABLE authority.
+   Output: durable cross-job work storage. Used by parent and batch RPG jobs.
+   Each generated run ID isolates concurrent invocations of the observatory. */
+CREATE TABLE BESSELAB.WORK_ITEMS (
+    run_id VARCHAR(32) NOT NULL,
+    ordinal INTEGER NOT NULL,
+    x DOUBLE NOT NULL,
+    y DOUBLE NOT NULL DEFAULT 0,
+    pid INTEGER NOT NULL DEFAULT 0,
+    state CHAR(1) NOT NULL DEFAULT &#x27;Q&#x27; CHECK (state IN (&#x27;Q&#x27;,&#x27;D&#x27;,&#x27;E&#x27;)),
+    PRIMARY KEY (run_id, ordinal)
+);
+</textarea>
+<footer>Highlighted with Pygments using the PostgreSQL SQL dialect lexer. All assets are local. SHA-256: <code>f5b1fb3646507d1e665a6bc5f5060e267bf22b63c1c9dc886b5c72290f4dc0bf</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

@@ -1,0 +1,534 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="510e65842f2bf1fc4765da4552193ce40ccd60fda18cea0427c90a13446fb76e">
+<title>Haskell — bessel.hs — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.erl.html">← Erlang</a><a href="bessel.ml.html">OCaml →</a></nav>
+<h1>Haskell <code>bessel.hs</code></h1>
+<p>GHC 9.x + process and unix packages · Pure sample generation, Either, pattern matching, scoped foreign memory, explicit IO and bracketed child lifetimes.</p>
+<p><strong>Memory:</strong> withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.<br><strong>Strings:</strong> Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.</p>
+<div class="actions"><a href="../bessel.hs">Open raw source</a>
+<a href="../bessel.hs" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">{-</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent reads input and owns result ordering; the worker computes the midpoint approximation.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.</span>
+<a id="L-5" name="L-5"></a><span class="cm">-}</span>
+<a id="L-6" name="L-6"></a><span class="cm">{-# LANGUAGE ScopedTypeVariables #-}</span>
+<a id="L-7" name="L-7"></a><span class="c1">-- GHC 9.x, process + unix packages. Pure numerical core, bracketed IO effects.</span>
+<a id="L-8" name="L-8"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Control.Exception</span>
+<a id="L-9" name="L-9"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Control.Monad</span><span class="w"> </span><span class="p">(</span><span class="nf">when</span><span class="p">,</span><span class="w"> </span><span class="nf">foldM</span><span class="p">)</span>
+<a id="L-10" name="L-10"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Foreign.Marshal.Array</span><span class="w"> </span><span class="p">(</span><span class="nf">withArray</span><span class="p">)</span>
+<a id="L-11" name="L-11"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Foreign.Ptr</span><span class="w"> </span><span class="p">(</span><span class="nf">plusPtr</span><span class="p">)</span>
+<a id="L-12" name="L-12"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Foreign.Storable</span><span class="w"> </span><span class="p">(</span><span class="nf">peek</span><span class="p">,</span><span class="w"> </span><span class="nf">sizeOf</span><span class="p">)</span>
+<a id="L-13" name="L-13"></a><span class="kr">import</span><span class="w"> </span><span class="nn">System.Environment</span><span class="w"> </span><span class="p">(</span><span class="nf">getArgs</span><span class="p">,</span><span class="w"> </span><span class="nf">getExecutablePath</span><span class="p">)</span>
+<a id="L-14" name="L-14"></a><span class="kr">import</span><span class="w"> </span><span class="nn">System.Exit</span>
+<a id="L-15" name="L-15"></a><span class="kr">import</span><span class="w"> </span><span class="nn">System.IO</span>
+<a id="L-16" name="L-16"></a><span class="kr">import</span><span class="w"> </span><span class="nn">System.Posix.Process</span><span class="w"> </span><span class="p">(</span><span class="nf">getProcessID</span><span class="p">)</span>
+<a id="L-17" name="L-17"></a><span class="kr">import</span><span class="w"> </span><span class="nn">System.Process</span>
+<a id="L-18" name="L-18"></a><span class="kr">import</span><span class="w"> </span><span class="nn">Text.Read</span><span class="w"> </span><span class="p">(</span><span class="nf">readMaybe</span><span class="p">)</span>
+<a id="L-19" name="L-19"></a>
+<a id="L-20" name="L-20"></a><span class="cm">{-</span>
+<a id="L-21" name="L-21"></a><span class="cm">  Validate a numeric token while keeping the parser free of IO effects.</span>
+<a id="L-22" name="L-22"></a><span class="cm">  Inputs: A candidate String.</span>
+<a id="L-23" name="L-23"></a><span class="cm">  Outputs: Either a diagnostic or a bounded Double.</span>
+<a id="L-24" name="L-24"></a><span class="cm">  Used by: readValues and the internal worker branch of run.</span>
+<a id="L-25" name="L-25"></a><span class="cm">-}</span>
+<a id="L-26" name="L-26"></a><span class="nf">number</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Either</span><span class="w"> </span><span class="kt">String</span><span class="w"> </span><span class="kt">Double</span>
+<a id="L-27" name="L-27"></a><span class="nf">number</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">readMaybe</span><span class="w"> </span><span class="n">s</span><span class="w"> </span><span class="kr">of</span>
+<a id="L-28" name="L-28"></a><span class="w">  </span><span class="kt">Just</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="p">(</span><span class="n">isNaN</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">isInfinite</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">abs</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Right</span><span class="w"> </span><span class="n">x</span>
+<a id="L-29" name="L-29"></a><span class="w">  </span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Left</span><span class="w"> </span><span class="s">&quot;expected finite x in [-1000,1000]&quot;</span>
+<a id="L-30" name="L-30"></a>
+<a id="L-31" name="L-31"></a><span class="cm">{-</span>
+<a id="L-32" name="L-32"></a><span class="cm">  Describe the midpoint values as a pure sequence.</span>
+<a id="L-33" name="L-33"></a><span class="cm">  Inputs: A validated Double x.</span>
+<a id="L-34" name="L-34"></a><span class="cm">  Outputs: The list of 16,384 integrand samples.</span>
+<a id="L-35" name="L-35"></a><span class="cm">  Used by: j0 before it creates a scoped foreign-memory view.</span>
+<a id="L-36" name="L-36"></a><span class="cm">-}</span>
+<a id="L-37" name="L-37"></a><span class="nf">samples</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Double</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="kt">Double</span><span class="p">]</span>
+<a id="L-38" name="L-38"></a><span class="nf">samples</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">[</span><span class="n">cos</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sin</span><span class="w"> </span><span class="p">(</span><span class="n">pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">fromIntegral</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">))</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">16383</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">]]</span>
+<a id="L-39" name="L-39"></a>
+<a id="L-40" name="L-40"></a><span class="cm">{-</span>
+<a id="L-41" name="L-41"></a><span class="cm">  Reduce sample storage through explicit pointer reads in IO.</span>
+<a id="L-42" name="L-42"></a><span class="cm">  Inputs: A bounded Double x.</span>
+<a id="L-43" name="L-43"></a><span class="cm">  Outputs: An IO action yielding approximate J0.</span>
+<a id="L-44" name="L-44"></a><span class="cm">  Used by: run in worker mode.</span>
+<a id="L-45" name="L-45"></a><span class="cm">-}</span>
+<a id="L-46" name="L-46"></a><span class="nf">j0</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Double</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="kt">Double</span>
+<a id="L-47" name="L-47"></a><span class="nf">j0</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">withArray</span><span class="w"> </span><span class="p">(</span><span class="n">samples</span><span class="w"> </span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="nf">\</span><span class="n">base</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-48" name="L-48"></a><span class="w">  </span><span class="cm">{-</span>
+<a id="L-49" name="L-49"></a><span class="cm">    withArray brackets the allocation. plusPtr counts bytes; peek is an</span>
+<a id="L-50" name="L-50"></a><span class="cm">    explicit IO effect, and all offsets refer to initialized Double values.</span>
+<a id="L-51" name="L-51"></a><span class="cm">    Accumulate values read at element-sized byte offsets while withArray keeps the allocation alive.</span>
+<a id="L-52" name="L-52"></a><span class="cm">  -}</span>
+<a id="L-53" name="L-53"></a><span class="w">  </span><span class="n">total</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">foldM</span><span class="w"> </span><span class="p">(</span><span class="nf">\</span><span class="n">acc</span><span class="w"> </span><span class="n">k</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-54" name="L-54"></a><span class="w">    </span><span class="n">value</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">peek</span><span class="w"> </span><span class="p">(</span><span class="n">base</span><span class="w"> </span><span class="p">`</span><span class="n">plusPtr</span><span class="p">`</span><span class="w"> </span><span class="p">(</span><span class="n">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">sizeOf</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Double</span><span class="p">)))</span>
+<a id="L-55" name="L-55"></a><span class="w">    </span><span class="n">pure</span><span class="w"> </span><span class="p">(</span><span class="n">acc</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">value</span><span class="p">))</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">16383</span><span class="p">]</span>
+<a id="L-56" name="L-56"></a><span class="w">  </span><span class="n">pure</span><span class="w"> </span><span class="p">(</span><span class="n">total</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">)</span>
+<a id="L-57" name="L-57"></a>
+<a id="L-58" name="L-58"></a><span class="cm">{-</span>
+<a id="L-59" name="L-59"></a><span class="cm">  Read ordered observations and recover from invalid numeric lines.</span>
+<a id="L-60" name="L-60"></a><span class="cm">  Inputs: An input Handle.</span>
+<a id="L-61" name="L-61"></a><span class="cm">  Outputs: An IO action yielding the accepted values.</span>
+<a id="L-62" name="L-62"></a><span class="cm">  Used by: run before launching workers.</span>
+<a id="L-63" name="L-63"></a><span class="cm">-}</span>
+<a id="L-64" name="L-64"></a><span class="nf">readValues</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Handle</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="p">[</span><span class="kt">Double</span><span class="p">]</span>
+<a id="L-65" name="L-65"></a><span class="nf">readValues</span><span class="w"> </span><span class="n">handle</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">go</span><span class="w"> </span><span class="kt">[]</span><span class="w"> </span><span class="p">(</span><span class="mi">0</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="p">)</span>
+<a id="L-66" name="L-66"></a><span class="w">  </span><span class="kr">where</span>
+<a id="L-67" name="L-67"></a><span class="w">    </span><span class="cm">{-</span>
+<a id="L-68" name="L-68"></a><span class="cm">      Continue reading with bounded reverse-order accumulation.</span>
+<a id="L-69" name="L-69"></a><span class="cm">      Inputs: Accepted values so far and their count; the input handle is captured.</span>
+<a id="L-70" name="L-70"></a><span class="cm">      Outputs: The final ordered values or a fatal input-limit/read error.</span>
+<a id="L-71" name="L-71"></a><span class="cm">      Used by: readValues and its own recursive continuation.</span>
+<a id="L-72" name="L-72"></a><span class="cm">    -}</span>
+<a id="L-73" name="L-73"></a><span class="w">    </span><span class="n">go</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-74" name="L-74"></a><span class="w">      </span><span class="n">eof</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">hIsEOF</span><span class="w"> </span><span class="n">handle</span>
+<a id="L-75" name="L-75"></a><span class="w">      </span><span class="kr">if</span><span class="w"> </span><span class="n">eof</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="n">pure</span><span class="w"> </span><span class="p">(</span><span class="n">reverse</span><span class="w"> </span><span class="n">acc</span><span class="p">)</span><span class="w"> </span><span class="kr">else</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-76" name="L-76"></a><span class="w">        </span><span class="n">line</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">hGetLine</span><span class="w"> </span><span class="n">handle</span>
+<a id="L-77" name="L-77"></a><span class="w">        </span><span class="kr">case</span><span class="w"> </span><span class="n">dropWhile</span><span class="w"> </span><span class="p">(`</span><span class="n">elem</span><span class="p">`</span><span class="w"> </span><span class="s">&quot; </span><span class="se">\t\r</span><span class="s">&quot;</span><span class="p">)</span><span class="w"> </span><span class="n">line</span><span class="w"> </span><span class="kr">of</span>
+<a id="L-78" name="L-78"></a><span class="w">          </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">pure</span><span class="w"> </span><span class="p">(</span><span class="n">reverse</span><span class="w"> </span><span class="n">acc</span><span class="p">)</span>
+<a id="L-79" name="L-79"></a><span class="w">          </span><span class="sc">&#39;#&#39;</span><span class="kt">:</span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">go</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="n">n</span>
+<a id="L-80" name="L-80"></a><span class="w">          </span><span class="n">text</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">number</span><span class="w"> </span><span class="n">text</span><span class="w"> </span><span class="kr">of</span>
+<a id="L-81" name="L-81"></a><span class="w">            </span><span class="kt">Left</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">hPutStrLn</span><span class="w"> </span><span class="n">stderr</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;warning: &quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">message</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="s">&quot;; skipped&quot;</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">go</span><span class="w"> </span><span class="n">acc</span><span class="w"> </span><span class="n">n</span>
+<a id="L-82" name="L-82"></a><span class="w">            </span><span class="kt">Right</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">if</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;at most 4096 values&quot;</span><span class="p">)</span><span class="w"> </span><span class="kr">else</span><span class="w"> </span><span class="n">go</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">acc</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+<a id="L-83" name="L-83"></a>
+<a id="L-84" name="L-84"></a><span class="cm">{-</span>
+<a id="L-85" name="L-85"></a><span class="cm">  Start a bounded set of executable children and collect their rows.</span>
+<a id="L-86" name="L-86"></a><span class="cm">  Inputs: This executable path and a group of x values.</span>
+<a id="L-87" name="L-87"></a><span class="cm">  Outputs: An IO action yielding rows in original order.</span>
+<a id="L-88" name="L-88"></a><span class="cm">  Used by: run through mapM over input chunks.</span>
+<a id="L-89" name="L-89"></a><span class="cm">-}</span>
+<a id="L-90" name="L-90"></a><span class="nf">batch</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">FilePath</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="kt">Double</span><span class="p">]</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="p">[</span><span class="kt">String</span><span class="p">]</span>
+<a id="L-91" name="L-91"></a><span class="nf">batch</span><span class="w"> </span><span class="n">executable</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="kt">[]</span>
+<a id="L-92" name="L-92"></a><span class="w">  </span><span class="kr">where</span>
+<a id="L-93" name="L-93"></a><span class="w">    </span><span class="cm">{-</span>
+<a id="L-94" name="L-94"></a><span class="cm">      Nested brackets keep every child alive until all have been launched.</span>
+<a id="L-95" name="L-95"></a><span class="cm">      Keep all child lifetimes nested until the full batch is launched.</span>
+<a id="L-96" name="L-96"></a><span class="cm">      Inputs: Pending child handles and the remaining values.</span>
+<a id="L-97" name="L-97"></a><span class="cm">      Outputs: The collected rows; withCreateProcess cleans up each child scope.</span>
+<a id="L-98" name="L-98"></a><span class="cm">      Used by: batch and recursive launch calls.</span>
+<a id="L-99" name="L-99"></a><span class="cm">    -}</span>
+<a id="L-100" name="L-100"></a><span class="w">    </span><span class="n">launch</span><span class="w"> </span><span class="n">pending</span><span class="w"> </span><span class="kt">[]</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">mapM</span><span class="w"> </span><span class="n">collect</span><span class="w"> </span><span class="p">(</span><span class="n">reverse</span><span class="w"> </span><span class="n">pending</span><span class="p">)</span>
+<a id="L-101" name="L-101"></a><span class="w">    </span><span class="n">launch</span><span class="w"> </span><span class="n">pending</span><span class="w"> </span><span class="p">(</span><span class="n">x</span><span class="kt">:</span><span class="n">xs</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">withCreateProcess</span>
+<a id="L-102" name="L-102"></a><span class="w">      </span><span class="p">(</span><span class="n">proc</span><span class="w"> </span><span class="n">executable</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;--worker&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">show</span><span class="w"> </span><span class="n">x</span><span class="p">])</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">std_in</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">NoStream</span><span class="p">,</span><span class="w"> </span><span class="n">std_out</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">CreatePipe</span><span class="w"> </span><span class="p">}</span>
+<a id="L-103" name="L-103"></a><span class="w">      </span><span class="p">(</span><span class="nf">\</span><span class="kr">_</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="n">ph</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">out</span><span class="w"> </span><span class="kr">of</span>
+<a id="L-104" name="L-104"></a><span class="w">        </span><span class="kt">Just</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">launch</span><span class="w"> </span><span class="p">((</span><span class="n">h</span><span class="p">,</span><span class="n">ph</span><span class="p">)</span><span class="kt">:</span><span class="n">pending</span><span class="p">)</span><span class="w"> </span><span class="n">xs</span>
+<a id="L-105" name="L-105"></a><span class="w">        </span><span class="kt">Nothing</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;missing worker pipe&quot;</span><span class="p">))</span>
+<a id="L-106" name="L-106"></a><span class="w">    </span><span class="cm">{-</span>
+<a id="L-107" name="L-107"></a><span class="cm">      Force a child output string before closing its lazy stream.</span>
+<a id="L-108" name="L-108"></a><span class="cm">      Inputs: The child output handle and process handle.</span>
+<a id="L-109" name="L-109"></a><span class="cm">      Outputs: One complete row, or an IO error for failed/empty output.</span>
+<a id="L-110" name="L-110"></a><span class="cm">      Used by: launch after the final child is started.</span>
+<a id="L-111" name="L-111"></a><span class="cm">    -}</span>
+<a id="L-112" name="L-112"></a><span class="w">    </span><span class="n">collect</span><span class="w"> </span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">ph</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-113" name="L-113"></a><span class="w">      </span><span class="n">row</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">hGetContents</span><span class="w"> </span><span class="n">h</span>
+<a id="L-114" name="L-114"></a><span class="w">      </span><span class="kr">_</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">evaluate</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="n">row</span><span class="p">)</span><span class="w"> </span><span class="c1">-- Drain lazy IO before waiting/closing the pipe.</span>
+<a id="L-115" name="L-115"></a><span class="w">      </span><span class="n">status</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">waitForProcess</span><span class="w"> </span><span class="n">ph</span>
+<a id="L-116" name="L-116"></a><span class="w">      </span><span class="kr">if</span><span class="w"> </span><span class="n">status</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="kt">ExitSuccess</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">not</span><span class="w"> </span><span class="p">(</span><span class="n">null</span><span class="w"> </span><span class="n">row</span><span class="p">)</span><span class="w"> </span><span class="kr">then</span><span class="w"> </span><span class="n">pure</span><span class="w"> </span><span class="n">row</span>
+<a id="L-117" name="L-117"></a><span class="w">      </span><span class="kr">else</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;worker failed&quot;</span><span class="p">)</span>
+<a id="L-118" name="L-118"></a>
+<a id="L-119" name="L-119"></a><span class="cm">{-</span>
+<a id="L-120" name="L-120"></a><span class="cm">  Partition a list without changing its sequence.</span>
+<a id="L-121" name="L-121"></a><span class="cm">  Inputs: A positive group size and a list.</span>
+<a id="L-122" name="L-122"></a><span class="cm">  Outputs: Successive groups with at most that many elements.</span>
+<a id="L-123" name="L-123"></a><span class="cm">  Used by: run to enforce the worker limit.</span>
+<a id="L-124" name="L-124"></a><span class="cm">-}</span>
+<a id="L-125" name="L-125"></a><span class="nf">chunks</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">Int</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="p">[[</span><span class="n">a</span><span class="p">]]</span>
+<a id="L-126" name="L-126"></a><span class="nf">chunks</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="kt">[]</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kt">[]</span>
+<a id="L-127" name="L-127"></a><span class="nf">chunks</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">xs</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">let</span><span class="w"> </span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">splitAt</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">xs</span><span class="w"> </span><span class="kr">in</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="kt">:</span><span class="w"> </span><span class="n">chunks</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="n">b</span>
+<a id="L-128" name="L-128"></a>
+<a id="L-129" name="L-129"></a><span class="cm">{-</span>
+<a id="L-130" name="L-130"></a><span class="cm">  Choose help, worker calculation, or the complete experiment.</span>
+<a id="L-131" name="L-131"></a><span class="cm">  Inputs: The process argument strings.</span>
+<a id="L-132" name="L-132"></a><span class="cm">  Outputs: An IO action that writes results or raises an exception.</span>
+<a id="L-133" name="L-133"></a><span class="cm">  Used by: main behind the final error boundary.</span>
+<a id="L-134" name="L-134"></a><span class="cm">-}</span>
+<a id="L-135" name="L-135"></a><span class="nf">run</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="p">[</span><span class="kt">String</span><span class="p">]</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="nb">()</span>
+<a id="L-136" name="L-136"></a><span class="nf">run</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;--help&quot;</span><span class="p">]</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="n">putStrLn</span><span class="w"> </span><span class="s">&quot;Usage: bessel-haskell [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;</span>
+<a id="L-137" name="L-137"></a><span class="nf">run</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;--worker&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">text</span><span class="p">]</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-138" name="L-138"></a><span class="w">  </span><span class="n">x</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">either</span><span class="w"> </span><span class="p">(</span><span class="n">ioError</span><span class="w"> </span><span class="o">.</span><span class="w"> </span><span class="n">userError</span><span class="p">)</span><span class="w"> </span><span class="n">pure</span><span class="w"> </span><span class="p">(</span><span class="n">number</span><span class="w"> </span><span class="n">text</span><span class="p">)</span>
+<a id="L-139" name="L-139"></a><span class="w">  </span><span class="n">pid</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">getProcessID</span>
+<a id="L-140" name="L-140"></a><span class="w">  </span><span class="n">y</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">j0</span><span class="w"> </span><span class="n">x</span>
+<a id="L-141" name="L-141"></a><span class="w">  </span><span class="n">putStrLn</span><span class="w"> </span><span class="p">(</span><span class="n">show</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="s">&quot;,&quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">show</span><span class="w"> </span><span class="n">y</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="s">&quot;,&quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">show</span><span class="w"> </span><span class="n">pid</span><span class="p">)</span>
+<a id="L-142" name="L-142"></a><span class="nf">run</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-143" name="L-143"></a><span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;too many arguments&quot;</span><span class="p">)</span>
+<a id="L-144" name="L-144"></a><span class="w">  </span><span class="kr">let</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="n">x</span><span class="kt">:</span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;-&quot;</span>
+<a id="L-145" name="L-145"></a><span class="w">      </span><span class="n">target</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="kr">_</span><span class="kt">:</span><span class="n">x</span><span class="kt">:</span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="s">&quot;results.csv&quot;</span>
+<a id="L-146" name="L-146"></a><span class="w">      </span><span class="n">jobsMaybe</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">args</span><span class="w"> </span><span class="kr">of</span><span class="w"> </span><span class="kr">_</span><span class="kt">:</span><span class="kr">_</span><span class="kt">:</span><span class="n">x</span><span class="kt">:</span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">readMaybe</span><span class="w"> </span><span class="n">x</span><span class="p">;</span><span class="w"> </span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kt">Just</span><span class="w"> </span><span class="mi">2</span>
+<a id="L-147" name="L-147"></a><span class="w">  </span><span class="n">jobs</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="kr">case</span><span class="w"> </span><span class="n">jobsMaybe</span><span class="w"> </span><span class="kr">of</span>
+<a id="L-148" name="L-148"></a><span class="w">    </span><span class="kt">Just</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">pure</span><span class="w"> </span><span class="n">n</span>
+<a id="L-149" name="L-149"></a><span class="w">    </span><span class="kr">_</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;workers must be 1..16&quot;</span><span class="p">)</span>
+<a id="L-150" name="L-150"></a><span class="w">  </span><span class="c1">-- Choose an interactive handle or a scoped file without changing the reader logic.</span>
+<a id="L-151" name="L-151"></a><span class="w">  </span><span class="n">values</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="kr">if</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&quot;-&quot;</span>
+<a id="L-152" name="L-152"></a><span class="w">    </span><span class="kr">then</span><span class="w"> </span><span class="n">hPutStrLn</span><span class="w"> </span><span class="n">stderr</span><span class="w"> </span><span class="s">&quot;Enter one x per line; blank line or EOF finishes:&quot;</span><span class="w"> </span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">readValues</span><span class="w"> </span><span class="n">stdin</span>
+<a id="L-153" name="L-153"></a><span class="w">    </span><span class="kr">else</span><span class="w"> </span><span class="n">withFile</span><span class="w"> </span><span class="n">source</span><span class="w"> </span><span class="kt">ReadMode</span><span class="w"> </span><span class="n">readValues</span>
+<a id="L-154" name="L-154"></a><span class="w">  </span><span class="n">when</span><span class="w"> </span><span class="p">(</span><span class="n">null</span><span class="w"> </span><span class="n">values</span><span class="p">)</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="n">ioError</span><span class="w"> </span><span class="p">(</span><span class="n">userError</span><span class="w"> </span><span class="s">&quot;no valid input values&quot;</span><span class="p">)</span>
+<a id="L-155" name="L-155"></a><span class="w">  </span><span class="n">executable</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">getExecutablePath</span>
+<a id="L-156" name="L-156"></a><span class="w">  </span><span class="c1">-- Finish groups in sequence while each group itself runs concurrent child processes.</span>
+<a id="L-157" name="L-157"></a><span class="w">  </span><span class="n">rows</span><span class="w"> </span><span class="ow">&lt;-</span><span class="w"> </span><span class="n">concat</span><span class="w"> </span><span class="o">&lt;$&gt;</span><span class="w"> </span><span class="n">mapM</span><span class="w"> </span><span class="p">(</span><span class="n">batch</span><span class="w"> </span><span class="n">executable</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="n">chunks</span><span class="w"> </span><span class="n">jobs</span><span class="w"> </span><span class="n">values</span><span class="p">)</span>
+<a id="L-158" name="L-158"></a><span class="w">  </span><span class="c1">-- Write the complete output within an automatically closed file scope.</span>
+<a id="L-159" name="L-159"></a><span class="w">  </span><span class="n">withFile</span><span class="w"> </span><span class="n">target</span><span class="w"> </span><span class="kt">WriteMode</span><span class="w"> </span><span class="o">$</span><span class="w"> </span><span class="nf">\</span><span class="n">h</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="n">hPutStr</span><span class="w"> </span><span class="n">h</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;x,j0,worker_pid</span><span class="se">\n</span><span class="s">&quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">concat</span><span class="w"> </span><span class="n">rows</span><span class="p">)</span>
+<a id="L-160" name="L-160"></a><span class="w">  </span><span class="n">putStrLn</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;Wrote &quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">show</span><span class="w"> </span><span class="p">(</span><span class="n">length</span><span class="w"> </span><span class="n">rows</span><span class="p">)</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="s">&quot; observations to &quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">target</span><span class="p">)</span>
+<a id="L-161" name="L-161"></a>
+<a id="L-162" name="L-162"></a><span class="cm">{-</span>
+<a id="L-163" name="L-163"></a><span class="cm">  Run the CLI and render exceptions as readable failures.</span>
+<a id="L-164" name="L-164"></a><span class="cm">  Inputs: The environment argument list obtained by getArgs.</span>
+<a id="L-165" name="L-165"></a><span class="cm">  Outputs: Console output and success/failure process status.</span>
+<a id="L-166" name="L-166"></a><span class="cm">  Used by: The Haskell runtime.</span>
+<a id="L-167" name="L-167"></a><span class="cm">-}</span>
+<a id="L-168" name="L-168"></a><span class="nf">main</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">IO</span><span class="w"> </span><span class="nb">()</span>
+<a id="L-169" name="L-169"></a><span class="nf">main</span><span class="w"> </span><span class="ow">=</span><span class="w"> </span><span class="p">(</span><span class="n">getArgs</span><span class="w"> </span><span class="o">&gt;&gt;=</span><span class="w"> </span><span class="n">run</span><span class="p">)</span><span class="w"> </span><span class="p">`</span><span class="n">catch</span><span class="p">`</span><span class="w"> </span><span class="nf">\</span><span class="p">(</span><span class="n">e</span><span class="w"> </span><span class="ow">::</span><span class="w"> </span><span class="kt">SomeException</span><span class="p">)</span><span class="w"> </span><span class="ow">-&gt;</span><span class="w"> </span><span class="kr">do</span>
+<a id="L-170" name="L-170"></a><span class="w">  </span><span class="n">hPutStrLn</span><span class="w"> </span><span class="n">stderr</span><span class="w"> </span><span class="p">(</span><span class="s">&quot;error: &quot;</span><span class="w"> </span><span class="o">++</span><span class="w"> </span><span class="n">displayException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span>
+<a id="L-171" name="L-171"></a><span class="w">  </span><span class="n">exitFailure</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>{-
+  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.
+  The parent reads input and owns result ordering; the worker computes the midpoint approximation.
+  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.
+-}
+{-# LANGUAGE ScopedTypeVariables #-}
+-- GHC 9.x, process + unix packages. Pure numerical core, bracketed IO effects.
+import Control.Exception
+import Control.Monad (when, foldM)
+import Foreign.Marshal.Array (withArray)
+import Foreign.Ptr (plusPtr)
+import Foreign.Storable (peek, sizeOf)
+import System.Environment (getArgs, getExecutablePath)
+import System.Exit
+import System.IO
+import System.Posix.Process (getProcessID)
+import System.Process
+import Text.Read (readMaybe)
+
+{-
+  Validate a numeric token while keeping the parser free of IO effects.
+  Inputs: A candidate String.
+  Outputs: Either a diagnostic or a bounded Double.
+  Used by: readValues and the internal worker branch of run.
+-}
+number :: String -&gt; Either String Double
+number s = case readMaybe s of
+  Just x | not (isNaN x || isInfinite x) &amp;&amp; abs x &lt;= 1000 -&gt; Right x
+  _ -&gt; Left &quot;expected finite x in [-1000,1000]&quot;
+
+{-
+  Describe the midpoint values as a pure sequence.
+  Inputs: A validated Double x.
+  Outputs: The list of 16,384 integrand samples.
+  Used by: j0 before it creates a scoped foreign-memory view.
+-}
+samples :: Double -&gt; [Double]
+samples x = [cos (x * sin (pi * (fromIntegral k + 0.5) / 16384)) | k &lt;- [0..16383 :: Int]]
+
+{-
+  Reduce sample storage through explicit pointer reads in IO.
+  Inputs: A bounded Double x.
+  Outputs: An IO action yielding approximate J0.
+  Used by: run in worker mode.
+-}
+j0 :: Double -&gt; IO Double
+j0 x = withArray (samples x) $ \base -&gt; do
+  {-
+    withArray brackets the allocation. plusPtr counts bytes; peek is an
+    explicit IO effect, and all offsets refer to initialized Double values.
+    Accumulate values read at element-sized byte offsets while withArray keeps the allocation alive.
+  -}
+  total &lt;- foldM (\acc k -&gt; do
+    value &lt;- peek (base `plusPtr` (k * sizeOf (0 :: Double)))
+    pure (acc + value)) 0 [0..16383]
+  pure (total / 16384)
+
+{-
+  Read ordered observations and recover from invalid numeric lines.
+  Inputs: An input Handle.
+  Outputs: An IO action yielding the accepted values.
+  Used by: run before launching workers.
+-}
+readValues :: Handle -&gt; IO [Double]
+readValues handle = go [] (0 :: Int)
+  where
+    {-
+      Continue reading with bounded reverse-order accumulation.
+      Inputs: Accepted values so far and their count; the input handle is captured.
+      Outputs: The final ordered values or a fatal input-limit/read error.
+      Used by: readValues and its own recursive continuation.
+    -}
+    go acc n = do
+      eof &lt;- hIsEOF handle
+      if eof then pure (reverse acc) else do
+        line &lt;- hGetLine handle
+        case dropWhile (`elem` &quot; \t\r&quot;) line of
+          &quot;&quot; -&gt; pure (reverse acc)
+          &#x27;#&#x27;:_ -&gt; go acc n
+          text -&gt; case number text of
+            Left message -&gt; hPutStrLn stderr (&quot;warning: &quot; ++ message ++ &quot;; skipped&quot;) &gt;&gt; go acc n
+            Right x -&gt; if n == 4096 then ioError (userError &quot;at most 4096 values&quot;) else go (x:acc) (n+1)
+
+{-
+  Start a bounded set of executable children and collect their rows.
+  Inputs: This executable path and a group of x values.
+  Outputs: An IO action yielding rows in original order.
+  Used by: run through mapM over input chunks.
+-}
+batch :: FilePath -&gt; [Double] -&gt; IO [String]
+batch executable = launch []
+  where
+    {-
+      Nested brackets keep every child alive until all have been launched.
+      Keep all child lifetimes nested until the full batch is launched.
+      Inputs: Pending child handles and the remaining values.
+      Outputs: The collected rows; withCreateProcess cleans up each child scope.
+      Used by: batch and recursive launch calls.
+    -}
+    launch pending [] = mapM collect (reverse pending)
+    launch pending (x:xs) = withCreateProcess
+      (proc executable [&quot;--worker&quot;, show x]) { std_in = NoStream, std_out = CreatePipe }
+      (\_ out _ ph -&gt; case out of
+        Just h -&gt; launch ((h,ph):pending) xs
+        Nothing -&gt; ioError (userError &quot;missing worker pipe&quot;))
+    {-
+      Force a child output string before closing its lazy stream.
+      Inputs: The child output handle and process handle.
+      Outputs: One complete row, or an IO error for failed/empty output.
+      Used by: launch after the final child is started.
+    -}
+    collect (h,ph) = do
+      row &lt;- hGetContents h
+      _ &lt;- evaluate (length row) -- Drain lazy IO before waiting/closing the pipe.
+      status &lt;- waitForProcess ph
+      if status == ExitSuccess &amp;&amp; not (null row) then pure row
+      else ioError (userError &quot;worker failed&quot;)
+
+{-
+  Partition a list without changing its sequence.
+  Inputs: A positive group size and a list.
+  Outputs: Successive groups with at most that many elements.
+  Used by: run to enforce the worker limit.
+-}
+chunks :: Int -&gt; [a] -&gt; [[a]]
+chunks _ [] = []
+chunks n xs = let (a,b) = splitAt n xs in a : chunks n b
+
+{-
+  Choose help, worker calculation, or the complete experiment.
+  Inputs: The process argument strings.
+  Outputs: An IO action that writes results or raises an exception.
+  Used by: main behind the final error boundary.
+-}
+run :: [String] -&gt; IO ()
+run [&quot;--help&quot;] = putStrLn &quot;Usage: bessel-haskell [INPUT|- [OUTPUT [WORKERS 1..16]]]&quot;
+run [&quot;--worker&quot;, text] = do
+  x &lt;- either (ioError . userError) pure (number text)
+  pid &lt;- getProcessID
+  y &lt;- j0 x
+  putStrLn (show x ++ &quot;,&quot; ++ show y ++ &quot;,&quot; ++ show pid)
+run args = do
+  when (length args &gt; 3) $ ioError (userError &quot;too many arguments&quot;)
+  let source = case args of x:_ -&gt; x; _ -&gt; &quot;-&quot;
+      target = case args of _:x:_ -&gt; x; _ -&gt; &quot;results.csv&quot;
+      jobsMaybe = case args of _:_:x:_ -&gt; readMaybe x; _ -&gt; Just 2
+  jobs &lt;- case jobsMaybe of
+    Just n | n &gt;= 1 &amp;&amp; n &lt;= 16 -&gt; pure n
+    _ -&gt; ioError (userError &quot;workers must be 1..16&quot;)
+  -- Choose an interactive handle or a scoped file without changing the reader logic.
+  values &lt;- if source == &quot;-&quot;
+    then hPutStrLn stderr &quot;Enter one x per line; blank line or EOF finishes:&quot; &gt;&gt; readValues stdin
+    else withFile source ReadMode readValues
+  when (null values) $ ioError (userError &quot;no valid input values&quot;)
+  executable &lt;- getExecutablePath
+  -- Finish groups in sequence while each group itself runs concurrent child processes.
+  rows &lt;- concat &lt;$&gt; mapM (batch executable) (chunks jobs values)
+  -- Write the complete output within an automatically closed file scope.
+  withFile target WriteMode $ \h -&gt; hPutStr h (&quot;x,j0,worker_pid\n&quot; ++ concat rows)
+  putStrLn (&quot;Wrote &quot; ++ show (length rows) ++ &quot; observations to &quot; ++ target)
+
+{-
+  Run the CLI and render exceptions as readable failures.
+  Inputs: The environment argument list obtained by getArgs.
+  Outputs: Console output and success/failure process status.
+  Used by: The Haskell runtime.
+-}
+main :: IO ()
+main = (getArgs &gt;&gt;= run) `catch` \(e :: SomeException) -&gt; do
+  hPutStrLn stderr (&quot;error: &quot; ++ displayException e)
+  exitFailure
+</textarea>
+<footer>Highlighted with Pygments using the Haskell lexer. All assets are local. SHA-256: <code>510e65842f2bf1fc4765da4552193ce40ccd60fda18cea0427c90a13446fb76e</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

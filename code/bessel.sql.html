@@ -1,0 +1,474 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="75baef1b137ee93e278387138e9820e20e3c3bdcf498ece55f446f2ddb5b28d1">
+<title>SQL — bessel.sql — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.go.html">← Go</a><a href="Bessel.Mod.html">Oberon-2 →</a></nav>
+<h1>SQL <code>bessel.sql</code></h1>
+<p>PostgreSQL 14+ + psql + dblink · Set-based numeric aggregation, temporary relations, PL/pgSQL exceptions, psql variables.</p>
+<p><strong>Memory:</strong> Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.<br><strong>Strings:</strong> btrim, regexp validation, replace, string_to_array, format and array operations.</p>
+<div class="actions"><a href="../bessel.sql">Open raw source</a>
+<a href="../bessel.sql" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">/*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent reads input and owns result ordering; the worker computes the midpoint approximation.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  PostgreSQL 14+ / psql. Run in a disposable database with dblink available.</span>
+<a id="L-6" name="L-6"></a><span class="cm">  psql -X -d observatory -v values=&#39;0,1,5,10&#39; -v workers=2 -v output=results.csv -f bessel.sql</span>
+<a id="L-7" name="L-7"></a><span class="cm">  Optional: -v input=/absolute/SERVER/path/values.txt (pg_read_file privileges required).</span>
+<a id="L-8" name="L-8"></a><span class="cm">  Optional: -v conn=&#39;service=observatory&#39; for dblink authentication/connection settings.</span>
+<a id="L-9" name="L-9"></a><span class="cm">  Without input/values, psql prompts for a comma-separated list.</span>
+<a id="L-10" name="L-10"></a><span class="cm">  Every dblink connection has its own PostgreSQL OS backend process.</span>
+<a id="L-11" name="L-11"></a><span class="cm">  Stop psql on a failed SQL or meta-command instead of continuing with partial results.</span>
+<a id="L-12" name="L-12"></a><span class="cm">*/</span>
+<a id="L-13" name="L-13"></a><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="n">ON_ERROR_STOP</span><span class="w"> </span><span class="k">on</span>
+<a id="L-14" name="L-14"></a><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="n">QUIET</span><span class="w"> </span><span class="k">on</span>
+<a id="L-15" name="L-15"></a><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="p">:{</span><span class="o">?</span><span class="k">input</span><span class="p">}</span>
+<a id="L-16" name="L-16"></a><span class="err">\</span><span class="k">else</span>
+<a id="L-17" name="L-17"></a><span class="w">  </span><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="k">input</span><span class="w"> </span><span class="s1">&#39;-&#39;</span>
+<a id="L-18" name="L-18"></a><span class="err">\</span><span class="n">endif</span>
+<a id="L-19" name="L-19"></a><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="p">:{</span><span class="o">?</span><span class="n">output</span><span class="p">}</span>
+<a id="L-20" name="L-20"></a><span class="err">\</span><span class="k">else</span>
+<a id="L-21" name="L-21"></a><span class="w">  </span><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="n">output</span><span class="w"> </span><span class="s1">&#39;results.csv&#39;</span>
+<a id="L-22" name="L-22"></a><span class="err">\</span><span class="n">endif</span>
+<a id="L-23" name="L-23"></a><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="p">:{</span><span class="o">?</span><span class="n">workers</span><span class="p">}</span>
+<a id="L-24" name="L-24"></a><span class="err">\</span><span class="k">else</span>
+<a id="L-25" name="L-25"></a><span class="w">  </span><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="n">workers</span><span class="w"> </span><span class="mf">2</span>
+<a id="L-26" name="L-26"></a><span class="err">\</span><span class="n">endif</span>
+<a id="L-27" name="L-27"></a><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="p">:{</span><span class="o">?</span><span class="n">conn</span><span class="p">}</span>
+<a id="L-28" name="L-28"></a><span class="err">\</span><span class="k">else</span>
+<a id="L-29" name="L-29"></a><span class="w">  </span><span class="k">SELECT</span><span class="w"> </span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;dbname=%L&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">current_database</span><span class="p">())</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">conn</span><span class="w"> </span><span class="err">\</span><span class="n">gset</span>
+<a id="L-30" name="L-30"></a><span class="err">\</span><span class="n">endif</span>
+<a id="L-31" name="L-31"></a><span class="k">SELECT</span><span class="w"> </span><span class="nv">:&#39;input&#39;</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">interactive</span><span class="w"> </span><span class="err">\</span><span class="n">gset</span>
+<a id="L-32" name="L-32"></a><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="nv">:interactive</span>
+<a id="L-33" name="L-33"></a><span class="w">  </span><span class="err">\</span><span class="k">if</span><span class="w"> </span><span class="p">:{</span><span class="o">?</span><span class="k">values</span><span class="p">}</span>
+<a id="L-34" name="L-34"></a><span class="w">  </span><span class="err">\</span><span class="k">else</span>
+<a id="L-35" name="L-35"></a><span class="w">    </span><span class="err">\</span><span class="n">prompt</span><span class="w"> </span><span class="s1">&#39;Enter x values separated by commas: &#39;</span><span class="w"> </span><span class="k">values</span>
+<a id="L-36" name="L-36"></a><span class="w">  </span><span class="err">\</span><span class="n">endif</span>
+<a id="L-37" name="L-37"></a><span class="err">\</span><span class="k">else</span>
+<a id="L-38" name="L-38"></a><span class="w">  </span><span class="err">\</span><span class="k">set</span><span class="w"> </span><span class="k">values</span><span class="w"> </span><span class="s1">&#39;&#39;</span>
+<a id="L-39" name="L-39"></a><span class="err">\</span><span class="n">endif</span>
+<a id="L-40" name="L-40"></a>
+<a id="L-41" name="L-41"></a><span class="c1">-- Make asynchronous connections available in this dedicated database; extension privileges are required.</span>
+<a id="L-42" name="L-42"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">EXTENSION</span><span class="w"> </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">EXISTS</span><span class="w"> </span><span class="n">dblink</span><span class="p">;</span>
+<a id="L-43" name="L-43"></a><span class="c1">-- Bind psql arguments as quoted data so SQL does not interpret user text as executable syntax.</span>
+<a id="L-44" name="L-44"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TEMP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">bessel_config</span><span class="w"> </span><span class="k">AS</span>
+<a id="L-45" name="L-45"></a><span class="k">SELECT</span><span class="w"> </span><span class="nv">:&#39;input&#39;</span><span class="o">::</span><span class="nb">text</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">input</span><span class="p">,</span><span class="w"> </span><span class="nv">:&#39;values&#39;</span><span class="o">::</span><span class="nb">text</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">entered_values</span><span class="p">,</span>
+<a id="L-46" name="L-46"></a><span class="w">       </span><span class="nv">:&#39;workers&#39;</span><span class="o">::</span><span class="nb">integer</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="n">workers</span><span class="p">,</span><span class="w"> </span><span class="nv">:&#39;conn&#39;</span><span class="o">::</span><span class="nb">text</span><span class="w"> </span><span class="k">AS</span><span class="w"> </span><span class="k">connection</span><span class="p">;</span>
+<a id="L-47" name="L-47"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TEMP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">bessel_input</span><span class="w"> </span><span class="p">(</span><span class="n">ordinal</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="nb">double precision</span><span class="p">);</span>
+<a id="L-48" name="L-48"></a><span class="k">CREATE</span><span class="w"> </span><span class="k">TEMP</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">bessel_results</span>
+<a id="L-49" name="L-49"></a><span class="w">    </span><span class="p">(</span><span class="n">ordinal</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="k">PRIMARY</span><span class="w"> </span><span class="k">KEY</span><span class="p">,</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">j0</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">worker_pid</span><span class="w"> </span><span class="nb">integer</span><span class="p">);</span>
+<a id="L-50" name="L-50"></a>
+<a id="L-51" name="L-51"></a><span class="c1">-- Main execution block. Inputs: bessel_config and optional server file. Outputs: ordered bessel_results rows. Used by: the psql CSV export below.</span>
+<a id="L-52" name="L-52"></a><span class="k">DO</span><span class="w"> </span><span class="s">$</span><span class="dl">observatory</span><span class="s">$</span>
+<a id="L-53" name="L-53"></a><span class="k">DECLARE</span>
+<a id="L-54" name="L-54"></a><span class="w">    </span><span class="n">config</span><span class="w"> </span><span class="nb">record</span><span class="p">;</span>
+<a id="L-55" name="L-55"></a><span class="w">    </span><span class="n">source</span><span class="w"> </span><span class="nb">text</span><span class="p">;</span>
+<a id="L-56" name="L-56"></a><span class="w">    </span><span class="nb">line</span><span class="w"> </span><span class="nb">text</span><span class="p">;</span>
+<a id="L-57" name="L-57"></a><span class="w">    </span><span class="k">value</span><span class="w"> </span><span class="nb">double precision</span><span class="p">;</span>
+<a id="L-58" name="L-58"></a><span class="w">    </span><span class="n">accepted</span><span class="w"> </span><span class="nb">integer</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<a id="L-59" name="L-59"></a><span class="w">    </span><span class="n">first_row</span><span class="w"> </span><span class="nb">integer</span><span class="p">;</span>
+<a id="L-60" name="L-60"></a><span class="w">    </span><span class="n">slot</span><span class="w"> </span><span class="nb">integer</span><span class="p">;</span>
+<a id="L-61" name="L-61"></a><span class="w">    </span><span class="n">active</span><span class="w"> </span><span class="nb">integer</span><span class="p">;</span>
+<a id="L-62" name="L-62"></a><span class="w">    </span><span class="n">connection_name</span><span class="w"> </span><span class="nb">text</span><span class="p">;</span>
+<a id="L-63" name="L-63"></a><span class="w">    </span><span class="k">names</span><span class="w"> </span><span class="nb">text</span><span class="p">[]</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">ARRAY</span><span class="p">[]</span><span class="o">::</span><span class="nb">text</span><span class="p">[];</span>
+<a id="L-64" name="L-64"></a><span class="w">    </span><span class="k">row</span><span class="w"> </span><span class="nb">record</span><span class="p">;</span>
+<a id="L-65" name="L-65"></a><span class="k">BEGIN</span>
+<a id="L-66" name="L-66"></a><span class="w">    </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="k">STRICT</span><span class="w"> </span><span class="n">config</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">bessel_config</span><span class="p">;</span>
+<a id="L-67" name="L-67"></a><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="n">config</span><span class="mf">.</span><span class="n">workers</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-68" name="L-68"></a><span class="w">        </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="s1">&#39;workers must be 1..16&#39;</span><span class="p">;</span>
+<a id="L-69" name="L-69"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-70" name="L-70"></a><span class="w">    </span><span class="c1">-- Choose interactive comma-separated text or a file read by the database server.</span>
+<a id="L-71" name="L-71"></a><span class="w">    </span><span class="n">source</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">CASE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">config</span><span class="mf">.</span><span class="k">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-&#39;</span>
+<a id="L-72" name="L-72"></a><span class="w">              </span><span class="k">THEN</span><span class="w"> </span><span class="k">replace</span><span class="p">(</span><span class="n">config</span><span class="mf">.</span><span class="n">entered_values</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;,&#39;</span><span class="p">,</span><span class="w"> </span><span class="sa">E</span><span class="s1">&#39;\n&#39;</span><span class="p">)</span>
+<a id="L-73" name="L-73"></a><span class="w">              </span><span class="k">ELSE</span><span class="w"> </span><span class="n">pg_read_file</span><span class="p">(</span><span class="n">config</span><span class="mf">.</span><span class="k">input</span><span class="p">)</span><span class="w"> </span><span class="k">END</span><span class="p">;</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="c1">-- Normalize input records, end on a blank line, skip comments, and validate individual numbers.</span>
+<a id="L-75" name="L-75"></a><span class="w">    </span><span class="k">FOREACH</span><span class="w"> </span><span class="nb">line</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">ARRAY</span><span class="w"> </span><span class="n">string_to_array</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="sa">E</span><span class="s1">&#39;\n&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-76" name="L-76"></a><span class="w">        </span><span class="nb">line</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">btrim</span><span class="p">(</span><span class="nb">line</span><span class="p">,</span><span class="w"> </span><span class="sa">E</span><span class="s1">&#39; \t\r&#39;</span><span class="p">);</span>
+<a id="L-77" name="L-77"></a><span class="w">        </span><span class="k">EXIT</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="nb">line</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+<a id="L-78" name="L-78"></a><span class="w">        </span><span class="k">CONTINUE</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="k">left</span><span class="p">(</span><span class="nb">line</span><span class="p">,</span><span class="w"> </span><span class="mf">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;#&#39;</span><span class="p">;</span>
+<a id="L-79" name="L-79"></a><span class="w">        </span><span class="k">BEGIN</span>
+<a id="L-80" name="L-80"></a><span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="nb">line</span><span class="w"> </span><span class="o">!~</span><span class="w"> </span><span class="s1">&#39;^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][+-]?[0-9]+)?$&#39;</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-81" name="L-81"></a><span class="w">                </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">ERRCODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;22P02&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">MESSAGE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;expected one decimal number&#39;</span><span class="p">;</span>
+<a id="L-82" name="L-82"></a><span class="w">            </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-83" name="L-83"></a><span class="w">            </span><span class="k">value</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">line</span><span class="o">::</span><span class="nb">double precision</span><span class="p">;</span>
+<a id="L-84" name="L-84"></a><span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="p">(</span><span class="k">value</span><span class="w"> </span><span class="k">BETWEEN</span><span class="w"> </span><span class="o">-</span><span class="mf">1000</span><span class="w"> </span><span class="k">AND</span><span class="w"> </span><span class="mf">1000</span><span class="p">)</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-85" name="L-85"></a><span class="w">                </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="k">USING</span><span class="w"> </span><span class="n">ERRCODE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;22003&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">MESSAGE</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;x outside [-1000,1000]&#39;</span><span class="p">;</span>
+<a id="L-86" name="L-86"></a><span class="w">            </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-87" name="L-87"></a><span class="w">        </span><span class="c1">-- Recover from a bad value by warning and continuing with the next record.</span>
+<a id="L-88" name="L-88"></a><span class="w">        </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="n">invalid_text_representation</span><span class="w"> </span><span class="k">OR</span><span class="w"> </span><span class="n">numeric_value_out_of_range</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-89" name="L-89"></a><span class="w">            </span><span class="k">RAISE</span><span class="w"> </span><span class="n">WARNING</span><span class="w"> </span><span class="s1">&#39;invalid number: %; skipped&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">line</span><span class="p">;</span>
+<a id="L-90" name="L-90"></a><span class="w">            </span><span class="k">CONTINUE</span><span class="p">;</span>
+<a id="L-91" name="L-91"></a><span class="w">        </span><span class="k">END</span><span class="p">;</span>
+<a id="L-92" name="L-92"></a><span class="w">        </span><span class="n">accepted</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<a id="L-93" name="L-93"></a><span class="w">        </span><span class="k">IF</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">4096</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="s1">&#39;at most 4096 values&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-94" name="L-94"></a><span class="w">        </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">bessel_input</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="n">accepted</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">);</span>
+<a id="L-95" name="L-95"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-96" name="L-96"></a><span class="w">    </span><span class="k">IF</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="s1">&#39;no valid input values&#39;</span><span class="p">;</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-97" name="L-97"></a>
+<a id="L-98" name="L-98"></a><span class="w">    </span><span class="c1">-- Create a bounded set of database connections, each backed by a separate server OS process.</span>
+<a id="L-99" name="L-99"></a><span class="w">    </span><span class="k">FOR</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="mf">1..</span><span class="k">least</span><span class="p">(</span><span class="n">config</span><span class="mf">.</span><span class="n">workers</span><span class="p">,</span><span class="w"> </span><span class="n">accepted</span><span class="p">)</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-100" name="L-100"></a><span class="w">        </span><span class="n">connection_name</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;bessel_%s_%s&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">pg_backend_pid</span><span class="p">(),</span><span class="w"> </span><span class="n">slot</span><span class="p">);</span>
+<a id="L-101" name="L-101"></a><span class="w">        </span><span class="k">PERFORM</span><span class="w"> </span><span class="n">dblink_connect</span><span class="p">(</span><span class="n">connection_name</span><span class="p">,</span><span class="w"> </span><span class="n">config</span><span class="mf">.</span><span class="k">connection</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="s1">&#39; connect_timeout=10&#39;</span><span class="p">);</span>
+<a id="L-102" name="L-102"></a><span class="w">        </span><span class="k">names</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">array_append</span><span class="p">(</span><span class="k">names</span><span class="p">,</span><span class="w"> </span><span class="n">connection_name</span><span class="p">);</span>
+<a id="L-103" name="L-103"></a><span class="w">        </span><span class="k">PERFORM</span><span class="w"> </span><span class="n">dblink_exec</span><span class="p">(</span><span class="n">connection_name</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;SET statement_timeout = &#39;&#39;30s&#39;&#39;&#39;</span><span class="p">);</span>
+<a id="L-104" name="L-104"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-105" name="L-105"></a><span class="w">    </span><span class="n">first_row</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<a id="L-106" name="L-106"></a><span class="w">    </span><span class="c1">-- Reuse the worker connections across bounded groups while retaining original row ordinals.</span>
+<a id="L-107" name="L-107"></a><span class="w">    </span><span class="k">WHILE</span><span class="w"> </span><span class="n">first_row</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-108" name="L-108"></a><span class="w">        </span><span class="n">active</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="k">least</span><span class="p">(</span><span class="n">config</span><span class="mf">.</span><span class="n">workers</span><span class="p">,</span><span class="w"> </span><span class="n">accepted</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">first_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">1</span><span class="p">);</span>
+<a id="L-109" name="L-109"></a><span class="w">        </span><span class="k">FOR</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="mf">1..</span><span class="n">active</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-110" name="L-110"></a><span class="w">            </span><span class="k">SELECT</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="k">STRICT</span><span class="w"> </span><span class="k">value</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">bessel_input</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">ordinal</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">first_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span>
+<a id="L-111" name="L-111"></a><span class="w">            </span><span class="c1">-- The numerical kernel is a relational aggregate, wholly in SQL.</span>
+<a id="L-112" name="L-112"></a><span class="w">            </span><span class="k">IF</span><span class="w"> </span><span class="n">dblink_send_query</span><span class="p">(</span><span class="k">names</span><span class="p">[</span><span class="n">slot</span><span class="p">],</span><span class="w"> </span><span class="n">format</span><span class="p">(</span>
+<a id="L-113" name="L-113"></a><span class="w">                </span><span class="s1">&#39;SELECT %L::float8 AS x,</span>
+<a id="L-114" name="L-114"></a><span class="s1">                        avg(cos(%L::float8 * sin(pi() * (k + 0.5::float8) / 16384))) AS j0,</span>
+<a id="L-115" name="L-115"></a><span class="s1">                        pg_backend_pid() AS worker_pid FROM generate_series(0,16383) AS g(k)&#39;</span><span class="p">,</span>
+<a id="L-116" name="L-116"></a><span class="w">                </span><span class="k">value</span><span class="p">,</span><span class="w"> </span><span class="k">value</span><span class="p">))</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-117" name="L-117"></a><span class="w">                </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="s1">&#39;could not dispatch worker %&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">slot</span><span class="p">;</span>
+<a id="L-118" name="L-118"></a><span class="w">            </span><span class="k">END</span><span class="w"> </span><span class="k">IF</span><span class="p">;</span>
+<a id="L-119" name="L-119"></a><span class="w">        </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-120" name="L-120"></a><span class="w">        </span><span class="c1">-- Collect one result from each launched worker and associate it with its original input position.</span>
+<a id="L-121" name="L-121"></a><span class="w">        </span><span class="k">FOR</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="mf">1..</span><span class="n">active</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-122" name="L-122"></a><span class="w">            </span><span class="k">SELECT</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="k">STRICT</span><span class="w"> </span><span class="k">row</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dblink_get_result</span><span class="p">(</span><span class="k">names</span><span class="p">[</span><span class="n">slot</span><span class="p">])</span>
+<a id="L-123" name="L-123"></a><span class="w">                </span><span class="k">AS</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">j0</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">worker_pid</span><span class="w"> </span><span class="nb">integer</span><span class="p">);</span>
+<a id="L-124" name="L-124"></a><span class="w">            </span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">bessel_results</span><span class="w"> </span><span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="n">first_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">slot</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mf">1</span><span class="p">,</span><span class="w"> </span><span class="k">row</span><span class="mf">.</span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="k">row</span><span class="mf">.</span><span class="n">j0</span><span class="p">,</span><span class="w"> </span><span class="k">row</span><span class="mf">.</span><span class="n">worker_pid</span><span class="p">);</span>
+<a id="L-125" name="L-125"></a><span class="w">            </span><span class="c1">-- Async dblink requires one extra fetch to clear the command&#39;s result.</span>
+<a id="L-126" name="L-126"></a><span class="w">            </span><span class="k">PERFORM</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">dblink_get_result</span><span class="p">(</span><span class="k">names</span><span class="p">[</span><span class="n">slot</span><span class="p">])</span>
+<a id="L-127" name="L-127"></a><span class="w">                </span><span class="k">AS</span><span class="w"> </span><span class="n">t</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">j0</span><span class="w"> </span><span class="nb">double precision</span><span class="p">,</span><span class="w"> </span><span class="n">worker_pid</span><span class="w"> </span><span class="nb">integer</span><span class="p">);</span>
+<a id="L-128" name="L-128"></a><span class="w">        </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-129" name="L-129"></a><span class="w">        </span><span class="n">first_row</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">first_row</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">active</span><span class="p">;</span>
+<a id="L-130" name="L-130"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-131" name="L-131"></a><span class="w">    </span><span class="k">FOREACH</span><span class="w"> </span><span class="n">connection_name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">ARRAY</span><span class="w"> </span><span class="k">names</span><span class="w"> </span><span class="k">LOOP</span><span class="w"> </span><span class="k">PERFORM</span><span class="w"> </span><span class="n">dblink_disconnect</span><span class="p">(</span><span class="n">connection_name</span><span class="p">);</span><span class="w"> </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-132" name="L-132"></a><span class="c1">-- Cancel and disconnect owned worker connections before re-raising the original failure.</span>
+<a id="L-133" name="L-133"></a><span class="k">EXCEPTION</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="k">OTHERS</span><span class="w"> </span><span class="k">THEN</span>
+<a id="L-134" name="L-134"></a><span class="w">    </span><span class="k">FOREACH</span><span class="w"> </span><span class="n">connection_name</span><span class="w"> </span><span class="k">IN</span><span class="w"> </span><span class="k">ARRAY</span><span class="w"> </span><span class="k">names</span><span class="w"> </span><span class="k">LOOP</span>
+<a id="L-135" name="L-135"></a><span class="w">        </span><span class="k">BEGIN</span>
+<a id="L-136" name="L-136"></a><span class="w">            </span><span class="k">PERFORM</span><span class="w"> </span><span class="n">dblink_cancel_query</span><span class="p">(</span><span class="n">connection_name</span><span class="p">);</span>
+<a id="L-137" name="L-137"></a><span class="w">            </span><span class="k">PERFORM</span><span class="w"> </span><span class="n">dblink_disconnect</span><span class="p">(</span><span class="n">connection_name</span><span class="p">);</span>
+<a id="L-138" name="L-138"></a><span class="w">        </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="k">WHEN</span><span class="w"> </span><span class="k">OTHERS</span><span class="w"> </span><span class="k">THEN</span><span class="w"> </span><span class="k">NULL</span><span class="p">;</span><span class="w"> </span><span class="c1">-- Preserve the original error during cleanup.</span>
+<a id="L-139" name="L-139"></a><span class="w">        </span><span class="k">END</span><span class="p">;</span>
+<a id="L-140" name="L-140"></a><span class="w">    </span><span class="k">END</span><span class="w"> </span><span class="k">LOOP</span><span class="p">;</span>
+<a id="L-141" name="L-141"></a><span class="w">    </span><span class="k">RAISE</span><span class="w"> </span><span class="k">EXCEPTION</span><span class="w"> </span><span class="s1">&#39;Bessel Observatory: %&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">SQLERRM</span><span class="p">;</span>
+<a id="L-142" name="L-142"></a><span class="k">END</span>
+<a id="L-143" name="L-143"></a><span class="s">$</span><span class="dl">observatory</span><span class="s">$</span><span class="p">;</span>
+<a id="L-144" name="L-144"></a>
+<a id="L-145" name="L-145"></a><span class="c1">-- Send only the final ordered result relation to a client-local CSV file.</span>
+<a id="L-146" name="L-146"></a><span class="err">\</span><span class="n">pset</span><span class="w"> </span><span class="n">format</span><span class="w"> </span><span class="k">csv</span>
+<a id="L-147" name="L-147"></a><span class="err">\</span><span class="n">pset</span><span class="w"> </span><span class="n">footer</span><span class="w"> </span><span class="k">off</span>
+<a id="L-148" name="L-148"></a><span class="err">\</span><span class="n">o</span><span class="w"> </span><span class="nv">:output</span>
+<a id="L-149" name="L-149"></a><span class="k">SELECT</span><span class="w"> </span><span class="n">x</span><span class="p">,</span><span class="w"> </span><span class="n">j0</span><span class="p">,</span><span class="w"> </span><span class="n">worker_pid</span><span class="w"> </span><span class="k">FROM</span><span class="w"> </span><span class="n">bessel_results</span><span class="w"> </span><span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="n">ordinal</span><span class="p">;</span>
+<a id="L-150" name="L-150"></a><span class="err">\</span><span class="n">o</span>
+<a id="L-151" name="L-151"></a><span class="err">\</span><span class="n">echo</span><span class="w"> </span><span class="n">Wrote</span><span class="w"> </span><span class="n">observations</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nv">:output</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>/*
+  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.
+  The parent reads input and owns result ordering; the worker computes the midpoint approximation.
+  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.
+  PostgreSQL 14+ / psql. Run in a disposable database with dblink available.
+  psql -X -d observatory -v values=&#x27;0,1,5,10&#x27; -v workers=2 -v output=results.csv -f bessel.sql
+  Optional: -v input=/absolute/SERVER/path/values.txt (pg_read_file privileges required).
+  Optional: -v conn=&#x27;service=observatory&#x27; for dblink authentication/connection settings.
+  Without input/values, psql prompts for a comma-separated list.
+  Every dblink connection has its own PostgreSQL OS backend process.
+  Stop psql on a failed SQL or meta-command instead of continuing with partial results.
+*/
+\set ON_ERROR_STOP on
+\set QUIET on
+\if :{?input}
+\else
+  \set input &#x27;-&#x27;
+\endif
+\if :{?output}
+\else
+  \set output &#x27;results.csv&#x27;
+\endif
+\if :{?workers}
+\else
+  \set workers 2
+\endif
+\if :{?conn}
+\else
+  SELECT format(&#x27;dbname=%L&#x27;, current_database()) AS conn \gset
+\endif
+SELECT :&#x27;input&#x27; = &#x27;-&#x27; AS interactive \gset
+\if :interactive
+  \if :{?values}
+  \else
+    \prompt &#x27;Enter x values separated by commas: &#x27; values
+  \endif
+\else
+  \set values &#x27;&#x27;
+\endif
+
+-- Make asynchronous connections available in this dedicated database; extension privileges are required.
+CREATE EXTENSION IF NOT EXISTS dblink;
+-- Bind psql arguments as quoted data so SQL does not interpret user text as executable syntax.
+CREATE TEMP TABLE bessel_config AS
+SELECT :&#x27;input&#x27;::text AS input, :&#x27;values&#x27;::text AS entered_values,
+       :&#x27;workers&#x27;::integer AS workers, :&#x27;conn&#x27;::text AS connection;
+CREATE TEMP TABLE bessel_input (ordinal integer PRIMARY KEY, x double precision);
+CREATE TEMP TABLE bessel_results
+    (ordinal integer PRIMARY KEY, x double precision, j0 double precision, worker_pid integer);
+
+-- Main execution block. Inputs: bessel_config and optional server file. Outputs: ordered bessel_results rows. Used by: the psql CSV export below.
+DO $observatory$
+DECLARE
+    config record;
+    source text;
+    line text;
+    value double precision;
+    accepted integer := 0;
+    first_row integer;
+    slot integer;
+    active integer;
+    connection_name text;
+    names text[] := ARRAY[]::text[];
+    row record;
+BEGIN
+    SELECT * INTO STRICT config FROM bessel_config;
+    IF config.workers NOT BETWEEN 1 AND 16 THEN
+        RAISE EXCEPTION &#x27;workers must be 1..16&#x27;;
+    END IF;
+    -- Choose interactive comma-separated text or a file read by the database server.
+    source := CASE WHEN config.input = &#x27;-&#x27;
+              THEN replace(config.entered_values, &#x27;,&#x27;, E&#x27;\n&#x27;)
+              ELSE pg_read_file(config.input) END;
+    -- Normalize input records, end on a blank line, skip comments, and validate individual numbers.
+    FOREACH line IN ARRAY string_to_array(source, E&#x27;\n&#x27;) LOOP
+        line := btrim(line, E&#x27; \t\r&#x27;);
+        EXIT WHEN line = &#x27;&#x27;;
+        CONTINUE WHEN left(line, 1) = &#x27;#&#x27;;
+        BEGIN
+            IF line !~ &#x27;^[+-]?([0-9]+(\.[0-9]*)?|\.[0-9]+)([eE][+-]?[0-9]+)?$&#x27; THEN
+                RAISE EXCEPTION USING ERRCODE = &#x27;22P02&#x27;, MESSAGE = &#x27;expected one decimal number&#x27;;
+            END IF;
+            value := line::double precision;
+            IF NOT (value BETWEEN -1000 AND 1000) THEN
+                RAISE EXCEPTION USING ERRCODE = &#x27;22003&#x27;, MESSAGE = &#x27;x outside [-1000,1000]&#x27;;
+            END IF;
+        -- Recover from a bad value by warning and continuing with the next record.
+        EXCEPTION WHEN invalid_text_representation OR numeric_value_out_of_range THEN
+            RAISE WARNING &#x27;invalid number: %; skipped&#x27;, line;
+            CONTINUE;
+        END;
+        accepted := accepted + 1;
+        IF accepted &gt; 4096 THEN RAISE EXCEPTION &#x27;at most 4096 values&#x27;; END IF;
+        INSERT INTO bessel_input VALUES (accepted, value);
+    END LOOP;
+    IF accepted = 0 THEN RAISE EXCEPTION &#x27;no valid input values&#x27;; END IF;
+
+    -- Create a bounded set of database connections, each backed by a separate server OS process.
+    FOR slot IN 1..least(config.workers, accepted) LOOP
+        connection_name := format(&#x27;bessel_%s_%s&#x27;, pg_backend_pid(), slot);
+        PERFORM dblink_connect(connection_name, config.connection || &#x27; connect_timeout=10&#x27;);
+        names := array_append(names, connection_name);
+        PERFORM dblink_exec(connection_name, &#x27;SET statement_timeout = &#x27;&#x27;30s&#x27;&#x27;&#x27;);
+    END LOOP;
+    first_row := 1;
+    -- Reuse the worker connections across bounded groups while retaining original row ordinals.
+    WHILE first_row &lt;= accepted LOOP
+        active := least(config.workers, accepted - first_row + 1);
+        FOR slot IN 1..active LOOP
+            SELECT x INTO STRICT value FROM bessel_input WHERE ordinal = first_row + slot - 1;
+            -- The numerical kernel is a relational aggregate, wholly in SQL.
+            IF dblink_send_query(names[slot], format(
+                &#x27;SELECT %L::float8 AS x,
+                        avg(cos(%L::float8 * sin(pi() * (k + 0.5::float8) / 16384))) AS j0,
+                        pg_backend_pid() AS worker_pid FROM generate_series(0,16383) AS g(k)&#x27;,
+                value, value)) &lt;&gt; 1 THEN
+                RAISE EXCEPTION &#x27;could not dispatch worker %&#x27;, slot;
+            END IF;
+        END LOOP;
+        -- Collect one result from each launched worker and associate it with its original input position.
+        FOR slot IN 1..active LOOP
+            SELECT * INTO STRICT row FROM dblink_get_result(names[slot])
+                AS t(x double precision, j0 double precision, worker_pid integer);
+            INSERT INTO bessel_results VALUES (first_row + slot - 1, row.x, row.j0, row.worker_pid);
+            -- Async dblink requires one extra fetch to clear the command&#x27;s result.
+            PERFORM * FROM dblink_get_result(names[slot])
+                AS t(x double precision, j0 double precision, worker_pid integer);
+        END LOOP;
+        first_row := first_row + active;
+    END LOOP;
+    FOREACH connection_name IN ARRAY names LOOP PERFORM dblink_disconnect(connection_name); END LOOP;
+-- Cancel and disconnect owned worker connections before re-raising the original failure.
+EXCEPTION WHEN OTHERS THEN
+    FOREACH connection_name IN ARRAY names LOOP
+        BEGIN
+            PERFORM dblink_cancel_query(connection_name);
+            PERFORM dblink_disconnect(connection_name);
+        EXCEPTION WHEN OTHERS THEN NULL; -- Preserve the original error during cleanup.
+        END;
+    END LOOP;
+    RAISE EXCEPTION &#x27;Bessel Observatory: %&#x27;, SQLERRM;
+END
+$observatory$;
+
+-- Send only the final ordered result relation to a client-local CSV file.
+\pset format csv
+\pset footer off
+\o :output
+SELECT x, j0, worker_pid FROM bessel_results ORDER BY ordinal;
+\o
+\echo Wrote observations to :output
+</textarea>
+<footer>Highlighted with Pygments using the PostgreSQL SQL dialect lexer. All assets are local. SHA-256: <code>75baef1b137ee93e278387138e9820e20e3c3bdcf498ece55f446f2ddb5b28d1</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

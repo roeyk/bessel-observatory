@@ -1,0 +1,405 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="d338c3bbe0e31b9a1b7639eeedb237e98b9fa055d7c9484b86befe4d7842df55">
+<title>Smalltalk — bessel.st — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.m.html">← Objective-C</a><a href="bessel.cpp.html">C++ →</a></nav>
+<h1>Smalltalk <code>bessel.st</code></h1>
+<p>GNU Smalltalk 3.2+ / POSIX · Message sends, blocks, inject:into:, OrderedCollection, on:do: and ensure:.</p>
+<p><strong>Memory:</strong> Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.<br><strong>Strings:</strong> trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.</p>
+<div class="actions"><a href="../bessel.st">Open raw source</a>
+<a href="../bessel.st" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="c">&quot;Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.</span>
+<a id="L-2" name="L-2"></a><span class="c"> The parent reads input and owns result ordering; the worker computes the midpoint approximation.</span>
+<a id="L-3" name="L-3"></a><span class="c"> An invalid observation is skipped with a warning, while failed I/O or workers abort the run.&quot;</span>
+<a id="L-4" name="L-4"></a><span class="c">&quot;GNU Smalltalk 3.2+, POSIX. Messages, blocks, collections and ensure:.</span>
+<a id="L-5" name="L-5"></a><span class="c"> Run from this directory: gst -f bessel.st INPUT OUTPUT WORKERS.</span>
+<a id="L-6" name="L-6"></a><span class="c"> popen creates external GST VMs; Smalltalk block fork would only be a green process.&quot;</span>
+<a id="L-7" name="L-7"></a>
+<a id="L-8" name="L-8"></a><span class="nc">Object</span> <span class="nf">subclass:</span> <span class="nc">Observatory</span> [
+<a id="L-9" name="L-9"></a>    <span class="c">&quot;Expose the OS identity of the current GNU Smalltalk VM.</span>
+<a id="L-10" name="L-10"></a><span class="c">     Inputs: No explicit inputs.</span>
+<a id="L-11" name="L-11"></a><span class="c">     Outputs: The integer OS process ID.</span>
+<a id="L-12" name="L-12"></a><span class="c">     Used by: run: in worker mode when formatting its result row.&quot;</span>
+<a id="L-13" name="L-13"></a>    <span class="nc">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nv">processId</span> [
+<a id="L-14" name="L-14"></a>        &lt;<span class="k">cCall:</span> &#39;getpid&#39; returning: #int args: #()&gt;
+<a id="L-15" name="L-15"></a>    ]
+<a id="L-16" name="L-16"></a>    <span class="c">&quot;Parse one complete numeric string and enforce the shared range.</span>
+<a id="L-17" name="L-17"></a><span class="c">     Inputs: A trimmed text string.</span>
+<a id="L-18" name="L-18"></a><span class="c">     Outputs: A bounded FloatD, or an Error.</span>
+<a id="L-19" name="L-19"></a><span class="c">     Used by: readValues: and run: before numerical work.&quot;</span>
+<a id="L-20" name="L-20"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">number:</span> <span class="nv">text</span> [
+<a id="L-21" name="L-21"></a>        <span class="o">|</span> <span class="nv">stream</span> <span class="nf">x</span> <span class="nf">|</span>
+<a id="L-22" name="L-22"></a>        <span class="nv">text</span> <span class="nf">isEmpty</span> <span class="nb">ifTrue:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;expected a number&#39;</span>]<span class="p">.</span>
+<a id="L-23" name="L-23"></a>        (<span class="nv">text</span> <span class="nf">allSatisfy:</span> [<span class="o">:</span><span class="nv">c</span> <span class="o">|</span> <span class="s">&#39;0123456789+-.eE&#39;</span> <span class="nf">includes:</span> <span class="nv">c</span>])
+<a id="L-24" name="L-24"></a>            <span class="nb">ifFalse:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;invalid numeric character&#39;</span>]<span class="p">.</span>
+<a id="L-25" name="L-25"></a>        (<span class="nv">text</span> <span class="nf">anySatisfy:</span> [<span class="o">:</span><span class="nv">c</span> <span class="o">|</span> <span class="nv">c</span> <span class="nf">isDigit</span>]) <span class="nb">ifFalse:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;expected digits&#39;</span>]<span class="p">.</span>
+<a id="L-26" name="L-26"></a>        <span class="c">&quot;Use a stream position to ensure parsing consumed the entire token.&quot;</span>
+<a id="L-27" name="L-27"></a>        <span class="nv">stream</span> <span class="o">:=</span> <span class="nv">text</span> <span class="nf">readStream</span><span class="p">.</span>
+<a id="L-28" name="L-28"></a>        <span class="nv">x</span> <span class="o">:=</span> (<span class="nc">Number</span> <span class="nf">readFrom:</span> <span class="nv">stream</span>) <span class="nf">asFloatD</span><span class="p">.</span>
+<a id="L-29" name="L-29"></a>        (<span class="nv">stream</span> <span class="nf">atEnd</span> <span class="nf">and:</span> [<span class="nv">x</span> <span class="nf">&gt;=</span> <span class="m">-1000</span> <span class="nf">and:</span> [<span class="nv">x</span> <span class="nf">&lt;=</span> <span class="m">1000</span>]])
+<a id="L-30" name="L-30"></a>            <span class="nb">ifFalse:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;expected finite x in [-1000,1000]&#39;</span>]<span class="p">.</span>
+<a id="L-31" name="L-31"></a>        <span class="o">^</span><span class="nv">x</span>
+<a id="L-32" name="L-32"></a>    ]
+<a id="L-33" name="L-33"></a>    <span class="c">&quot;Convert a floating value to portable CSV scientific notation.</span>
+<a id="L-34" name="L-34"></a><span class="c">     Inputs: A numeric object.</span>
+<a id="L-35" name="L-35"></a><span class="c">     Outputs: Its printed text with a d exponent marker replaced by e.</span>
+<a id="L-36" name="L-36"></a><span class="c">     Used by: run: and batch: for CSV rows and worker arguments.&quot;</span>
+<a id="L-37" name="L-37"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">decimal:</span> <span class="nv">x</span> [
+<a id="L-38" name="L-38"></a>        <span class="o">^</span><span class="nv">x</span> <span class="nf">printString</span> <span class="nf">copyReplaceAll:</span> <span class="s">&#39;d&#39;</span> <span class="nf">with:</span> <span class="s">&#39;e&#39;</span>
+<a id="L-39" name="L-39"></a>    ]
+<a id="L-40" name="L-40"></a>    <span class="c">&quot;Fold midpoint samples into the Bessel approximation.</span>
+<a id="L-41" name="L-41"></a><span class="c">     Inputs: One validated x.</span>
+<a id="L-42" name="L-42"></a><span class="c">     Outputs: The approximate J0 value.</span>
+<a id="L-43" name="L-43"></a><span class="c">     Used by: run: when executing in an external worker VM.&quot;</span>
+<a id="L-44" name="L-44"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">j0:</span> <span class="nv">x</span> [
+<a id="L-45" name="L-45"></a>        <span class="o">^</span>((<span class="m">0</span> <span class="nf">to:</span> <span class="m">16383</span>) <span class="nf">inject:</span> <span class="m">0.0</span><span class="nf">d0</span> <span class="err">into:</span> [<span class="o">:</span><span class="nv">sum</span> <span class="o">:</span><span class="nv">k</span> <span class="o">|</span>
+<a id="L-46" name="L-46"></a>            <span class="nv">sum</span> <span class="nf">+</span> (<span class="nv">x</span> <span class="nf">*</span> ((<span class="nc">FloatD</span> <span class="nf">pi</span> <span class="nf">*</span> (<span class="nv">k</span> <span class="nf">+</span> <span class="m">0.5</span><span class="nf">d0</span>) <span class="nf">/</span> <span class="m">16384</span>) <span class="nf">sin</span>)) <span class="nf">cos</span>]) <span class="nf">/</span> <span class="m">16384</span>
+<a id="L-47" name="L-47"></a>    ]
+<a id="L-48" name="L-48"></a>    <span class="c">&quot;Collect usable observations while allowing malformed lines to be skipped.</span>
+<a id="L-49" name="L-49"></a><span class="c">     Inputs: A FileStream input.</span>
+<a id="L-50" name="L-50"></a><span class="c">     Outputs: An OrderedCollection of validated values.</span>
+<a id="L-51" name="L-51"></a><span class="c">     Used by: run: before process creation.&quot;</span>
+<a id="L-52" name="L-52"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">readValues:</span> <span class="nv">input</span> [
+<a id="L-53" name="L-53"></a>        <span class="o">|</span> <span class="nv">values</span> <span class="nf">text</span> <span class="nf">done</span> <span class="nf">|</span>
+<a id="L-54" name="L-54"></a>        <span class="nv">values</span> <span class="o">:=</span> <span class="nc">OrderedCollection</span> <span class="nb">new</span><span class="p">.</span> <span class="nv">done</span> <span class="o">:=</span> <span class="bp">false</span><span class="p">.</span>
+<a id="L-55" name="L-55"></a>        [<span class="nv">input</span> <span class="nf">atEnd</span> <span class="nf">or:</span> [<span class="nv">done</span>]] <span class="nb">whileFalse:</span> [
+<a id="L-56" name="L-56"></a>            <span class="nv">text</span> <span class="o">:=</span> <span class="nv">input</span> <span class="nf">nextLine</span> <span class="nf">trimSeparators</span><span class="p">.</span>
+<a id="L-57" name="L-57"></a>            <span class="nv">text</span> <span class="nf">isEmpty</span> <span class="nb">ifTrue:</span> [<span class="nv">done</span> <span class="o">:=</span> <span class="bp">true</span>] <span class="nb">ifFalse:</span> [
+<a id="L-58" name="L-58"></a>                <span class="nv">text</span> <span class="nf">first</span> <span class="nf">=</span> <span class="sc">$#</span> <span class="nb">ifFalse:</span> [
+<a id="L-59" name="L-59"></a>                    [<span class="nv">values</span> <span class="nf">add:</span> (<span class="bp">self</span> <span class="nf">number:</span> <span class="nv">text</span>)]
+<a id="L-60" name="L-60"></a>                        <span class="nf">on:</span> <span class="nc">Error</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">e</span> <span class="o">|</span> <span class="nc">FileStream</span> <span class="nf">stderr</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;warning: invalid number; skipped&#39;</span><span class="p">;</span> <span class="nf">nl</span>]<span class="p">.</span>
+<a id="L-61" name="L-61"></a>                    <span class="nv">values</span> <span class="nf">size</span> <span class="nf">&gt;</span> <span class="m">4096</span> <span class="nb">ifTrue:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;at most 4096 values&#39;</span>]]]]<span class="p">.</span>
+<a id="L-62" name="L-62"></a>        <span class="nv">values</span> <span class="nf">isEmpty</span> <span class="nb">ifTrue:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;no valid input values&#39;</span>]<span class="p">.</span>
+<a id="L-63" name="L-63"></a>        <span class="o">^</span><span class="nv">values</span>
+<a id="L-64" name="L-64"></a>    ]
+<a id="L-65" name="L-65"></a>    <span class="c">&quot;Open independent worker VMs and gather their rows in order.</span>
+<a id="L-66" name="L-66"></a><span class="c">     Inputs: A bounded collection of numeric values.</span>
+<a id="L-67" name="L-67"></a><span class="c">     Outputs: A collection of CSV row strings, or an Error after pipe cleanup.</span>
+<a id="L-68" name="L-68"></a><span class="c">     Used by: run: for each worker-sized slice.&quot;</span>
+<a id="L-69" name="L-69"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">batch:</span> <span class="nv">values</span> [
+<a id="L-70" name="L-70"></a>        <span class="o">|</span> <span class="nv">pipes</span> <span class="nf">rows</span> <span class="nf">|</span>
+<a id="L-71" name="L-71"></a>        <span class="c">&quot;Retain every process pipe until collection or error cleanup finishes.&quot;</span>
+<a id="L-72" name="L-72"></a>        <span class="nv">pipes</span> <span class="o">:=</span> <span class="nc">OrderedCollection</span> <span class="nb">new</span><span class="p">.</span> <span class="nv">rows</span> <span class="o">:=</span> <span class="nc">OrderedCollection</span> <span class="nb">new</span><span class="p">.</span>
+<a id="L-73" name="L-73"></a>        [<span class="nv">values</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">x</span> <span class="o">|</span>
+<a id="L-74" name="L-74"></a>            <span class="c">&quot;Only a validated, re-formatted number enters the shell command.&quot;</span>
+<a id="L-75" name="L-75"></a>            <span class="nv">pipes</span> <span class="nf">add:</span> (<span class="nc">FileStream</span> <span class="nf">popen:</span> (<span class="s">&#39;gst -f bessel.st --worker &#39;</span><span class="nf">,</span> (<span class="bp">self</span> <span class="nf">decimal:</span> <span class="nv">x</span>)) <span class="nf">dir:</span> <span class="nc">FileStream</span> <span class="nf">read</span>)]<span class="p">.</span>
+<a id="L-76" name="L-76"></a>         <span class="c">&quot;Read results only after all pipes in the group have launched their external VMs.&quot;</span>
+<a id="L-77" name="L-77"></a>         <span class="nv">pipes</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">pipe</span> <span class="o">|</span>
+<a id="L-78" name="L-78"></a>            <span class="o">|</span><span class="nv"> row </span><span class="o">|</span>
+<a id="L-79" name="L-79"></a>            <span class="nv">row</span> <span class="o">:=</span> <span class="nv">pipe</span> <span class="nf">nextLine</span><span class="p">.</span>
+<a id="L-80" name="L-80"></a>            (<span class="nv">row</span> <span class="nf">isNil</span> <span class="nf">or:</span> [<span class="nv">row</span> <span class="nf">isEmpty</span>]) <span class="nb">ifTrue:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;worker failed&#39;</span>]<span class="p">.</span>
+<a id="L-81" name="L-81"></a>            <span class="nv">rows</span> <span class="nf">add:</span> <span class="nv">row</span>]]
+<a id="L-82" name="L-82"></a>            <span class="nf">ensure:</span> [<span class="nv">pipes</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">pipe</span> <span class="o">|</span> <span class="nv">pipe</span> <span class="nf">close</span>]]<span class="p">.</span>
+<a id="L-83" name="L-83"></a>        <span class="o">^</span><span class="nv">rows</span>
+<a id="L-84" name="L-84"></a>    ]
+<a id="L-85" name="L-85"></a>    <span class="c">&quot;Implement help, worker calculation, and the full CLI workflow.</span>
+<a id="L-86" name="L-86"></a><span class="c">     Inputs: Smalltalk argument strings and optional standard input.</span>
+<a id="L-87" name="L-87"></a><span class="c">     Outputs: A result file and completion message, or an Error.</span>
+<a id="L-88" name="L-88"></a><span class="c">     Used by: The final on:do: guarded entry block.&quot;</span>
+<a id="L-89" name="L-89"></a>    <span class="nf">Observatory</span> <span class="nf">class</span> <span class="nf">&gt;&gt;</span> <span class="nf">run:</span> <span class="nv">args</span> [
+<a id="L-90" name="L-90"></a>        <span class="o">|</span> <span class="nv">source</span> <span class="nf">target</span> <span class="nf">jobs</span> <span class="nf">input</span> <span class="nf">values</span> <span class="nf">rows</span> <span class="nf">output</span> <span class="nf">first</span> <span class="nf">last</span> <span class="nf">x</span> <span class="nf">|</span>
+<a id="L-91" name="L-91"></a>        (<span class="nv">args</span> <span class="nf">size</span> <span class="nf">=</span> <span class="m">1</span> <span class="nf">and:</span> [<span class="nv">args</span> <span class="nf">first</span> <span class="nf">=</span> <span class="s">&#39;--help&#39;</span>]) <span class="nb">ifTrue:</span> [
+<a id="L-92" name="L-92"></a>            <span class="nc">FileStream</span> <span class="nf">stdout</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;Usage: gst -f bessel.st [INPUT|- [OUTPUT [WORKERS 1..16]]]&#39;</span><span class="p">;</span> <span class="nf">nl</span><span class="p">.</span> <span class="o">^</span><span class="bp">self</span>]<span class="p">.</span>
+<a id="L-93" name="L-93"></a>        (<span class="nv">args</span> <span class="nf">size</span> <span class="nf">=</span> <span class="m">2</span> <span class="nf">and:</span> [<span class="nv">args</span> <span class="nf">first</span> <span class="nf">=</span> <span class="s">&#39;--worker&#39;</span>]) <span class="nb">ifTrue:</span> [
+<a id="L-94" name="L-94"></a>            <span class="nv">x</span> <span class="o">:=</span> <span class="bp">self</span> <span class="nf">number:</span> <span class="nv">args</span> <span class="nf">second</span><span class="p">.</span>
+<a id="L-95" name="L-95"></a>            <span class="nc">FileStream</span> <span class="nf">stdout</span> <span class="nf">nextPutAll:</span> (<span class="bp">self</span> <span class="nf">decimal:</span> <span class="nv">x</span>)<span class="p">;</span> <span class="nf">nextPut:</span> <span class="sc">$,</span><span class="p">;</span>
+<a id="L-96" name="L-96"></a>                <span class="nf">nextPutAll:</span> (<span class="bp">self</span> <span class="nf">decimal:</span> (<span class="bp">self</span> <span class="nf">j0:</span> <span class="nv">x</span>))<span class="p">;</span> <span class="nf">nextPut:</span> <span class="sc">$,</span><span class="p">;</span>
+<a id="L-97" name="L-97"></a>                <span class="nf">nextPutAll:</span> <span class="bp">self</span> <span class="nf">processId</span> <span class="nf">printString</span><span class="p">;</span> <span class="nf">nl</span><span class="p">;</span> <span class="nf">flush</span><span class="p">.</span> <span class="o">^</span><span class="bp">self</span>]<span class="p">.</span>
+<a id="L-98" name="L-98"></a>        <span class="nv">args</span> <span class="nf">size</span> <span class="nf">&gt;</span> <span class="m">3</span> <span class="nb">ifTrue:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;too many arguments&#39;</span>]<span class="p">.</span>
+<a id="L-99" name="L-99"></a>        <span class="nv">source</span> <span class="o">:=</span> <span class="nv">args</span> <span class="nf">at:</span> <span class="m">1</span> <span class="nf">ifAbsent:</span> [<span class="s">&#39;-&#39;</span>]<span class="p">.</span>
+<a id="L-100" name="L-100"></a>        <span class="nv">target</span> <span class="o">:=</span> <span class="nv">args</span> <span class="nf">at:</span> <span class="m">2</span> <span class="nf">ifAbsent:</span> [<span class="s">&#39;results.csv&#39;</span>]<span class="p">.</span>
+<a id="L-101" name="L-101"></a>        <span class="nv">jobs</span> <span class="o">:=</span> <span class="bp">self</span> <span class="nf">number:</span> (<span class="nv">args</span> <span class="nf">at:</span> <span class="m">3</span> <span class="nf">ifAbsent:</span> [<span class="s">&#39;2&#39;</span>])<span class="p">.</span>
+<a id="L-102" name="L-102"></a>        (<span class="nv">jobs</span> <span class="nf">&gt;=</span> <span class="m">1</span> <span class="nf">and:</span> [<span class="nv">jobs</span> <span class="nf">&lt;=</span> <span class="m">16</span> <span class="nf">and:</span> [<span class="nv">jobs</span> <span class="nf">=</span> <span class="nv">jobs</span> <span class="nf">truncated</span>]])
+<a id="L-103" name="L-103"></a>            <span class="nb">ifFalse:</span> [<span class="bp">self</span> <span class="nf">error:</span> <span class="s">&#39;workers must be 1..16&#39;</span>]<span class="p">.</span>
+<a id="L-104" name="L-104"></a>        <span class="nv">jobs</span> <span class="o">:=</span> <span class="nv">jobs</span> <span class="nf">truncated</span><span class="p">.</span>
+<a id="L-105" name="L-105"></a>        <span class="nv">source</span> <span class="nf">=</span> <span class="s">&#39;-&#39;</span> <span class="nb">ifTrue:</span> [
+<a id="L-106" name="L-106"></a>            <span class="nc">FileStream</span> <span class="nf">stderr</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;Enter one x per line; blank line or EOF finishes:&#39;</span><span class="p">;</span> <span class="nf">nl</span><span class="p">.</span>
+<a id="L-107" name="L-107"></a>            <span class="nv">values</span> <span class="o">:=</span> <span class="bp">self</span> <span class="nf">readValues:</span> <span class="nc">FileStream</span> <span class="nf">stdin</span>]
+<a id="L-108" name="L-108"></a>        <span class="nb">ifFalse:</span> [
+<a id="L-109" name="L-109"></a>            <span class="nv">input</span> <span class="o">:=</span> <span class="nc">FileStream</span> <span class="nf">open:</span> <span class="nv">source</span> <span class="nf">mode:</span> <span class="nc">FileStream</span> <span class="nf">read</span><span class="p">.</span>
+<a id="L-110" name="L-110"></a>            [<span class="nv">values</span> <span class="o">:=</span> <span class="bp">self</span> <span class="nf">readValues:</span> <span class="nv">input</span>] <span class="nf">ensure:</span> [<span class="nv">input</span> <span class="nf">close</span>]]<span class="p">.</span>
+<a id="L-111" name="L-111"></a>        <span class="nv">rows</span> <span class="o">:=</span> <span class="nc">OrderedCollection</span> <span class="nb">new</span><span class="p">.</span> <span class="nv">first</span> <span class="o">:=</span> <span class="m">1</span><span class="p">.</span>
+<a id="L-112" name="L-112"></a>        [<span class="nv">first</span> <span class="nf">&lt;=</span> <span class="nv">values</span> <span class="nf">size</span>] <span class="nb">whileTrue:</span> [
+<a id="L-113" name="L-113"></a>            <span class="nv">last</span> <span class="o">:=</span> (<span class="nv">first</span> <span class="nf">+</span> <span class="nv">jobs</span> <span class="nf">-</span> <span class="m">1</span>) <span class="nf">min:</span> <span class="nv">values</span> <span class="nf">size</span><span class="p">.</span>
+<a id="L-114" name="L-114"></a>            <span class="nv">rows</span> <span class="nf">addAll:</span> (<span class="bp">self</span> <span class="nf">batch:</span> (<span class="nv">values</span> <span class="nf">copyFrom:</span> <span class="nv">first</span> <span class="nf">to:</span> <span class="nv">last</span>))<span class="p">.</span>
+<a id="L-115" name="L-115"></a>            <span class="nv">first</span> <span class="o">:=</span> <span class="nv">last</span> <span class="nf">+</span> <span class="m">1</span>]<span class="p">.</span>
+<a id="L-116" name="L-116"></a>        <span class="c">&quot;Create the output file after every group has returned its observations.&quot;</span>
+<a id="L-117" name="L-117"></a>        <span class="nv">output</span> <span class="o">:=</span> <span class="nc">FileStream</span> <span class="nf">open:</span> <span class="nv">target</span> <span class="nf">mode:</span> <span class="nc">FileStream</span> <span class="nf">write</span><span class="p">.</span>
+<a id="L-118" name="L-118"></a>        [<span class="nv">output</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;x,j0,worker_pid&#39;</span><span class="p">;</span> <span class="nf">nl</span><span class="p">.</span>
+<a id="L-119" name="L-119"></a>         <span class="nv">rows</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">row</span> <span class="o">|</span> <span class="nv">output</span> <span class="nf">nextPutAll:</span> <span class="nv">row</span><span class="p">;</span> <span class="nf">nl</span>]] <span class="nf">ensure:</span> [<span class="nv">output</span> <span class="nf">close</span>]<span class="p">.</span>
+<a id="L-120" name="L-120"></a>        <span class="nc">FileStream</span> <span class="nf">stdout</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;Wrote &#39;</span><span class="p">;</span> <span class="nf">nextPutAll:</span> <span class="nv">rows</span> <span class="nf">size</span> <span class="nf">printString</span><span class="p">;</span>
+<a id="L-121" name="L-121"></a>            <span class="nf">nextPutAll:</span> <span class="s">&#39; observations to &#39;</span><span class="p">;</span> <span class="nf">nextPutAll:</span> <span class="nv">target</span><span class="p">;</span> <span class="nf">nl</span>
+<a id="L-122" name="L-122"></a>    ]
+<a id="L-123" name="L-123"></a>]
+<a id="L-124" name="L-124"></a><span class="c">&quot;Run the CLI behind a handler that turns runtime errors into readable failures.&quot;</span>
+<a id="L-125" name="L-125"></a>[<span class="nc">Observatory</span> <span class="nf">run:</span> <span class="nc">Smalltalk</span> <span class="nf">arguments</span>]
+<a id="L-126" name="L-126"></a>    <span class="nf">on:</span> <span class="nc">Error</span> <span class="nf">do:</span> [<span class="o">:</span><span class="nv">e</span> <span class="o">|</span>
+<a id="L-127" name="L-127"></a>        <span class="nc">FileStream</span> <span class="nf">stderr</span> <span class="nf">nextPutAll:</span> <span class="s">&#39;error: &#39;</span><span class="p">;</span> <span class="nf">nextPutAll:</span> <span class="nv">e</span> <span class="nf">messageText</span><span class="p">;</span> <span class="nf">nl</span><span class="p">.</span>
+<a id="L-128" name="L-128"></a>        <span class="nc">ObjectMemory</span> <span class="nf">quit:</span> <span class="m">1</span>]<span class="p">.</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>&quot;Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.
+ The parent reads input and owns result ordering; the worker computes the midpoint approximation.
+ An invalid observation is skipped with a warning, while failed I/O or workers abort the run.&quot;
+&quot;GNU Smalltalk 3.2+, POSIX. Messages, blocks, collections and ensure:.
+ Run from this directory: gst -f bessel.st INPUT OUTPUT WORKERS.
+ popen creates external GST VMs; Smalltalk block fork would only be a green process.&quot;
+
+Object subclass: Observatory [
+    &quot;Expose the OS identity of the current GNU Smalltalk VM.
+     Inputs: No explicit inputs.
+     Outputs: The integer OS process ID.
+     Used by: run: in worker mode when formatting its result row.&quot;
+    Observatory class &gt;&gt; processId [
+        &lt;cCall: &#x27;getpid&#x27; returning: #int args: #()&gt;
+    ]
+    &quot;Parse one complete numeric string and enforce the shared range.
+     Inputs: A trimmed text string.
+     Outputs: A bounded FloatD, or an Error.
+     Used by: readValues: and run: before numerical work.&quot;
+    Observatory class &gt;&gt; number: text [
+        | stream x |
+        text isEmpty ifTrue: [self error: &#x27;expected a number&#x27;].
+        (text allSatisfy: [:c | &#x27;0123456789+-.eE&#x27; includes: c])
+            ifFalse: [self error: &#x27;invalid numeric character&#x27;].
+        (text anySatisfy: [:c | c isDigit]) ifFalse: [self error: &#x27;expected digits&#x27;].
+        &quot;Use a stream position to ensure parsing consumed the entire token.&quot;
+        stream := text readStream.
+        x := (Number readFrom: stream) asFloatD.
+        (stream atEnd and: [x &gt;= -1000 and: [x &lt;= 1000]])
+            ifFalse: [self error: &#x27;expected finite x in [-1000,1000]&#x27;].
+        ^x
+    ]
+    &quot;Convert a floating value to portable CSV scientific notation.
+     Inputs: A numeric object.
+     Outputs: Its printed text with a d exponent marker replaced by e.
+     Used by: run: and batch: for CSV rows and worker arguments.&quot;
+    Observatory class &gt;&gt; decimal: x [
+        ^x printString copyReplaceAll: &#x27;d&#x27; with: &#x27;e&#x27;
+    ]
+    &quot;Fold midpoint samples into the Bessel approximation.
+     Inputs: One validated x.
+     Outputs: The approximate J0 value.
+     Used by: run: when executing in an external worker VM.&quot;
+    Observatory class &gt;&gt; j0: x [
+        ^((0 to: 16383) inject: 0.0d0 into: [:sum :k |
+            sum + (x * ((FloatD pi * (k + 0.5d0) / 16384) sin)) cos]) / 16384
+    ]
+    &quot;Collect usable observations while allowing malformed lines to be skipped.
+     Inputs: A FileStream input.
+     Outputs: An OrderedCollection of validated values.
+     Used by: run: before process creation.&quot;
+    Observatory class &gt;&gt; readValues: input [
+        | values text done |
+        values := OrderedCollection new. done := false.
+        [input atEnd or: [done]] whileFalse: [
+            text := input nextLine trimSeparators.
+            text isEmpty ifTrue: [done := true] ifFalse: [
+                text first = $# ifFalse: [
+                    [values add: (self number: text)]
+                        on: Error do: [:e | FileStream stderr nextPutAll: &#x27;warning: invalid number; skipped&#x27;; nl].
+                    values size &gt; 4096 ifTrue: [self error: &#x27;at most 4096 values&#x27;]]]].
+        values isEmpty ifTrue: [self error: &#x27;no valid input values&#x27;].
+        ^values
+    ]
+    &quot;Open independent worker VMs and gather their rows in order.
+     Inputs: A bounded collection of numeric values.
+     Outputs: A collection of CSV row strings, or an Error after pipe cleanup.
+     Used by: run: for each worker-sized slice.&quot;
+    Observatory class &gt;&gt; batch: values [
+        | pipes rows |
+        &quot;Retain every process pipe until collection or error cleanup finishes.&quot;
+        pipes := OrderedCollection new. rows := OrderedCollection new.
+        [values do: [:x |
+            &quot;Only a validated, re-formatted number enters the shell command.&quot;
+            pipes add: (FileStream popen: (&#x27;gst -f bessel.st --worker &#x27;, (self decimal: x)) dir: FileStream read)].
+         &quot;Read results only after all pipes in the group have launched their external VMs.&quot;
+         pipes do: [:pipe |
+            | row |
+            row := pipe nextLine.
+            (row isNil or: [row isEmpty]) ifTrue: [self error: &#x27;worker failed&#x27;].
+            rows add: row]]
+            ensure: [pipes do: [:pipe | pipe close]].
+        ^rows
+    ]
+    &quot;Implement help, worker calculation, and the full CLI workflow.
+     Inputs: Smalltalk argument strings and optional standard input.
+     Outputs: A result file and completion message, or an Error.
+     Used by: The final on:do: guarded entry block.&quot;
+    Observatory class &gt;&gt; run: args [
+        | source target jobs input values rows output first last x |
+        (args size = 1 and: [args first = &#x27;--help&#x27;]) ifTrue: [
+            FileStream stdout nextPutAll: &#x27;Usage: gst -f bessel.st [INPUT|- [OUTPUT [WORKERS 1..16]]]&#x27;; nl. ^self].
+        (args size = 2 and: [args first = &#x27;--worker&#x27;]) ifTrue: [
+            x := self number: args second.
+            FileStream stdout nextPutAll: (self decimal: x); nextPut: $,;
+                nextPutAll: (self decimal: (self j0: x)); nextPut: $,;
+                nextPutAll: self processId printString; nl; flush. ^self].
+        args size &gt; 3 ifTrue: [self error: &#x27;too many arguments&#x27;].
+        source := args at: 1 ifAbsent: [&#x27;-&#x27;].
+        target := args at: 2 ifAbsent: [&#x27;results.csv&#x27;].
+        jobs := self number: (args at: 3 ifAbsent: [&#x27;2&#x27;]).
+        (jobs &gt;= 1 and: [jobs &lt;= 16 and: [jobs = jobs truncated]])
+            ifFalse: [self error: &#x27;workers must be 1..16&#x27;].
+        jobs := jobs truncated.
+        source = &#x27;-&#x27; ifTrue: [
+            FileStream stderr nextPutAll: &#x27;Enter one x per line; blank line or EOF finishes:&#x27;; nl.
+            values := self readValues: FileStream stdin]
+        ifFalse: [
+            input := FileStream open: source mode: FileStream read.
+            [values := self readValues: input] ensure: [input close]].
+        rows := OrderedCollection new. first := 1.
+        [first &lt;= values size] whileTrue: [
+            last := (first + jobs - 1) min: values size.
+            rows addAll: (self batch: (values copyFrom: first to: last)).
+            first := last + 1].
+        &quot;Create the output file after every group has returned its observations.&quot;
+        output := FileStream open: target mode: FileStream write.
+        [output nextPutAll: &#x27;x,j0,worker_pid&#x27;; nl.
+         rows do: [:row | output nextPutAll: row; nl]] ensure: [output close].
+        FileStream stdout nextPutAll: &#x27;Wrote &#x27;; nextPutAll: rows size printString;
+            nextPutAll: &#x27; observations to &#x27;; nextPutAll: target; nl
+    ]
+]
+&quot;Run the CLI behind a handler that turns runtime errors into readable failures.&quot;
+[Observatory run: Smalltalk arguments]
+    on: Error do: [:e |
+        FileStream stderr nextPutAll: &#x27;error: &#x27;; nextPutAll: e messageText; nl.
+        ObjectMemory quit: 1].
+</textarea>
+<footer>Highlighted with Pygments using the Smalltalk lexer. All assets are local. SHA-256: <code>d338c3bbe0e31b9a1b7639eeedb237e98b9fa055d7c9484b86befe4d7842df55</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

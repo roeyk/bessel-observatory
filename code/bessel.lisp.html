@@ -1,0 +1,474 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="e7e37a52dfe74b135f5de3e36ae0deb349afd93d63476e35f39c15c33109e40d">
+<title>Lisp — bessel.lisp — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.ml.html">← OCaml</a><a href="bessel.pro.html">Prolog →</a></nav>
+<h1>Lisp <code>bessel.lisp</code></h1>
+<p>Common Lisp / SBCL 2.x · Conditions, a skip-value restart, LOOP, WITH-OPEN-FILE and UNWIND-PROTECT.</p>
+<p><strong>Memory:</strong> SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.<br><strong>Strings:</strong> STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.</p>
+<div class="actions"><a href="../bessel.lisp">Open raw source</a>
+<a href="../bessel.lisp" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">#|</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent reads input and owns result ordering; the worker computes the midpoint approximation.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.</span>
+<a id="L-5" name="L-5"></a><span class="cm">|#</span>
+<a id="L-6" name="L-6"></a><span class="c1">;;;; Common Lisp (SBCL 2.x): conditions, a recovery restart, LOOP, resource macros.</span>
+<a id="L-7" name="L-7"></a><span class="p">(</span><span class="nb">require</span><span class="w"> </span><span class="ss">:sb-posix</span><span class="p">)</span>
+<a id="L-8" name="L-8"></a><span class="p">(</span><span class="nb">defparameter</span><span class="w"> </span><span class="vg">*script-path*</span><span class="w"> </span><span class="p">(</span><span class="nb">namestring</span><span class="w"> </span><span class="p">(</span><span class="nb">truename</span><span class="w"> </span><span class="vg">*load-truename*</span><span class="p">)))</span>
+<a id="L-9" name="L-9"></a>
+<a id="L-10" name="L-10"></a><span class="cm">#|</span>
+<a id="L-11" name="L-11"></a><span class="cm">  Normalize surrounding text whitespace for all parser entry points.</span>
+<a id="L-12" name="L-12"></a><span class="cm">  Inputs: An input string.</span>
+<a id="L-13" name="L-13"></a><span class="cm">  Outputs: A trimmed string.</span>
+<a id="L-14" name="L-14"></a><span class="cm">  Used by: parse-number and read-values before validation.</span>
+<a id="L-15" name="L-15"></a><span class="cm">|#</span>
+<a id="L-16" name="L-16"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">trim-text</span><span class="w"> </span><span class="p">(</span><span class="nv">text</span><span class="p">)</span>
+<a id="L-17" name="L-17"></a><span class="w">  </span><span class="p">(</span><span class="nb">string-trim</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="sc">#\Space</span><span class="w"> </span><span class="sc">#\Tab</span><span class="w"> </span><span class="sc">#\Return</span><span class="w"> </span><span class="sc">#\Newline</span><span class="p">)</span><span class="w"> </span><span class="nv">text</span><span class="p">))</span>
+<a id="L-18" name="L-18"></a>
+<a id="L-19" name="L-19"></a><span class="cm">#|</span>
+<a id="L-20" name="L-20"></a><span class="cm">  Read one real value without permitting reader evaluation.</span>
+<a id="L-21" name="L-21"></a><span class="cm">  Inputs: An input token string.</span>
+<a id="L-22" name="L-22"></a><span class="cm">  Outputs: A double-float in range, or a condition describing invalid input.</span>
+<a id="L-23" name="L-23"></a><span class="cm">  Used by: read-values and main in worker mode.</span>
+<a id="L-24" name="L-24"></a><span class="cm">|#</span>
+<a id="L-25" name="L-25"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">parse-number</span><span class="w"> </span><span class="p">(</span><span class="nv">text</span><span class="p">)</span>
+<a id="L-26" name="L-26"></a><span class="w">  </span><span class="cm">#|</span>
+<a id="L-27" name="L-27"></a><span class="cm">    Input is data: reader evaluation is disabled, and the complete token is checked.</span>
+<a id="L-28" name="L-28"></a><span class="cm">    Treat user text as numeric data rather than allowing read-time code execution.</span>
+<a id="L-29" name="L-29"></a><span class="cm">  |#</span>
+<a id="L-30" name="L-30"></a><span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="vg">*read-eval*</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="vg">*read-default-float-format*</span><span class="w"> </span><span class="ss">&#39;double-float</span><span class="p">))</span>
+<a id="L-31" name="L-31"></a><span class="w">    </span><span class="p">(</span><span class="nb">multiple-value-bind</span><span class="w"> </span><span class="p">(</span><span class="nv">value</span><span class="w"> </span><span class="nv">end</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">read-from-string</span><span class="w"> </span><span class="nv">text</span><span class="p">)</span>
+<a id="L-32" name="L-32"></a><span class="w">      </span><span class="p">(</span><span class="nb">unless</span><span class="w"> </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nb">realp</span><span class="w"> </span><span class="nv">value</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">string=</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="w"> </span><span class="p">(</span><span class="nv">trim-text</span><span class="w"> </span><span class="p">(</span><span class="nb">subseq</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="nv">end</span><span class="p">))))</span>
+<a id="L-33" name="L-33"></a><span class="w">        </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Expected one real number&quot;</span><span class="p">))</span>
+<a id="L-34" name="L-34"></a><span class="w">      </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nb">coerce</span><span class="w"> </span><span class="nv">value</span><span class="w"> </span><span class="ss">&#39;double-float</span><span class="p">)))</span>
+<a id="L-35" name="L-35"></a><span class="w">        </span><span class="p">(</span><span class="nb">unless</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;=</span><span class="w"> </span><span class="mf">-1000d0</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="mf">1000d0</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Expected finite x in [-1000,1000]&quot;</span><span class="p">))</span>
+<a id="L-36" name="L-36"></a><span class="w">        </span><span class="nv">x</span><span class="p">))))</span>
+<a id="L-37" name="L-37"></a>
+<a id="L-38" name="L-38"></a><span class="cm">#|</span>
+<a id="L-39" name="L-39"></a><span class="cm">  Compute sample values and read them through a pinned native-memory view.</span>
+<a id="L-40" name="L-40"></a><span class="cm">  Inputs: A validated double-float x.</span>
+<a id="L-41" name="L-41"></a><span class="cm">  Outputs: The approximate J0 value.</span>
+<a id="L-42" name="L-42"></a><span class="cm">  Used by: main in a child SBCL process.</span>
+<a id="L-43" name="L-43"></a><span class="cm">|#</span>
+<a id="L-44" name="L-44"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">j0</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="p">)</span>
+<a id="L-45" name="L-45"></a><span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">samples</span><span class="w"> </span><span class="p">(</span><span class="nb">make-array</span><span class="w"> </span><span class="mi">16384</span><span class="w"> </span><span class="ss">:element-type</span><span class="w"> </span><span class="ss">&#39;double-float</span><span class="p">)))</span>
+<a id="L-46" name="L-46"></a><span class="w">    </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="nv">below</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">samples</span><span class="p">)</span>
+<a id="L-47" name="L-47"></a><span class="w">          </span><span class="nb">do</span><span class="w"> </span><span class="p">(</span><span class="nb">setf</span><span class="w"> </span><span class="p">(</span><span class="nb">aref</span><span class="w"> </span><span class="nv">samples</span><span class="w"> </span><span class="nv">k</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">cos</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nb">sin</span><span class="w"> </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">pi</span><span class="w"> </span><span class="p">(</span><span class="nb">+</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="mf">0.5d0</span><span class="p">))</span><span class="w"> </span><span class="mf">16384d0</span><span class="p">))))))</span>
+<a id="L-48" name="L-48"></a><span class="w">    </span><span class="cm">#|</span>
+<a id="L-49" name="L-49"></a><span class="cm">      SBCL-specific system-area pointers. Pin the owning vector so the GC</span>
+<a id="L-50" name="L-50"></a><span class="cm">      cannot move it. sap+ counts bytes; each 8-byte read is in bounds.</span>
+<a id="L-51" name="L-51"></a><span class="cm">    |#</span>
+<a id="L-52" name="L-52"></a><span class="w">    </span><span class="p">(</span><span class="nv">sb-sys:with-pinned-objects</span><span class="w"> </span><span class="p">(</span><span class="nv">samples</span><span class="p">)</span>
+<a id="L-53" name="L-53"></a><span class="w">      </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">base</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-sys:vector-sap</span><span class="w"> </span><span class="nv">samples</span><span class="p">)))</span>
+<a id="L-54" name="L-54"></a><span class="w">        </span><span class="p">(</span><span class="nb">/</span><span class="w"> </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="nv">below</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">samples</span><span class="p">)</span>
+<a id="L-55" name="L-55"></a><span class="w">                 </span><span class="nv">sum</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-sys:sap-ref-double</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-sys:sap+</span><span class="w"> </span><span class="nv">base</span><span class="w"> </span><span class="p">(</span><span class="nb">*</span><span class="w"> </span><span class="nv">k</span><span class="w"> </span><span class="mi">8</span><span class="p">))</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span>
+<a id="L-56" name="L-56"></a><span class="w">                   </span><span class="nv">into</span><span class="w"> </span><span class="nv">total</span><span class="w"> </span><span class="nv">of-type</span><span class="w"> </span><span class="kt">double-float</span>
+<a id="L-57" name="L-57"></a><span class="w">                 </span><span class="nv">finally</span><span class="w"> </span><span class="p">(</span><span class="nb">return</span><span class="w"> </span><span class="nv">total</span><span class="p">))</span>
+<a id="L-58" name="L-58"></a><span class="w">           </span><span class="mf">16384d0</span><span class="p">)))))</span>
+<a id="L-59" name="L-59"></a>
+<a id="L-60" name="L-60"></a><span class="cm">#|</span>
+<a id="L-61" name="L-61"></a><span class="cm">  Collect observations with a restart that skips a malformed value.</span>
+<a id="L-62" name="L-62"></a><span class="cm">  Inputs: An input stream.</span>
+<a id="L-63" name="L-63"></a><span class="cm">  Outputs: An ordered nonempty list, or a fatal condition.</span>
+<a id="L-64" name="L-64"></a><span class="cm">  Used by: main before it starts worker processes.</span>
+<a id="L-65" name="L-65"></a><span class="cm">|#</span>
+<a id="L-66" name="L-66"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">read-values</span><span class="w"> </span><span class="p">(</span><span class="nc">stream</span><span class="p">)</span>
+<a id="L-67" name="L-67"></a><span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nb">values</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">count</span><span class="w"> </span><span class="mi">0</span><span class="p">))</span>
+<a id="L-68" name="L-68"></a><span class="w">    </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">line</span><span class="w"> </span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nb">read-line</span><span class="w"> </span><span class="nc">stream</span><span class="w"> </span><span class="no">nil</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span><span class="w"> </span><span class="nv">while</span><span class="w"> </span><span class="nv">line</span>
+<a id="L-69" name="L-69"></a><span class="w">          </span><span class="nv">for</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nv">trim-text</span><span class="w"> </span><span class="nv">line</span><span class="p">)</span>
+<a id="L-70" name="L-70"></a><span class="w">          </span><span class="nv">until</span><span class="w"> </span><span class="p">(</span><span class="nb">string=</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="s">&quot;&quot;</span><span class="p">)</span>
+<a id="L-71" name="L-71"></a><span class="w">          </span><span class="nb">unless</span><span class="w"> </span><span class="p">(</span><span class="nb">char=</span><span class="w"> </span><span class="p">(</span><span class="nb">char</span><span class="w"> </span><span class="nv">text</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="sc">#\#</span><span class="p">)</span>
+<a id="L-72" name="L-72"></a><span class="w">          </span><span class="nb">do</span><span class="w"> </span><span class="p">(</span><span class="nb">handler-bind</span>
+<a id="L-73" name="L-73"></a><span class="w">                 </span><span class="p">((</span><span class="nb">error</span><span class="w"> </span><span class="p">(</span><span class="k">lambda</span><span class="w"> </span><span class="p">(</span><span class="kt">condition</span><span class="p">)</span>
+<a id="L-74" name="L-74"></a><span class="w">                           </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="vg">*error-output*</span><span class="w"> </span><span class="s">&quot;warning: ~A; skipped~%&quot;</span><span class="w"> </span><span class="kt">condition</span><span class="p">)</span>
+<a id="L-75" name="L-75"></a><span class="w">                           </span><span class="p">(</span><span class="nb">invoke-restart</span><span class="w"> </span><span class="ss">&#39;skip-value</span><span class="p">))))</span>
+<a id="L-76" name="L-76"></a><span class="w">               </span><span class="c1">;; Offer a precise recovery action that discards one bad value without discarding the entire input.</span>
+<a id="L-77" name="L-77"></a><span class="w">               </span><span class="p">(</span><span class="nb">restart-case</span><span class="w"> </span><span class="p">(</span><span class="nb">push</span><span class="w"> </span><span class="p">(</span><span class="nv">parse-number</span><span class="w"> </span><span class="nv">text</span><span class="p">)</span><span class="w"> </span><span class="nb">values</span><span class="p">)</span>
+<a id="L-78" name="L-78"></a><span class="w">                 </span><span class="p">(</span><span class="nv">skip-value</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="ss">:report</span><span class="w"> </span><span class="s">&quot;Skip this malformed input value.&quot;</span><span class="w"> </span><span class="no">nil</span><span class="p">)))</span>
+<a id="L-79" name="L-79"></a><span class="w">             </span><span class="p">(</span><span class="nb">setf</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nb">values</span><span class="p">))</span>
+<a id="L-80" name="L-80"></a><span class="w">             </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="nb">count</span><span class="w"> </span><span class="mi">4096</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;At most 4096 values&quot;</span><span class="p">)))</span>
+<a id="L-81" name="L-81"></a><span class="w">    </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">nreverse</span><span class="w"> </span><span class="nb">values</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;No valid input values&quot;</span><span class="p">))))</span>
+<a id="L-82" name="L-82"></a>
+<a id="L-83" name="L-83"></a><span class="cm">#|</span>
+<a id="L-84" name="L-84"></a><span class="cm">  Start asynchronous SBCL children and gather their result rows.</span>
+<a id="L-85" name="L-85"></a><span class="cm">  Inputs: A bounded list of numeric observations.</span>
+<a id="L-86" name="L-86"></a><span class="cm">  Outputs: CSV rows in input order; owned processes are cleaned up on unwinding.</span>
+<a id="L-87" name="L-87"></a><span class="cm">  Used by: main for each worker-sized prefix of input.</span>
+<a id="L-88" name="L-88"></a><span class="cm">|#</span>
+<a id="L-89" name="L-89"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">batch</span><span class="w"> </span><span class="p">(</span><span class="nb">values</span><span class="p">)</span>
+<a id="L-90" name="L-90"></a><span class="w">  </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">children</span><span class="w"> </span><span class="no">nil</span><span class="p">))</span>
+<a id="L-91" name="L-91"></a><span class="w">    </span><span class="c1">;; Retain cleanup obligations while processes are launched and their rows are collected.</span>
+<a id="L-92" name="L-92"></a><span class="w">    </span><span class="p">(</span><span class="k">unwind-protect</span>
+<a id="L-93" name="L-93"></a><span class="w">         </span><span class="p">(</span><span class="k">progn</span>
+<a id="L-94" name="L-94"></a><span class="w">           </span><span class="c1">;; Launch all children in this group before waiting for any one result.</span>
+<a id="L-95" name="L-95"></a><span class="w">           </span><span class="p">(</span><span class="nb">dolist</span><span class="w"> </span><span class="p">(</span><span class="nv">x</span><span class="w"> </span><span class="nb">values</span><span class="p">)</span>
+<a id="L-96" name="L-96"></a><span class="w">             </span><span class="p">(</span><span class="nb">push</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:run-program</span>
+<a id="L-97" name="L-97"></a><span class="w">                    </span><span class="p">(</span><span class="nb">namestring</span><span class="w"> </span><span class="nv">sb-ext:*runtime-pathname*</span><span class="p">)</span>
+<a id="L-98" name="L-98"></a><span class="w">                    </span><span class="p">(</span><span class="nb">list</span><span class="w"> </span><span class="s">&quot;--script&quot;</span><span class="w"> </span><span class="vg">*script-path*</span><span class="w"> </span><span class="s">&quot;--worker&quot;</span><span class="w"> </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="no">nil</span><span class="w"> </span><span class="s">&quot;~,17F&quot;</span><span class="w"> </span><span class="nv">x</span><span class="p">))</span>
+<a id="L-99" name="L-99"></a><span class="w">                    </span><span class="ss">:wait</span><span class="w"> </span><span class="no">nil</span><span class="w"> </span><span class="ss">:input</span><span class="w"> </span><span class="no">nil</span><span class="w"> </span><span class="ss">:output</span><span class="w"> </span><span class="ss">:stream</span><span class="w"> </span><span class="ss">:error</span><span class="w"> </span><span class="vg">*error-output*</span><span class="p">)</span>
+<a id="L-100" name="L-100"></a><span class="w">                   </span><span class="nv">children</span><span class="p">))</span>
+<a id="L-101" name="L-101"></a><span class="w">           </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nv">child</span><span class="w"> </span><span class="nv">in</span><span class="w"> </span><span class="p">(</span><span class="nb">reverse</span><span class="w"> </span><span class="nv">children</span><span class="p">)</span>
+<a id="L-102" name="L-102"></a><span class="w">                 </span><span class="nv">for</span><span class="w"> </span><span class="nv">row</span><span class="w"> </span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nb">read-line</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-output</span><span class="w"> </span><span class="nv">child</span><span class="p">)</span><span class="w"> </span><span class="no">nil</span><span class="w"> </span><span class="no">nil</span><span class="p">)</span>
+<a id="L-103" name="L-103"></a><span class="c1">;; Verify child completion before accepting its output line.</span>
+<a id="L-104" name="L-104"></a><span class="w">                 </span><span class="nb">do</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-wait</span><span class="w"> </span><span class="nv">child</span><span class="p">)</span>
+<a id="L-105" name="L-105"></a><span class="w">                    </span><span class="p">(</span><span class="nb">unless</span><span class="w"> </span><span class="p">(</span><span class="nb">and</span><span class="w"> </span><span class="nv">row</span><span class="w"> </span><span class="p">(</span><span class="nb">eq</span><span class="w"> </span><span class="ss">:exited</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-status</span><span class="w"> </span><span class="nv">child</span><span class="p">))</span>
+<a id="L-106" name="L-106"></a><span class="w">                                 </span><span class="p">(</span><span class="nb">eql</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-exit-code</span><span class="w"> </span><span class="nv">child</span><span class="p">)))</span>
+<a id="L-107" name="L-107"></a><span class="w">                      </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Worker failed&quot;</span><span class="p">))</span>
+<a id="L-108" name="L-108"></a><span class="w">                 </span><span class="nv">collect</span><span class="w"> </span><span class="nv">row</span><span class="p">))</span>
+<a id="L-109" name="L-109"></a><span class="w">      </span><span class="p">(</span><span class="nb">dolist</span><span class="w"> </span><span class="p">(</span><span class="nv">child</span><span class="w"> </span><span class="nv">children</span><span class="p">)</span>
+<a id="L-110" name="L-110"></a><span class="w">        </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-alive-p</span><span class="w"> </span><span class="nv">child</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-ext:process-kill</span><span class="w"> </span><span class="nv">child</span><span class="w"> </span><span class="mi">15</span><span class="p">))</span>
+<a id="L-111" name="L-111"></a><span class="w">        </span><span class="p">(</span><span class="nv">sb-ext:process-wait</span><span class="w"> </span><span class="nv">child</span><span class="p">)</span>
+<a id="L-112" name="L-112"></a><span class="w">        </span><span class="p">(</span><span class="nv">sb-ext:process-close</span><span class="w"> </span><span class="nv">child</span><span class="p">)))))</span>
+<a id="L-113" name="L-113"></a>
+<a id="L-114" name="L-114"></a><span class="cm">#|</span>
+<a id="L-115" name="L-115"></a><span class="cm">  Select help, child computation, or the full experiment.</span>
+<a id="L-116" name="L-116"></a><span class="cm">  Inputs: The command-line argument list.</span>
+<a id="L-117" name="L-117"></a><span class="cm">  Outputs: Result/console output, or a condition caught by the outer handler.</span>
+<a id="L-118" name="L-118"></a><span class="cm">  Used by: The final handler-case entry expression.</span>
+<a id="L-119" name="L-119"></a><span class="cm">|#</span>
+<a id="L-120" name="L-120"></a><span class="p">(</span><span class="nb">defun</span><span class="w"> </span><span class="nv">main</span><span class="w"> </span><span class="p">(</span><span class="nv">args</span><span class="p">)</span>
+<a id="L-121" name="L-121"></a><span class="w">  </span><span class="p">(</span><span class="nb">cond</span>
+<a id="L-122" name="L-122"></a><span class="w">    </span><span class="p">((</span><span class="nb">equal</span><span class="w"> </span><span class="nv">args</span><span class="w"> </span><span class="o">&#39;</span><span class="p">(</span><span class="s">&quot;--help&quot;</span><span class="p">))</span>
+<a id="L-123" name="L-123"></a><span class="w">     </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="no">t</span><span class="w"> </span><span class="s">&quot;Usage: sbcl --script bessel.lisp [INPUT|- [OUTPUT [WORKERS 1..16]]]~%&quot;</span><span class="p">))</span>
+<a id="L-124" name="L-124"></a><span class="w">    </span><span class="p">((</span><span class="nb">and</span><span class="w"> </span><span class="p">(</span><span class="nb">=</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">string=</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;--worker&quot;</span><span class="p">))</span>
+<a id="L-125" name="L-125"></a><span class="w">     </span><span class="p">(</span><span class="k">let</span><span class="w"> </span><span class="p">((</span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nv">parse-number</span><span class="w"> </span><span class="p">(</span><span class="nb">second</span><span class="w"> </span><span class="nv">args</span><span class="p">))))</span>
+<a id="L-126" name="L-126"></a><span class="w">       </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="no">t</span><span class="w"> </span><span class="s">&quot;~,17F,~,17F,~D~%&quot;</span><span class="w"> </span><span class="nv">x</span><span class="w"> </span><span class="p">(</span><span class="nv">j0</span><span class="w"> </span><span class="nv">x</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">sb-posix:getpid</span><span class="p">))))</span>
+<a id="L-127" name="L-127"></a><span class="w">    </span><span class="p">(</span><span class="no">t</span>
+<a id="L-128" name="L-128"></a><span class="w">     </span><span class="p">(</span><span class="nb">when</span><span class="w"> </span><span class="p">(</span><span class="nb">&gt;</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Too many arguments&quot;</span><span class="p">))</span>
+<a id="L-129" name="L-129"></a><span class="w">     </span><span class="p">(</span><span class="k">let*</span><span class="w"> </span><span class="p">((</span><span class="nv">source</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">first</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="p">))</span>
+<a id="L-130" name="L-130"></a><span class="w">            </span><span class="p">(</span><span class="nv">target</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">second</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;results.csv&quot;</span><span class="p">))</span>
+<a id="L-131" name="L-131"></a><span class="w">            </span><span class="p">(</span><span class="nv">jobs</span><span class="w"> </span><span class="p">(</span><span class="nb">parse-integer</span><span class="w"> </span><span class="p">(</span><span class="nb">or</span><span class="w"> </span><span class="p">(</span><span class="nb">third</span><span class="w"> </span><span class="nv">args</span><span class="p">)</span><span class="w"> </span><span class="s">&quot;2&quot;</span><span class="p">)))</span>
+<a id="L-132" name="L-132"></a><span class="w">            </span><span class="p">(</span><span class="nb">values</span><span class="w"> </span><span class="p">(</span><span class="k">progn</span>
+<a id="L-133" name="L-133"></a><span class="w">                      </span><span class="p">(</span><span class="nb">unless</span><span class="w"> </span><span class="p">(</span><span class="nb">&lt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="nv">jobs</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="s">&quot;Workers must be 1..16&quot;</span><span class="p">))</span>
+<a id="L-134" name="L-134"></a><span class="w">                      </span><span class="p">(</span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">string=</span><span class="w"> </span><span class="nv">source</span><span class="w"> </span><span class="s">&quot;-&quot;</span><span class="p">)</span>
+<a id="L-135" name="L-135"></a><span class="w">                          </span><span class="p">(</span><span class="k">progn</span>
+<a id="L-136" name="L-136"></a><span class="w">                            </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="vg">*error-output*</span><span class="w"> </span><span class="s">&quot;Enter one x per line; blank line or EOF finishes:~%&quot;</span><span class="p">)</span>
+<a id="L-137" name="L-137"></a><span class="w">                            </span><span class="p">(</span><span class="nv">read-values</span><span class="w"> </span><span class="vg">*standard-input*</span><span class="p">))</span>
+<a id="L-138" name="L-138"></a><span class="w">                          </span><span class="p">(</span><span class="nb">with-open-file</span><span class="w"> </span><span class="p">(</span><span class="nc">stream</span><span class="w"> </span><span class="nv">source</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nv">read-values</span><span class="w"> </span><span class="nc">stream</span><span class="p">)))))</span>
+<a id="L-139" name="L-139"></a><span class="w">            </span><span class="p">(</span><span class="nv">rows</span><span class="w"> </span><span class="p">(</span><span class="nb">loop</span><span class="w"> </span><span class="nv">for</span><span class="w"> </span><span class="nb">rest</span><span class="w"> </span><span class="nb">=</span><span class="w"> </span><span class="nb">values</span><span class="w"> </span><span class="nv">then</span><span class="w"> </span><span class="p">(</span><span class="nb">nthcdr</span><span class="w"> </span><span class="p">(</span><span class="nb">min</span><span class="w"> </span><span class="nv">jobs</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nb">rest</span><span class="p">))</span><span class="w"> </span><span class="nb">rest</span><span class="p">)</span>
+<a id="L-140" name="L-140"></a><span class="w">                        </span><span class="nv">while</span><span class="w"> </span><span class="nb">rest</span><span class="w"> </span><span class="nb">append</span><span class="w"> </span><span class="p">(</span><span class="nv">batch</span><span class="w"> </span><span class="p">(</span><span class="nb">subseq</span><span class="w"> </span><span class="nb">rest</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="p">(</span><span class="nb">min</span><span class="w"> </span><span class="nv">jobs</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nb">rest</span><span class="p">)))))))</span>
+<a id="L-141" name="L-141"></a><span class="w">       </span><span class="c1">;; Write the complete CSV in a scope that closes the file on normal and exceptional exits.</span>
+<a id="L-142" name="L-142"></a><span class="w">       </span><span class="p">(</span><span class="nb">with-open-file</span><span class="w"> </span><span class="p">(</span><span class="nc">stream</span><span class="w"> </span><span class="nv">target</span><span class="w"> </span><span class="ss">:direction</span><span class="w"> </span><span class="ss">:output</span><span class="w"> </span><span class="ss">:if-exists</span><span class="w"> </span><span class="ss">:supersede</span><span class="w"> </span><span class="ss">:if-does-not-exist</span><span class="w"> </span><span class="ss">:create</span><span class="p">)</span>
+<a id="L-143" name="L-143"></a><span class="w">         </span><span class="p">(</span><span class="nb">write-line</span><span class="w"> </span><span class="s">&quot;x,j0,worker_pid&quot;</span><span class="w"> </span><span class="nc">stream</span><span class="p">)</span>
+<a id="L-144" name="L-144"></a><span class="w">         </span><span class="p">(</span><span class="nb">dolist</span><span class="w"> </span><span class="p">(</span><span class="nv">row</span><span class="w"> </span><span class="nv">rows</span><span class="p">)</span><span class="w"> </span><span class="p">(</span><span class="nb">write-line</span><span class="w"> </span><span class="nv">row</span><span class="w"> </span><span class="nc">stream</span><span class="p">)))</span>
+<a id="L-145" name="L-145"></a><span class="w">       </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="no">t</span><span class="w"> </span><span class="s">&quot;Wrote ~D observations to ~A~%&quot;</span><span class="w"> </span><span class="p">(</span><span class="nb">length</span><span class="w"> </span><span class="nv">rows</span><span class="p">)</span><span class="w"> </span><span class="nv">target</span><span class="p">)))))</span>
+<a id="L-146" name="L-146"></a>
+<a id="L-147" name="L-147"></a><span class="c1">;; Keep fatal conditions behind the readable command-line error boundary.</span>
+<a id="L-148" name="L-148"></a><span class="p">(</span><span class="nb">handler-case</span><span class="w"> </span><span class="p">(</span><span class="nv">main</span><span class="w"> </span><span class="p">(</span><span class="nb">rest</span><span class="w"> </span><span class="nv">sb-ext:*posix-argv*</span><span class="p">))</span>
+<a id="L-149" name="L-149"></a><span class="w">  </span><span class="p">(</span><span class="nb">error</span><span class="w"> </span><span class="p">(</span><span class="kt">condition</span><span class="p">)</span>
+<a id="L-150" name="L-150"></a><span class="w">    </span><span class="p">(</span><span class="nb">format</span><span class="w"> </span><span class="vg">*error-output*</span><span class="w"> </span><span class="s">&quot;error: ~A~%&quot;</span><span class="w"> </span><span class="kt">condition</span><span class="p">)</span>
+<a id="L-151" name="L-151"></a><span class="w">    </span><span class="p">(</span><span class="nv">sb-ext:exit</span><span class="w"> </span><span class="ss">:code</span><span class="w"> </span><span class="mi">1</span><span class="p">)))</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#|
+  Bessel Observatory: validate observations, compute J0 in separate OS workers, and save ordered CSV.
+  The parent reads input and owns result ordering; the worker computes the midpoint approximation.
+  An invalid observation is skipped with a warning, while failed I/O or workers abort the run.
+|#
+;;;; Common Lisp (SBCL 2.x): conditions, a recovery restart, LOOP, resource macros.
+(require :sb-posix)
+(defparameter *script-path* (namestring (truename *load-truename*)))
+
+#|
+  Normalize surrounding text whitespace for all parser entry points.
+  Inputs: An input string.
+  Outputs: A trimmed string.
+  Used by: parse-number and read-values before validation.
+|#
+(defun trim-text (text)
+  (string-trim &#x27;(#\Space #\Tab #\Return #\Newline) text))
+
+#|
+  Read one real value without permitting reader evaluation.
+  Inputs: An input token string.
+  Outputs: A double-float in range, or a condition describing invalid input.
+  Used by: read-values and main in worker mode.
+|#
+(defun parse-number (text)
+  #|
+    Input is data: reader evaluation is disabled, and the complete token is checked.
+    Treat user text as numeric data rather than allowing read-time code execution.
+  |#
+  (let ((*read-eval* nil) (*read-default-float-format* &#x27;double-float))
+    (multiple-value-bind (value end) (read-from-string text)
+      (unless (and (realp value) (string= &quot;&quot; (trim-text (subseq text end))))
+        (error &quot;Expected one real number&quot;))
+      (let ((x (coerce value &#x27;double-float)))
+        (unless (&lt;= -1000d0 x 1000d0) (error &quot;Expected finite x in [-1000,1000]&quot;))
+        x))))
+
+#|
+  Compute sample values and read them through a pinned native-memory view.
+  Inputs: A validated double-float x.
+  Outputs: The approximate J0 value.
+  Used by: main in a child SBCL process.
+|#
+(defun j0 (x)
+  (let ((samples (make-array 16384 :element-type &#x27;double-float)))
+    (loop for k below (length samples)
+          do (setf (aref samples k) (cos (* x (sin (/ (* pi (+ k 0.5d0)) 16384d0))))))
+    #|
+      SBCL-specific system-area pointers. Pin the owning vector so the GC
+      cannot move it. sap+ counts bytes; each 8-byte read is in bounds.
+    |#
+    (sb-sys:with-pinned-objects (samples)
+      (let ((base (sb-sys:vector-sap samples)))
+        (/ (loop for k below (length samples)
+                 sum (sb-sys:sap-ref-double (sb-sys:sap+ base (* k 8)) 0)
+                   into total of-type double-float
+                 finally (return total))
+           16384d0)))))
+
+#|
+  Collect observations with a restart that skips a malformed value.
+  Inputs: An input stream.
+  Outputs: An ordered nonempty list, or a fatal condition.
+  Used by: main before it starts worker processes.
+|#
+(defun read-values (stream)
+  (let ((values nil) (count 0))
+    (loop for line = (read-line stream nil nil) while line
+          for text = (trim-text line)
+          until (string= text &quot;&quot;)
+          unless (char= (char text 0) #\#)
+          do (handler-bind
+                 ((error (lambda (condition)
+                           (format *error-output* &quot;warning: ~A; skipped~%&quot; condition)
+                           (invoke-restart &#x27;skip-value))))
+               ;; Offer a precise recovery action that discards one bad value without discarding the entire input.
+               (restart-case (push (parse-number text) values)
+                 (skip-value () :report &quot;Skip this malformed input value.&quot; nil)))
+             (setf count (length values))
+             (when (&gt; count 4096) (error &quot;At most 4096 values&quot;)))
+    (or (nreverse values) (error &quot;No valid input values&quot;))))
+
+#|
+  Start asynchronous SBCL children and gather their result rows.
+  Inputs: A bounded list of numeric observations.
+  Outputs: CSV rows in input order; owned processes are cleaned up on unwinding.
+  Used by: main for each worker-sized prefix of input.
+|#
+(defun batch (values)
+  (let ((children nil))
+    ;; Retain cleanup obligations while processes are launched and their rows are collected.
+    (unwind-protect
+         (progn
+           ;; Launch all children in this group before waiting for any one result.
+           (dolist (x values)
+             (push (sb-ext:run-program
+                    (namestring sb-ext:*runtime-pathname*)
+                    (list &quot;--script&quot; *script-path* &quot;--worker&quot; (format nil &quot;~,17F&quot; x))
+                    :wait nil :input nil :output :stream :error *error-output*)
+                   children))
+           (loop for child in (reverse children)
+                 for row = (read-line (sb-ext:process-output child) nil nil)
+;; Verify child completion before accepting its output line.
+                 do (sb-ext:process-wait child)
+                    (unless (and row (eq :exited (sb-ext:process-status child))
+                                 (eql 0 (sb-ext:process-exit-code child)))
+                      (error &quot;Worker failed&quot;))
+                 collect row))
+      (dolist (child children)
+        (when (sb-ext:process-alive-p child) (sb-ext:process-kill child 15))
+        (sb-ext:process-wait child)
+        (sb-ext:process-close child)))))
+
+#|
+  Select help, child computation, or the full experiment.
+  Inputs: The command-line argument list.
+  Outputs: Result/console output, or a condition caught by the outer handler.
+  Used by: The final handler-case entry expression.
+|#
+(defun main (args)
+  (cond
+    ((equal args &#x27;(&quot;--help&quot;))
+     (format t &quot;Usage: sbcl --script bessel.lisp [INPUT|- [OUTPUT [WORKERS 1..16]]]~%&quot;))
+    ((and (= (length args) 2) (string= (first args) &quot;--worker&quot;))
+     (let ((x (parse-number (second args))))
+       (format t &quot;~,17F,~,17F,~D~%&quot; x (j0 x) (sb-posix:getpid))))
+    (t
+     (when (&gt; (length args) 3) (error &quot;Too many arguments&quot;))
+     (let* ((source (or (first args) &quot;-&quot;))
+            (target (or (second args) &quot;results.csv&quot;))
+            (jobs (parse-integer (or (third args) &quot;2&quot;)))
+            (values (progn
+                      (unless (&lt;= 1 jobs 16) (error &quot;Workers must be 1..16&quot;))
+                      (if (string= source &quot;-&quot;)
+                          (progn
+                            (format *error-output* &quot;Enter one x per line; blank line or EOF finishes:~%&quot;)
+                            (read-values *standard-input*))
+                          (with-open-file (stream source) (read-values stream)))))
+            (rows (loop for rest = values then (nthcdr (min jobs (length rest)) rest)
+                        while rest append (batch (subseq rest 0 (min jobs (length rest)))))))
+       ;; Write the complete CSV in a scope that closes the file on normal and exceptional exits.
+       (with-open-file (stream target :direction :output :if-exists :supersede :if-does-not-exist :create)
+         (write-line &quot;x,j0,worker_pid&quot; stream)
+         (dolist (row rows) (write-line row stream)))
+       (format t &quot;Wrote ~D observations to ~A~%&quot; (length rows) target)))))
+
+;; Keep fatal conditions behind the readable command-line error boundary.
+(handler-case (main (rest sb-ext:*posix-argv*))
+  (error (condition)
+    (format *error-output* &quot;error: ~A~%&quot; condition)
+    (sb-ext:exit :code 1)))
+</textarea>
+<footer>Highlighted with Pygments using the Common Lisp lexer. All assets are local. SHA-256: <code>e7e37a52dfe74b135f5de3e36ae0deb349afd93d63476e35f39c15c33109e40d</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

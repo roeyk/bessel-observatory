@@ -1,0 +1,11 @@
+build/
+__pycache__/
+*.o
+*.ali
+*.mod
+*.cmi
+*.cmx
+*.class
+*.jar
+results.csv
+*-results.csv

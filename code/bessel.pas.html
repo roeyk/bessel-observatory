@@ -1,0 +1,471 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="1a0dc88c2cc5f92f03f6244c4fd384b1f055c8b7b24346bd3c7ce695f0897c95">
+<title>Pascal — bessel.pas — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="rpg_setup.sql.html">← RPG support</a><a href="bessel.adb.html">Ada →</a></nav>
+<h1>Pascal <code>bessel.pas</code></h1>
+<p>Free Pascal 3.2+ · Procedures, dynamic arrays, try/except and try/finally, TProcess ownership.</p>
+<p><strong>Memory:</strong> PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.<br><strong>Strings:</strong> Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.</p>
+<div class="actions"><a href="../bessel.pas">Open raw source</a>
+<a href="../bessel.pas" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cm">(*</span>
+<a id="L-2" name="L-2"></a><span class="cm">  Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.</span>
+<a id="L-3" name="L-3"></a><span class="cm">  The parent owns file I/O and result ordering; children perform the numerical work.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.</span>
+<a id="L-5" name="L-5"></a><span class="cm">*)</span>
+<a id="L-6" name="L-6"></a><span class="k">program</span><span class="w"> </span><span class="n">Bessel</span><span class="o">;</span>
+<a id="L-7" name="L-7"></a><span class="cm">{$mode objfpc}{$H+}</span>
+<a id="L-8" name="L-8"></a><span class="cm">{ Free Pascal 3.2+: structured procedures, exceptions, TProcess ownership. }</span>
+<a id="L-9" name="L-9"></a><span class="k">uses</span><span class="w"> </span><span class="n">SysUtils</span><span class="o">,</span><span class="w"> </span><span class="n">Classes</span><span class="o">,</span><span class="w"> </span><span class="n">Math</span><span class="o">,</span><span class="w"> </span><span class="n">Process</span><span class="o">;</span>
+<a id="L-10" name="L-10"></a><span class="k">type</span>
+<a id="L-11" name="L-11"></a><span class="w">  </span><span class="n">TValues</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">array</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span>
+<a id="L-12" name="L-12"></a><span class="w">  </span><span class="n">TProcesses</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">array</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="n">TProcess</span><span class="o">;</span>
+<a id="L-13" name="L-13"></a><span class="k">var</span>
+<a id="L-14" name="L-14"></a><span class="w">  </span><span class="c1">// Keep decimal parsing and output stable even when the machine locale uses commas.</span>
+<a id="L-15" name="L-15"></a><span class="w">  </span><span class="n">FS</span><span class="o">:</span><span class="w"> </span><span class="n">TFormatSettings</span><span class="o">;</span>
+<a id="L-16" name="L-16"></a>
+<a id="L-17" name="L-17"></a><span class="cm">(*</span>
+<a id="L-18" name="L-18"></a><span class="cm">  Convert an observation token using the explicitly selected decimal separator.</span>
+<a id="L-19" name="L-19"></a><span class="cm">  Inputs: The candidate numeric string S.</span>
+<a id="L-20" name="L-20"></a><span class="cm">  Outputs: A bounded Double, or EConvertError for a bad observation.</span>
+<a id="L-21" name="L-21"></a><span class="cm">  Used by: Run for ordinary input and internal worker arguments.</span>
+<a id="L-22" name="L-22"></a><span class="cm">*)</span>
+<a id="L-23" name="L-23"></a><span class="k">function</span><span class="w"> </span><span class="nf">Number</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">S</span><span class="o">:</span><span class="w"> </span><span class="k">String</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span>
+<a id="L-24" name="L-24"></a><span class="k">begin</span>
+<a id="L-25" name="L-25"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="nb">TryStrToFloat</span><span class="p">(</span><span class="nb">Trim</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">,</span><span class="w"> </span><span class="bp">Result</span><span class="o">,</span><span class="w"> </span><span class="n">FS</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="L-26" name="L-26"></a><span class="w">    </span><span class="k">raise</span><span class="w"> </span><span class="n">EConvertError</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;expected a number&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-27" name="L-27"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">IsNan</span><span class="p">(</span><span class="bp">Result</span><span class="p">)</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="nb">IsInfinite</span><span class="p">(</span><span class="bp">Result</span><span class="p">)</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="p">(</span><span class="nb">Abs</span><span class="p">(</span><span class="bp">Result</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1000</span><span class="p">)</span><span class="w"> </span><span class="k">then</span>
+<a id="L-28" name="L-28"></a><span class="w">    </span><span class="k">raise</span><span class="w"> </span><span class="n">EConvertError</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;expected finite x in [-1000,1000]&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-29" name="L-29"></a><span class="k">end</span><span class="o">;</span>
+<a id="L-30" name="L-30"></a>
+<a id="L-31" name="L-31"></a><span class="cm">(*</span>
+<a id="L-32" name="L-32"></a><span class="cm">  Compute midpoint samples and sum them through a typed pointer.</span>
+<a id="L-33" name="L-33"></a><span class="cm">  Inputs: One validated Double X.</span>
+<a id="L-34" name="L-34"></a><span class="cm">  Outputs: The approximate J0 value.</span>
+<a id="L-35" name="L-35"></a><span class="cm">  Used by: Run in the separate child process selected by --worker.</span>
+<a id="L-36" name="L-36"></a><span class="cm">*)</span>
+<a id="L-37" name="L-37"></a><span class="k">function</span><span class="w"> </span><span class="nf">Observe</span><span class="p">(</span><span class="n">X</span><span class="o">:</span><span class="w"> </span><span class="kt">Double</span><span class="p">)</span><span class="o">:</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span>
+<a id="L-38" name="L-38"></a><span class="k">var</span><span class="w"> </span><span class="n">K</span><span class="o">:</span><span class="w"> </span><span class="kt">Integer</span><span class="o">;</span><span class="w"> </span><span class="nb">Sum</span><span class="o">:</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span><span class="w"> </span><span class="n">Samples</span><span class="o">:</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">16383</span><span class="p">]</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span><span class="w"> </span><span class="n">Cursor</span><span class="o">:</span><span class="w"> </span><span class="kt">PDouble</span><span class="o">;</span>
+<a id="L-39" name="L-39"></a><span class="k">begin</span>
+<a id="L-40" name="L-40"></a><span class="w">  </span><span class="nb">Sum</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="o">;</span>
+<a id="L-41" name="L-41"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="n">K</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">16383</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="n">Samples</span><span class="p">[</span><span class="n">K</span><span class="p">]</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">Cos</span><span class="p">(</span><span class="n">X</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">Sin</span><span class="p">(</span><span class="nb">Pi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">K</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="p">))</span><span class="o">;</span>
+<a id="L-42" name="L-42"></a><span class="w">  </span><span class="n">Cursor</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="o">@</span><span class="n">Samples</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">;</span>
+<a id="L-43" name="L-43"></a><span class="w">  </span><span class="cm">{ Typed pointer arithmetic: Inc advances by SizeOf(Double), not one byte.</span>
+<a id="L-44" name="L-44"></a><span class="cm">    Samples owns the storage for this entire procedure. }</span>
+<a id="L-45" name="L-45"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="n">K</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nb">High</span><span class="p">(</span><span class="n">Samples</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span><span class="w"> </span><span class="nb">Sum</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">Sum</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">Cursor</span><span class="o">^;</span><span class="w"> </span><span class="nb">Inc</span><span class="p">(</span><span class="n">Cursor</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-46" name="L-46"></a><span class="w">  </span><span class="bp">Result</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">Sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">16384</span><span class="o">;</span>
+<a id="L-47" name="L-47"></a><span class="k">end</span><span class="o">;</span>
+<a id="L-48" name="L-48"></a>
+<a id="L-49" name="L-49"></a><span class="cm">(*</span>
+<a id="L-50" name="L-50"></a><span class="cm">  Implement help, child computation, and the full parent workflow.</span>
+<a id="L-51" name="L-51"></a><span class="cm">  Inputs: ParamStr values and either a file stream or standard input.</span>
+<a id="L-52" name="L-52"></a><span class="cm">  Outputs: CSV/console output; failures are raised to the program error handler.</span>
+<a id="L-53" name="L-53"></a><span class="cm">  Used by: The final program block after it sets decimal formatting.</span>
+<a id="L-54" name="L-54"></a><span class="cm">*)</span>
+<a id="L-55" name="L-55"></a><span class="k">procedure</span><span class="w"> </span><span class="nf">Run</span><span class="o">;</span>
+<a id="L-56" name="L-56"></a><span class="k">var</span>
+<a id="L-57" name="L-57"></a><span class="w">  </span><span class="n">Source</span><span class="o">,</span><span class="w"> </span><span class="n">Target</span><span class="o">,</span><span class="w"> </span><span class="n">S</span><span class="o">:</span><span class="w"> </span><span class="k">String</span><span class="o">;</span>
+<a id="L-58" name="L-58"></a><span class="w">  </span><span class="n">InFile</span><span class="o">,</span><span class="w"> </span><span class="n">OutFile</span><span class="o">:</span><span class="w"> </span><span class="n">Text</span><span class="o">;</span>
+<a id="L-59" name="L-59"></a><span class="w">  </span><span class="n">Values</span><span class="o">:</span><span class="w"> </span><span class="n">TValues</span><span class="o">;</span>
+<a id="L-60" name="L-60"></a><span class="w">  </span><span class="n">Rows</span><span class="o">:</span><span class="w"> </span><span class="n">TStringList</span><span class="o">;</span>
+<a id="L-61" name="L-61"></a><span class="w">  </span><span class="n">Children</span><span class="o">:</span><span class="w"> </span><span class="n">TProcesses</span><span class="o">;</span>
+<a id="L-62" name="L-62"></a><span class="w">  </span><span class="n">I</span><span class="o">,</span><span class="w"> </span><span class="n">J</span><span class="o">,</span><span class="w"> </span><span class="n">N</span><span class="o">,</span><span class="w"> </span><span class="n">Jobs</span><span class="o">,</span><span class="w"> </span><span class="n">Count</span><span class="o">:</span><span class="w"> </span><span class="kt">Integer</span><span class="o">;</span>
+<a id="L-63" name="L-63"></a><span class="w">  </span><span class="n">X</span><span class="o">:</span><span class="w"> </span><span class="kt">Double</span><span class="o">;</span>
+<a id="L-64" name="L-64"></a><span class="w">  </span><span class="n">Buffer</span><span class="o">:</span><span class="w"> </span><span class="k">array</span><span class="p">[</span><span class="mi">0</span><span class="o">..</span><span class="mi">255</span><span class="p">]</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="kt">Char</span><span class="o">;</span>
+<a id="L-65" name="L-65"></a><span class="k">begin</span>
+<a id="L-66" name="L-66"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;--help&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-67" name="L-67"></a><span class="w">    </span><span class="nb">WriteLn</span><span class="p">(</span><span class="s">&#39;Usage: bessel-pascal [INPUT|- [OUTPUT [WORKERS 1..16]]]&#39;</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">Exit</span><span class="o">;</span>
+<a id="L-68" name="L-68"></a><span class="w">  </span><span class="k">end</span><span class="o">;</span>
+<a id="L-69" name="L-69"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="k">and</span><span class="w"> </span><span class="p">(</span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;--worker&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-70" name="L-70"></a><span class="w">    </span><span class="n">X</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">Number</span><span class="p">(</span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span><span class="o">;</span>
+<a id="L-71" name="L-71"></a><span class="w">    </span><span class="nb">WriteLn</span><span class="p">(</span><span class="nb">FloatToStr</span><span class="p">(</span><span class="n">X</span><span class="o">,</span><span class="w"> </span><span class="n">FS</span><span class="p">)</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;,&#39;</span><span class="o">,</span><span class="w"> </span><span class="nb">FloatToStr</span><span class="p">(</span><span class="n">Observe</span><span class="p">(</span><span class="n">X</span><span class="p">)</span><span class="o">,</span><span class="w"> </span><span class="n">FS</span><span class="p">)</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;,&#39;</span><span class="o">,</span><span class="w"> </span><span class="n">GetProcessID</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">Exit</span><span class="o">;</span>
+<a id="L-72" name="L-72"></a><span class="w">  </span><span class="k">end</span><span class="o">;</span>
+<a id="L-73" name="L-73"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">raise</span><span class="w"> </span><span class="n">Exception</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;too many arguments&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-74" name="L-74"></a><span class="w">  </span><span class="n">Source</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="o">;</span><span class="w"> </span><span class="n">Target</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#39;results.csv&#39;</span><span class="o">;</span><span class="w"> </span><span class="n">Jobs</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">2</span><span class="o">;</span>
+<a id="L-75" name="L-75"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="n">Source</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span>
+<a id="L-76" name="L-76"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="n">Target</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">;</span>
+<a id="L-77" name="L-77"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">ParamCount</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="n">Jobs</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">StrToInt</span><span class="p">(</span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span><span class="o">;</span>
+<a id="L-78" name="L-78"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Jobs</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="p">(</span><span class="n">Jobs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">16</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">raise</span><span class="w"> </span><span class="n">Exception</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;workers must be 1..16&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-79" name="L-79"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="n">Source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-80" name="L-80"></a><span class="w">    </span><span class="nb">WriteLn</span><span class="p">(</span><span class="n">StdErr</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;Enter one x per line; blank line or EOF finishes:&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-81" name="L-81"></a><span class="w">    </span><span class="nb">AssignFile</span><span class="p">(</span><span class="n">InFile</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-82" name="L-82"></a><span class="w">  </span><span class="k">end</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="nb">AssignFile</span><span class="p">(</span><span class="n">InFile</span><span class="o">,</span><span class="w"> </span><span class="n">Source</span><span class="p">)</span><span class="o">;</span>
+<a id="L-83" name="L-83"></a><span class="w">  </span><span class="c1">// Open the selected input before reading values; opening errors become exceptions.</span>
+<a id="L-84" name="L-84"></a><span class="w">  </span><span class="nb">Reset</span><span class="p">(</span><span class="n">InFile</span><span class="p">)</span><span class="o">;</span>
+<a id="L-85" name="L-85"></a><span class="w">  </span><span class="k">try</span>
+<a id="L-86" name="L-86"></a><span class="w">    </span><span class="c1">// Normalize and classify lines, stopping at the first blank line or EOF.</span>
+<a id="L-87" name="L-87"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="k">not</span><span class="w"> </span><span class="nb">EOF</span><span class="p">(</span><span class="n">InFile</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-88" name="L-88"></a><span class="w">      </span><span class="nb">ReadLn</span><span class="p">(</span><span class="n">InFile</span><span class="o">,</span><span class="w"> </span><span class="n">S</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">Trim</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">;</span>
+<a id="L-89" name="L-89"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">Break</span><span class="o">;</span>
+<a id="L-90" name="L-90"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="n">S</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;#&#39;</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">Continue</span><span class="o">;</span>
+<a id="L-91" name="L-91"></a><span class="w">      </span><span class="k">try</span>
+<a id="L-92" name="L-92"></a><span class="w">        </span><span class="n">X</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">Number</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="o">;</span>
+<a id="L-93" name="L-93"></a><span class="w">        </span><span class="c1">// Append only a successfully parsed value so later output preserves accepted input order.</span>
+<a id="L-94" name="L-94"></a><span class="w">        </span><span class="nb">SetLength</span><span class="p">(</span><span class="n">Values</span><span class="o">,</span><span class="w"> </span><span class="nb">Length</span><span class="p">(</span><span class="n">Values</span><span class="p">)</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="n">Values</span><span class="p">[</span><span class="nb">High</span><span class="p">(</span><span class="n">Values</span><span class="p">)]</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">X</span><span class="o">;</span>
+<a id="L-95" name="L-95"></a><span class="w">      </span><span class="k">except</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">E</span><span class="o">:</span><span class="w"> </span><span class="n">EConvertError</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">WriteLn</span><span class="p">(</span><span class="n">StdErr</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;warning: &#39;</span><span class="o">,</span><span class="w"> </span><span class="n">E</span><span class="o">.</span><span class="n">Message</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;; skipped&#39;</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-96" name="L-96"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="nb">Length</span><span class="p">(</span><span class="n">Values</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">4096</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">raise</span><span class="w"> </span><span class="n">Exception</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;at most 4096 values&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-97" name="L-97"></a><span class="w">    </span><span class="k">end</span><span class="o">;</span>
+<a id="L-98" name="L-98"></a><span class="w">  </span><span class="k">finally</span><span class="w"> </span><span class="nb">CloseFile</span><span class="p">(</span><span class="n">InFile</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-99" name="L-99"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="nb">Length</span><span class="p">(</span><span class="n">Values</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">raise</span><span class="w"> </span><span class="n">Exception</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;no valid input values&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-100" name="L-100"></a><span class="w">  </span><span class="c1">// Keep result rows owned by a scoped object until they can be written together.</span>
+<a id="L-101" name="L-101"></a><span class="w">  </span><span class="n">Rows</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">TStringList</span><span class="o">.</span><span class="n">Create</span><span class="o">;</span>
+<a id="L-102" name="L-102"></a><span class="w">  </span><span class="k">try</span>
+<a id="L-103" name="L-103"></a><span class="w">    </span><span class="n">I</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="o">;</span>
+<a id="L-104" name="L-104"></a><span class="w">    </span><span class="k">while</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nb">Length</span><span class="p">(</span><span class="n">Values</span><span class="p">)</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-105" name="L-105"></a><span class="w">      </span><span class="n">N</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">Min</span><span class="p">(</span><span class="n">Jobs</span><span class="o">,</span><span class="w"> </span><span class="nb">Length</span><span class="p">(</span><span class="n">Values</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">I</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="nb">SetLength</span><span class="p">(</span><span class="n">Children</span><span class="o">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="o">;</span>
+<a id="L-106" name="L-106"></a><span class="w">      </span><span class="k">try</span>
+<a id="L-107" name="L-107"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-108" name="L-108"></a><span class="w">          </span><span class="c1">// Create one child per value without waiting, so the whole bounded batch can run concurrently.</span>
+<a id="L-109" name="L-109"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">TProcess</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="k">nil</span><span class="p">)</span><span class="o">;</span>
+<a id="L-110" name="L-110"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Executable</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="nb">ExpandFileName</span><span class="p">(</span><span class="nb">ParamStr</span><span class="p">(</span><span class="mi">0</span><span class="p">))</span><span class="o">;</span>
+<a id="L-111" name="L-111"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Parameters</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="s">&#39;--worker&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-112" name="L-112"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Parameters</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="nb">FloatToStr</span><span class="p">(</span><span class="n">Values</span><span class="p">[</span><span class="n">I</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">J</span><span class="p">]</span><span class="o">,</span><span class="w"> </span><span class="n">FS</span><span class="p">))</span><span class="o">;</span>
+<a id="L-113" name="L-113"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Options</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="p">[</span><span class="n">poUsePipes</span><span class="p">]</span><span class="o">;</span><span class="w"> </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Execute</span><span class="o">;</span>
+<a id="L-114" name="L-114"></a><span class="w">        </span><span class="k">end</span><span class="o">;</span>
+<a id="L-115" name="L-115"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-116" name="L-116"></a><span class="w">          </span><span class="n">S</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="o">;</span>
+<a id="L-117" name="L-117"></a><span class="w">          </span><span class="k">repeat</span>
+<a id="L-118" name="L-118"></a><span class="w">            </span><span class="c1">// Drain all available child output rather than assuming one read contains the full row.</span>
+<a id="L-119" name="L-119"></a><span class="w">            </span><span class="n">Count</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Output</span><span class="o">.</span><span class="n">Read</span><span class="p">(</span><span class="n">Buffer</span><span class="o">,</span><span class="w"> </span><span class="nb">SizeOf</span><span class="p">(</span><span class="n">Buffer</span><span class="p">))</span><span class="o">;</span>
+<a id="L-120" name="L-120"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">Count</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">S</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nb">Copy</span><span class="p">(</span><span class="n">Buffer</span><span class="o">,</span><span class="w"> </span><span class="mi">0</span><span class="o">,</span><span class="w"> </span><span class="n">Count</span><span class="p">)</span><span class="o">;</span>
+<a id="L-121" name="L-121"></a><span class="w">          </span><span class="k">until</span><span class="w"> </span><span class="n">Count</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="o">;</span>
+<a id="L-122" name="L-122"></a><span class="w">          </span><span class="c1">// Check process completion before accepting its buffered CSV row.</span>
+<a id="L-123" name="L-123"></a><span class="w">          </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">WaitOnExit</span><span class="o">;</span>
+<a id="L-124" name="L-124"></a><span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">ExitStatus</span><span class="w"> </span><span class="o">&lt;&gt;</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="k">or</span><span class="w"> </span><span class="p">(</span><span class="nb">Trim</span><span class="p">(</span><span class="n">S</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&#39;&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">raise</span><span class="w"> </span><span class="n">Exception</span><span class="o">.</span><span class="n">Create</span><span class="p">(</span><span class="s">&#39;worker failed&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-125" name="L-125"></a><span class="w">          </span><span class="n">Rows</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="nb">Trim</span><span class="p">(</span><span class="n">S</span><span class="p">))</span><span class="o">;</span>
+<a id="L-126" name="L-126"></a><span class="w">        </span><span class="k">end</span><span class="o">;</span>
+<a id="L-127" name="L-127"></a><span class="w">      </span><span class="k">finally</span>
+<a id="L-128" name="L-128"></a><span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="n">J</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">N</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">do</span>
+<a id="L-129" name="L-129"></a><span class="w">          </span><span class="k">if</span><span class="w"> </span><span class="nb">Assigned</span><span class="p">(</span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">])</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span>
+<a id="L-130" name="L-130"></a><span class="w">            </span><span class="c1">// Terminate and reap remaining workers when normal collection or an exception leaves this scope.</span>
+<a id="L-131" name="L-131"></a><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Running</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="k">begin</span><span class="w"> </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">Terminate</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">]</span><span class="o">.</span><span class="n">WaitOnExit</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-132" name="L-132"></a><span class="w">            </span><span class="nb">FreeAndNil</span><span class="p">(</span><span class="n">Children</span><span class="p">[</span><span class="n">J</span><span class="p">])</span><span class="o">;</span>
+<a id="L-133" name="L-133"></a><span class="w">          </span><span class="k">end</span><span class="o">;</span>
+<a id="L-134" name="L-134"></a><span class="w">      </span><span class="k">end</span><span class="o">;</span>
+<a id="L-135" name="L-135"></a><span class="w">      </span><span class="nb">Inc</span><span class="p">(</span><span class="n">I</span><span class="o">,</span><span class="w"> </span><span class="n">N</span><span class="p">)</span><span class="o">;</span>
+<a id="L-136" name="L-136"></a><span class="w">    </span><span class="k">end</span><span class="o">;</span>
+<a id="L-137" name="L-137"></a><span class="w">    </span><span class="c1">// Create the output after the calculation phase, then close it even if writing fails.</span>
+<a id="L-138" name="L-138"></a><span class="w">    </span><span class="nb">AssignFile</span><span class="p">(</span><span class="n">OutFile</span><span class="o">,</span><span class="w"> </span><span class="n">Target</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="nb">Rewrite</span><span class="p">(</span><span class="n">OutFile</span><span class="p">)</span><span class="o">;</span>
+<a id="L-139" name="L-139"></a><span class="w">    </span><span class="k">try</span>
+<a id="L-140" name="L-140"></a><span class="w">      </span><span class="nb">WriteLn</span><span class="p">(</span><span class="n">OutFile</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;x,j0,worker_pid&#39;</span><span class="p">)</span><span class="o">;</span>
+<a id="L-141" name="L-141"></a><span class="w">      </span><span class="k">for</span><span class="w"> </span><span class="n">I</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="mi">0</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="n">Rows</span><span class="o">.</span><span class="n">Count</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="nb">WriteLn</span><span class="p">(</span><span class="n">OutFile</span><span class="o">,</span><span class="w"> </span><span class="n">Rows</span><span class="p">[</span><span class="n">I</span><span class="p">])</span><span class="o">;</span>
+<a id="L-142" name="L-142"></a><span class="w">    </span><span class="k">finally</span><span class="w"> </span><span class="nb">CloseFile</span><span class="p">(</span><span class="n">OutFile</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-143" name="L-143"></a><span class="w">    </span><span class="nb">WriteLn</span><span class="p">(</span><span class="s">&#39;Wrote &#39;</span><span class="o">,</span><span class="w"> </span><span class="n">Rows</span><span class="o">.</span><span class="n">Count</span><span class="o">,</span><span class="w"> </span><span class="s">&#39; observations to &#39;</span><span class="o">,</span><span class="w"> </span><span class="n">Target</span><span class="p">)</span><span class="o">;</span>
+<a id="L-144" name="L-144"></a><span class="w">  </span><span class="k">finally</span><span class="w"> </span><span class="n">Rows</span><span class="o">.</span><span class="n">Free</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-145" name="L-145"></a><span class="k">end</span><span class="o">;</span>
+<a id="L-146" name="L-146"></a><span class="k">begin</span>
+<a id="L-147" name="L-147"></a><span class="w">  </span><span class="n">FS</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="n">DefaultFormatSettings</span><span class="o">;</span><span class="w"> </span><span class="n">FS</span><span class="o">.</span><span class="n">DecimalSeparator</span><span class="w"> </span><span class="o">:=</span><span class="w"> </span><span class="s">&#39;.&#39;</span><span class="o">;</span>
+<a id="L-148" name="L-148"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="n">Run</span><span class="o">;</span>
+<a id="L-149" name="L-149"></a><span class="w">  </span><span class="k">except</span><span class="w"> </span><span class="k">on</span><span class="w"> </span><span class="n">E</span><span class="o">:</span><span class="w"> </span><span class="n">Exception</span><span class="w"> </span><span class="k">do</span><span class="w"> </span><span class="k">begin</span><span class="w"> </span><span class="nb">WriteLn</span><span class="p">(</span><span class="n">StdErr</span><span class="o">,</span><span class="w"> </span><span class="s">&#39;error: &#39;</span><span class="o">,</span><span class="w"> </span><span class="n">E</span><span class="o">.</span><span class="n">Message</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="nb">Halt</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span><span class="w"> </span><span class="k">end</span><span class="o">;</span>
+<a id="L-150" name="L-150"></a><span class="k">end</span><span class="o">.</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>(*
+  Bessel Observatory: validate input, evaluate the common midpoint integral in child processes, then save CSV.
+  The parent owns file I/O and result ordering; children perform the numerical work.
+  The common CLI accepts an input file or -, an output filename, and a worker limit from 1 to 16.
+*)
+program Bessel;
+{$mode objfpc}{$H+}
+{ Free Pascal 3.2+: structured procedures, exceptions, TProcess ownership. }
+uses SysUtils, Classes, Math, Process;
+type
+  TValues = array of Double;
+  TProcesses = array of TProcess;
+var
+  // Keep decimal parsing and output stable even when the machine locale uses commas.
+  FS: TFormatSettings;
+
+(*
+  Convert an observation token using the explicitly selected decimal separator.
+  Inputs: The candidate numeric string S.
+  Outputs: A bounded Double, or EConvertError for a bad observation.
+  Used by: Run for ordinary input and internal worker arguments.
+*)
+function Number(const S: String): Double;
+begin
+  if not TryStrToFloat(Trim(S), Result, FS) then
+    raise EConvertError.Create(&#x27;expected a number&#x27;);
+  if IsNan(Result) or IsInfinite(Result) or (Abs(Result) &gt; 1000) then
+    raise EConvertError.Create(&#x27;expected finite x in [-1000,1000]&#x27;);
+end;
+
+(*
+  Compute midpoint samples and sum them through a typed pointer.
+  Inputs: One validated Double X.
+  Outputs: The approximate J0 value.
+  Used by: Run in the separate child process selected by --worker.
+*)
+function Observe(X: Double): Double;
+var K: Integer; Sum: Double; Samples: array[0..16383] of Double; Cursor: PDouble;
+begin
+  Sum := 0;
+  for K := 0 to 16383 do Samples[K] := Cos(X * Sin(Pi * (K + 0.5) / 16384));
+  Cursor := @Samples[0];
+  { Typed pointer arithmetic: Inc advances by SizeOf(Double), not one byte.
+    Samples owns the storage for this entire procedure. }
+  for K := 0 to High(Samples) do begin Sum := Sum + Cursor^; Inc(Cursor); end;
+  Result := Sum / 16384;
+end;
+
+(*
+  Implement help, child computation, and the full parent workflow.
+  Inputs: ParamStr values and either a file stream or standard input.
+  Outputs: CSV/console output; failures are raised to the program error handler.
+  Used by: The final program block after it sets decimal formatting.
+*)
+procedure Run;
+var
+  Source, Target, S: String;
+  InFile, OutFile: Text;
+  Values: TValues;
+  Rows: TStringList;
+  Children: TProcesses;
+  I, J, N, Jobs, Count: Integer;
+  X: Double;
+  Buffer: array[0..255] of Char;
+begin
+  if (ParamCount = 1) and (ParamStr(1) = &#x27;--help&#x27;) then begin
+    WriteLn(&#x27;Usage: bessel-pascal [INPUT|- [OUTPUT [WORKERS 1..16]]]&#x27;); Exit;
+  end;
+  if (ParamCount = 2) and (ParamStr(1) = &#x27;--worker&#x27;) then begin
+    X := Number(ParamStr(2));
+    WriteLn(FloatToStr(X, FS), &#x27;,&#x27;, FloatToStr(Observe(X), FS), &#x27;,&#x27;, GetProcessID); Exit;
+  end;
+  if ParamCount &gt; 3 then raise Exception.Create(&#x27;too many arguments&#x27;);
+  Source := &#x27;-&#x27;; Target := &#x27;results.csv&#x27;; Jobs := 2;
+  if ParamCount &gt;= 1 then Source := ParamStr(1);
+  if ParamCount &gt;= 2 then Target := ParamStr(2);
+  if ParamCount &gt;= 3 then Jobs := StrToInt(ParamStr(3));
+  if (Jobs &lt; 1) or (Jobs &gt; 16) then raise Exception.Create(&#x27;workers must be 1..16&#x27;);
+  if Source = &#x27;-&#x27; then begin
+    WriteLn(StdErr, &#x27;Enter one x per line; blank line or EOF finishes:&#x27;);
+    AssignFile(InFile, &#x27;&#x27;);
+  end else AssignFile(InFile, Source);
+  // Open the selected input before reading values; opening errors become exceptions.
+  Reset(InFile);
+  try
+    // Normalize and classify lines, stopping at the first blank line or EOF.
+    while not EOF(InFile) do begin
+      ReadLn(InFile, S); S := Trim(S);
+      if S = &#x27;&#x27; then Break;
+      if S[1] = &#x27;#&#x27; then Continue;
+      try
+        X := Number(S);
+        // Append only a successfully parsed value so later output preserves accepted input order.
+        SetLength(Values, Length(Values) + 1); Values[High(Values)] := X;
+      except on E: EConvertError do WriteLn(StdErr, &#x27;warning: &#x27;, E.Message, &#x27;; skipped&#x27;); end;
+      if Length(Values) &gt; 4096 then raise Exception.Create(&#x27;at most 4096 values&#x27;);
+    end;
+  finally CloseFile(InFile); end;
+  if Length(Values) = 0 then raise Exception.Create(&#x27;no valid input values&#x27;);
+  // Keep result rows owned by a scoped object until they can be written together.
+  Rows := TStringList.Create;
+  try
+    I := 0;
+    while I &lt; Length(Values) do begin
+      N := Min(Jobs, Length(Values) - I); SetLength(Children, N);
+      try
+        for J := 0 to N - 1 do begin
+          // Create one child per value without waiting, so the whole bounded batch can run concurrently.
+          Children[J] := TProcess.Create(nil);
+          Children[J].Executable := ExpandFileName(ParamStr(0));
+          Children[J].Parameters.Add(&#x27;--worker&#x27;);
+          Children[J].Parameters.Add(FloatToStr(Values[I + J], FS));
+          Children[J].Options := [poUsePipes]; Children[J].Execute;
+        end;
+        for J := 0 to N - 1 do begin
+          S := &#x27;&#x27;;
+          repeat
+            // Drain all available child output rather than assuming one read contains the full row.
+            Count := Children[J].Output.Read(Buffer, SizeOf(Buffer));
+            if Count &gt; 0 then S := S + Copy(Buffer, 0, Count);
+          until Count = 0;
+          // Check process completion before accepting its buffered CSV row.
+          Children[J].WaitOnExit;
+          if (Children[J].ExitStatus &lt;&gt; 0) or (Trim(S) = &#x27;&#x27;) then raise Exception.Create(&#x27;worker failed&#x27;);
+          Rows.Add(Trim(S));
+        end;
+      finally
+        for J := 0 to N - 1 do
+          if Assigned(Children[J]) then begin
+            // Terminate and reap remaining workers when normal collection or an exception leaves this scope.
+            if Children[J].Running then begin Children[J].Terminate(1); Children[J].WaitOnExit; end;
+            FreeAndNil(Children[J]);
+          end;
+      end;
+      Inc(I, N);
+    end;
+    // Create the output after the calculation phase, then close it even if writing fails.
+    AssignFile(OutFile, Target); Rewrite(OutFile);
+    try
+      WriteLn(OutFile, &#x27;x,j0,worker_pid&#x27;);
+      for I := 0 to Rows.Count - 1 do WriteLn(OutFile, Rows[I]);
+    finally CloseFile(OutFile); end;
+    WriteLn(&#x27;Wrote &#x27;, Rows.Count, &#x27; observations to &#x27;, Target);
+  finally Rows.Free; end;
+end;
+begin
+  FS := DefaultFormatSettings; FS.DecimalSeparator := &#x27;.&#x27;;
+  try Run;
+  except on E: Exception do begin WriteLn(StdErr, &#x27;error: &#x27;, E.Message); Halt(1); end; end;
+end.
+</textarea>
+<footer>Highlighted with Pygments using the Delphi lexer. All assets are local. SHA-256: <code>1a0dc88c2cc5f92f03f6244c4fd384b1f055c8b7b24346bd3c7ce695f0897c95</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

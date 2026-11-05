@@ -1,0 +1,378 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="50382f7e8bcb16dbfc809531f5624c42ddf8374dc8a547619e36325d5c2af007">
+<title>JavaScript — bessel.mjs — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 30 languages</a>
+<a href="bessel.rb.html">← Ruby</a><a href="bessel.py.html">Python →</a></nav>
+<h1>JavaScript <code>bessel.mjs</code></h1>
+<p>Node.js 20+ · ES modules, async iteration, promises, Promise.all, try/finally.</p>
+<p><strong>Memory:</strong> ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.<br><strong>Strings:</strong> trim, startsWith, regex validation, template strings and array joining.</p>
+<div class="actions"><a href="../bessel.mjs">Open raw source</a>
+<a href="../bessel.mjs" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/usr/bin/env node</span>
+<a id="L-2" name="L-2"></a><span class="cm">/*</span>
+<a id="L-3" name="L-3"></a><span class="cm">  Bessel Observatory: read x values, compute the same midpoint integral in OS workers, and write CSV.</span>
+<a id="L-4" name="L-4"></a><span class="cm">  The normal argument order is input file (or -), output file, then worker limit.</span>
+<a id="L-5" name="L-5"></a><span class="cm">  User input is validated before workers start; malformed numeric lines are reported and skipped.</span>
+<a id="L-6" name="L-6"></a><span class="cm">  Node.js 20+: async iteration, promises, and child_process.fork with IPC.</span>
+<a id="L-7" name="L-7"></a><span class="cm">*/</span>
+<a id="L-8" name="L-8"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fork</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node:child_process&#39;</span><span class="p">;</span>
+<a id="L-9" name="L-9"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createReadStream</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node:fs&#39;</span><span class="p">;</span>
+<a id="L-10" name="L-10"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">writeFile</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node:fs/promises&#39;</span><span class="p">;</span>
+<a id="L-11" name="L-11"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">createInterface</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node:readline&#39;</span><span class="p">;</span>
+<a id="L-12" name="L-12"></a><span class="k">import</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">fileURLToPath</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="kr">from</span><span class="w"> </span><span class="s1">&#39;node:url&#39;</span><span class="p">;</span>
+<a id="L-13" name="L-13"></a>
+<a id="L-14" name="L-14"></a><span class="cm">/*</span>
+<a id="L-15" name="L-15"></a><span class="cm">  Parse a numeric token without accepting empty or non-finite values.</span>
+<a id="L-16" name="L-16"></a><span class="cm">  Inputs: A string supplied by the input reader or worker CLI.</span>
+<a id="L-17" name="L-17"></a><span class="cm">  Outputs: A bounded Number, or an Error.</span>
+<a id="L-18" name="L-18"></a><span class="cm">  Used by: main before scheduling a value or computing a child result.</span>
+<a id="L-19" name="L-19"></a><span class="cm">*/</span>
+<a id="L-20" name="L-20"></a><span class="kd">function</span><span class="w"> </span><span class="nx">number</span><span class="p">(</span><span class="nx">text</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-21" name="L-21"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">text</span><span class="p">);</span>
+<a id="L-22" name="L-22"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">text</span><span class="p">.</span><span class="nx">trim</span><span class="p">()</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nb">Number</span><span class="p">.</span><span class="nb">isFinite</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">abs</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">1000</span><span class="p">)</span>
+<a id="L-23" name="L-23"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;expected a finite x in [-1000,1000]&#39;</span><span class="p">);</span>
+<a id="L-24" name="L-24"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="nx">x</span><span class="p">;</span>
+<a id="L-25" name="L-25"></a><span class="p">}</span>
+<a id="L-26" name="L-26"></a><span class="cm">/*</span>
+<a id="L-27" name="L-27"></a><span class="cm">  Calculate one observation using checked byte offsets into a shared buffer.</span>
+<a id="L-28" name="L-28"></a><span class="cm">  Inputs: One validated numeric x.</span>
+<a id="L-29" name="L-29"></a><span class="cm">  Outputs: A complete CSV row with x, J0 and the current OS PID.</span>
+<a id="L-30" name="L-30"></a><span class="cm">  Used by: main when the forked Node process enters --worker mode.</span>
+<a id="L-31" name="L-31"></a><span class="cm">*/</span>
+<a id="L-32" name="L-32"></a><span class="kd">function</span><span class="w"> </span><span class="nx">observe</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-33" name="L-33"></a><span class="w">  </span><span class="cm">/*</span>
+<a id="L-34" name="L-34"></a><span class="cm">    ArrayBuffer and DataView share a referenced allocation. Byte offsets are</span>
+<a id="L-35" name="L-35"></a><span class="cm">    explicit but checked: JavaScript exposes no raw memory pointers.</span>
+<a id="L-36" name="L-36"></a><span class="cm">  */</span>
+<a id="L-37" name="L-37"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">width</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Float64Array</span><span class="p">.</span><span class="nx">BYTES_PER_ELEMENT</span><span class="p">;</span>
+<a id="L-38" name="L-38"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">samples</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">DataView</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="nb">ArrayBuffer</span><span class="p">(</span><span class="mf">16384</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">width</span><span class="p">));</span>
+<a id="L-39" name="L-39"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">16384</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="o">++</span><span class="p">)</span>
+<a id="L-40" name="L-40"></a><span class="w">    </span><span class="nx">samples</span><span class="p">.</span><span class="nx">setFloat64</span><span class="p">(</span><span class="nx">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">width</span><span class="p">,</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">cos</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nb">Math</span><span class="p">.</span><span class="nx">sin</span><span class="p">(</span><span class="nb">Math</span><span class="p">.</span><span class="nx">PI</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="nx">k</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mf">0.5</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">16384</span><span class="p">)),</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<a id="L-41" name="L-41"></a><span class="w">  </span><span class="kd">let</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span>
+<a id="L-42" name="L-42"></a><span class="w">  </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">16384</span><span class="p">;</span><span class="w"> </span><span class="nx">k</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="nx">sum</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">samples</span><span class="p">.</span><span class="nx">getFloat64</span><span class="p">(</span><span class="nx">k</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="nx">width</span><span class="p">,</span><span class="w"> </span><span class="kc">true</span><span class="p">);</span>
+<a id="L-43" name="L-43"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="sb">`</span><span class="si">${</span><span class="nx">x</span><span class="si">}</span><span class="sb">,</span><span class="si">${</span><span class="nx">sum</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mf">16384</span><span class="si">}</span><span class="sb">,</span><span class="si">${</span><span class="nx">process</span><span class="p">.</span><span class="nx">pid</span><span class="si">}</span><span class="sb">\n`</span><span class="p">;</span>
+<a id="L-44" name="L-44"></a><span class="p">}</span>
+<a id="L-45" name="L-45"></a><span class="cm">/*</span>
+<a id="L-46" name="L-46"></a><span class="cm">  Start a Node child and represent its eventual result as a Promise.</span>
+<a id="L-47" name="L-47"></a><span class="cm">  Inputs: A value x and the parent-owned set of active child handles.</span>
+<a id="L-48" name="L-48"></a><span class="cm">  Outputs: A Promise for one CSV row; rejection reports launch or child failure.</span>
+<a id="L-49" name="L-49"></a><span class="cm">  Used by: main through Promise.all to coordinate each bounded process batch.</span>
+<a id="L-50" name="L-50"></a><span class="cm">*/</span>
+<a id="L-51" name="L-51"></a><span class="kd">function</span><span class="w"> </span><span class="nx">worker</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">active</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-52" name="L-52"></a><span class="w">  </span><span class="k">return</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Promise</span><span class="p">((</span><span class="nx">resolve</span><span class="p">,</span><span class="w"> </span><span class="nx">reject</span><span class="p">)</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-53" name="L-53"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">child</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">fork</span><span class="p">(</span><span class="nx">fileURLToPath</span><span class="p">(</span><span class="k">import</span><span class="p">.</span><span class="nx">meta</span><span class="p">.</span><span class="nx">url</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;--worker&#39;</span><span class="p">,</span><span class="w"> </span><span class="nb">String</span><span class="p">(</span><span class="nx">x</span><span class="p">)],</span>
+<a id="L-54" name="L-54"></a><span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nx">stdio</span><span class="o">:</span><span class="w"> </span><span class="p">[</span><span class="s1">&#39;inherit&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;inherit&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;inherit&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;ipc&#39;</span><span class="p">]</span><span class="w"> </span><span class="p">});</span>
+<a id="L-55" name="L-55"></a><span class="w">    </span><span class="c1">// Retain the child so an enclosing failure can still terminate it.</span>
+<a id="L-56" name="L-56"></a><span class="w">    </span><span class="nx">active</span><span class="p">.</span><span class="nx">add</span><span class="p">(</span><span class="nx">child</span><span class="p">);</span>
+<a id="L-57" name="L-57"></a><span class="w">    </span><span class="kd">let</span><span class="w"> </span><span class="nx">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="p">;</span>
+<a id="L-58" name="L-58"></a><span class="w">    </span><span class="c1">// Receive the child result through Node IPC rather than parsing interleaved console output.</span>
+<a id="L-59" name="L-59"></a><span class="w">    </span><span class="nx">child</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;message&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="ow">typeof</span><span class="w"> </span><span class="nx">message</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;string&#39;</span><span class="p">)</span><span class="w"> </span><span class="nx">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">message</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
+<a id="L-60" name="L-60"></a><span class="w">    </span><span class="nx">child</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;error&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">reject</span><span class="p">);</span>
+<a id="L-61" name="L-61"></a><span class="w">    </span><span class="c1">// Accept a result only once the child has exited successfully.</span>
+<a id="L-62" name="L-62"></a><span class="w">    </span><span class="nx">child</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;close&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">code</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span>
+<a id="L-63" name="L-63"></a><span class="w">      </span><span class="nx">active</span><span class="p">.</span><span class="ow">delete</span><span class="p">(</span><span class="nx">child</span><span class="p">);</span>
+<a id="L-64" name="L-64"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">code</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">row</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="nx">resolve</span><span class="p">(</span><span class="nx">row</span><span class="p">);</span>
+<a id="L-65" name="L-65"></a><span class="w">      </span><span class="k">else</span><span class="w"> </span><span class="nx">reject</span><span class="p">(</span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="sb">`worker failed (</span><span class="si">${</span><span class="nx">code</span><span class="si">}</span><span class="sb">)`</span><span class="p">));</span>
+<a id="L-66" name="L-66"></a><span class="w">    </span><span class="p">});</span>
+<a id="L-67" name="L-67"></a><span class="w">  </span><span class="p">});</span>
+<a id="L-68" name="L-68"></a><span class="p">}</span>
+<a id="L-69" name="L-69"></a><span class="cm">/*</span>
+<a id="L-70" name="L-70"></a><span class="cm">  Coordinate asynchronous input, process dispatch, and result-file output.</span>
+<a id="L-71" name="L-71"></a><span class="cm">  Inputs: The program arguments and, optionally, stdin.</span>
+<a id="L-72" name="L-72"></a><span class="cm">  Outputs: A resolved Promise after writing results, or a rejected Promise on failure.</span>
+<a id="L-73" name="L-73"></a><span class="cm">  Used by: The final invocation, whose catch handler sets the process exit status.</span>
+<a id="L-74" name="L-74"></a><span class="cm">*/</span>
+<a id="L-75" name="L-75"></a><span class="k">async</span><span class="w"> </span><span class="kd">function</span><span class="w"> </span><span class="nx">main</span><span class="p">(</span><span class="nx">args</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-76" name="L-76"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;--help&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-77" name="L-77"></a><span class="w">    </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;Usage: node bessel.mjs [INPUT|- [OUTPUT [WORKERS 1..16]]]&#39;</span><span class="p">);</span><span class="w"> </span><span class="k">return</span><span class="p">;</span>
+<a id="L-78" name="L-78"></a><span class="w">  </span><span class="p">}</span>
+<a id="L-79" name="L-79"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nx">args</span><span class="p">[</span><span class="mf">0</span><span class="p">]</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;--worker&#39;</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-80" name="L-80"></a><span class="w">    </span><span class="kd">const</span><span class="w"> </span><span class="nx">row</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">observe</span><span class="p">(</span><span class="nx">number</span><span class="p">(</span><span class="nx">args</span><span class="p">[</span><span class="mf">1</span><span class="p">]));</span>
+<a id="L-81" name="L-81"></a><span class="w">    </span><span class="c1">// Use IPC when launched by the parent; retain stdout output for direct worker invocation.</span>
+<a id="L-82" name="L-82"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">)</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">row</span><span class="p">,</span><span class="w"> </span><span class="p">()</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">disconnect</span><span class="p">());</span>
+<a id="L-83" name="L-83"></a><span class="w">    </span><span class="k">else</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">stdout</span><span class="p">.</span><span class="nx">write</span><span class="p">(</span><span class="nx">row</span><span class="p">);</span>
+<a id="L-84" name="L-84"></a><span class="w">    </span><span class="k">return</span><span class="p">;</span>
+<a id="L-85" name="L-85"></a><span class="w">  </span><span class="p">}</span>
+<a id="L-86" name="L-86"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">args</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">3</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;too many arguments&#39;</span><span class="p">);</span>
+<a id="L-87" name="L-87"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="p">[</span><span class="nx">source</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;results.csv&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">jobsText</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;2&#39;</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">args</span><span class="p">;</span>
+<a id="L-88" name="L-88"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">jobs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nb">Number</span><span class="p">(</span><span class="nx">jobsText</span><span class="p">);</span>
+<a id="L-89" name="L-89"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="sr">/^\d+$/</span><span class="p">.</span><span class="nx">test</span><span class="p">(</span><span class="nx">jobsText</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="o">!</span><span class="nb">Number</span><span class="p">.</span><span class="nx">isInteger</span><span class="p">(</span><span class="nx">jobs</span><span class="p">)</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">jobs</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="nx">jobs</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">16</span><span class="p">)</span>
+<a id="L-90" name="L-90"></a><span class="w">    </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;workers must be 1..16&#39;</span><span class="p">);</span>
+<a id="L-91" name="L-91"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">source</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="s1">&#39;Enter one x per line; blank line or EOF finishes:&#39;</span><span class="p">);</span>
+<a id="L-92" name="L-92"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">input</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">source</span><span class="w"> </span><span class="o">===</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="w"> </span><span class="o">?</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">stdin</span><span class="w"> </span><span class="o">:</span><span class="w"> </span><span class="nx">createReadStream</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">encoding</span><span class="o">:</span><span class="w"> </span><span class="s1">&#39;utf8&#39;</span><span class="w"> </span><span class="p">});</span>
+<a id="L-93" name="L-93"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">lines</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">createInterface</span><span class="p">({</span><span class="w"> </span><span class="nx">input</span><span class="p">,</span><span class="w"> </span><span class="nx">crlfDelay</span><span class="o">:</span><span class="w"> </span><span class="kc">Infinity</span><span class="w"> </span><span class="p">});</span>
+<a id="L-94" name="L-94"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">values</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span>
+<a id="L-95" name="L-95"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="L-96" name="L-96"></a><span class="w">    </span><span class="c1">// Consume lines as they arrive instead of requiring the entire input file in memory.</span>
+<a id="L-97" name="L-97"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="k">await</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">line</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">lines</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<a id="L-98" name="L-98"></a><span class="w">      </span><span class="kd">const</span><span class="w"> </span><span class="nx">text</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">line</span><span class="p">.</span><span class="nx">trim</span><span class="p">();</span>
+<a id="L-99" name="L-99"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">text</span><span class="p">)</span><span class="w"> </span><span class="k">break</span><span class="p">;</span>
+<a id="L-100" name="L-100"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">text</span><span class="p">.</span><span class="nx">startsWith</span><span class="p">(</span><span class="s1">&#39;#&#39;</span><span class="p">))</span><span class="w"> </span><span class="k">continue</span><span class="p">;</span>
+<a id="L-101" name="L-101"></a><span class="w">      </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">values</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">number</span><span class="p">(</span><span class="nx">text</span><span class="p">));</span><span class="w"> </span><span class="p">}</span>
+<a id="L-102" name="L-102"></a><span class="w">      </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="nx">error</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="sb">`warning: </span><span class="si">${</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">; skipped`</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
+<a id="L-103" name="L-103"></a><span class="w">      </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">values</span><span class="p">.</span><span class="nx">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mf">4096</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;at most 4096 values&#39;</span><span class="p">);</span>
+<a id="L-104" name="L-104"></a><span class="w">    </span><span class="p">}</span>
+<a id="L-105" name="L-105"></a><span class="w">  </span><span class="c1">// Release the readline interface and close owned file streams even after parsing failures.</span>
+<a id="L-106" name="L-106"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">lines</span><span class="p">.</span><span class="nx">close</span><span class="p">();</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nx">source</span><span class="w"> </span><span class="o">!==</span><span class="w"> </span><span class="s1">&#39;-&#39;</span><span class="p">)</span><span class="w"> </span><span class="nx">input</span><span class="p">.</span><span class="nx">destroy</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="L-107" name="L-107"></a><span class="w">  </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nx">values</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span><span class="w"> </span><span class="k">throw</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="ne">Error</span><span class="p">(</span><span class="s1">&#39;no valid input values&#39;</span><span class="p">);</span>
+<a id="L-108" name="L-108"></a><span class="w">  </span><span class="kd">const</span><span class="w"> </span><span class="nx">rows</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[];</span><span class="w"> </span><span class="kd">const</span><span class="w"> </span><span class="nx">active</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="ow">new</span><span class="w"> </span><span class="nb">Set</span><span class="p">();</span>
+<a id="L-109" name="L-109"></a><span class="w">  </span><span class="k">try</span><span class="w"> </span><span class="p">{</span>
+<a id="L-110" name="L-110"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">let</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="nx">values</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="nx">jobs</span><span class="p">)</span>
+<a id="L-111" name="L-111"></a><span class="w">      </span><span class="c1">// Launch this group together and preserve input order in the returned Promise results.</span>
+<a id="L-112" name="L-112"></a><span class="w">      </span><span class="nx">rows</span><span class="p">.</span><span class="nx">push</span><span class="p">(...</span><span class="k">await</span><span class="w"> </span><span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">(</span><span class="nx">values</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">jobs</span><span class="p">).</span><span class="nx">map</span><span class="p">(</span><span class="nx">x</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="nx">worker</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span><span class="w"> </span><span class="nx">active</span><span class="p">))));</span>
+<a id="L-113" name="L-113"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="k">finally</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">const</span><span class="w"> </span><span class="nx">child</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nx">active</span><span class="p">)</span><span class="w"> </span><span class="nx">child</span><span class="p">.</span><span class="nx">kill</span><span class="p">();</span><span class="w"> </span><span class="p">}</span>
+<a id="L-114" name="L-114"></a><span class="w">  </span><span class="c1">// Write the final ordered CSV only after every batch has succeeded.</span>
+<a id="L-115" name="L-115"></a><span class="w">  </span><span class="k">await</span><span class="w"> </span><span class="nx">writeFile</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;x,j0,worker_pid\n&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">rows</span><span class="p">.</span><span class="nx">join</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">));</span>
+<a id="L-116" name="L-116"></a><span class="w">  </span><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="sb">`Wrote </span><span class="si">${</span><span class="nx">rows</span><span class="p">.</span><span class="nx">length</span><span class="si">}</span><span class="sb"> observations to </span><span class="si">${</span><span class="nx">target</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span>
+<a id="L-117" name="L-117"></a><span class="p">}</span>
+<a id="L-118" name="L-118"></a><span class="c1">// Strip the Node executable/script arguments and report rejected work without a stack dump.</span>
+<a id="L-119" name="L-119"></a><span class="nx">main</span><span class="p">(</span><span class="nx">process</span><span class="p">.</span><span class="nx">argv</span><span class="p">.</span><span class="nx">slice</span><span class="p">(</span><span class="mf">2</span><span class="p">)).</span><span class="k">catch</span><span class="p">(</span><span class="nx">error</span><span class="w"> </span><span class="p">=&gt;</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nx">console</span><span class="p">.</span><span class="nx">error</span><span class="p">(</span><span class="sb">`error: </span><span class="si">${</span><span class="nx">error</span><span class="p">.</span><span class="nx">message</span><span class="si">}</span><span class="sb">`</span><span class="p">);</span><span class="w"> </span><span class="nx">process</span><span class="p">.</span><span class="nx">exitCode</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">1</span><span class="p">;</span><span class="w"> </span><span class="p">});</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#!/usr/bin/env node
+/*
+  Bessel Observatory: read x values, compute the same midpoint integral in OS workers, and write CSV.
+  The normal argument order is input file (or -), output file, then worker limit.
+  User input is validated before workers start; malformed numeric lines are reported and skipped.
+  Node.js 20+: async iteration, promises, and child_process.fork with IPC.
+*/
+import { fork } from &#x27;node:child_process&#x27;;
+import { createReadStream } from &#x27;node:fs&#x27;;
+import { writeFile } from &#x27;node:fs/promises&#x27;;
+import { createInterface } from &#x27;node:readline&#x27;;
+import { fileURLToPath } from &#x27;node:url&#x27;;
+
+/*
+  Parse a numeric token without accepting empty or non-finite values.
+  Inputs: A string supplied by the input reader or worker CLI.
+  Outputs: A bounded Number, or an Error.
+  Used by: main before scheduling a value or computing a child result.
+*/
+function number(text) {
+  const x = Number(text);
+  if (!text.trim() || !Number.isFinite(x) || Math.abs(x) &gt; 1000)
+    throw new Error(&#x27;expected a finite x in [-1000,1000]&#x27;);
+  return x;
+}
+/*
+  Calculate one observation using checked byte offsets into a shared buffer.
+  Inputs: One validated numeric x.
+  Outputs: A complete CSV row with x, J0 and the current OS PID.
+  Used by: main when the forked Node process enters --worker mode.
+*/
+function observe(x) {
+  /*
+    ArrayBuffer and DataView share a referenced allocation. Byte offsets are
+    explicit but checked: JavaScript exposes no raw memory pointers.
+  */
+  const width = Float64Array.BYTES_PER_ELEMENT;
+  const samples = new DataView(new ArrayBuffer(16384 * width));
+  for (let k = 0; k &lt; 16384; k++)
+    samples.setFloat64(k * width, Math.cos(x * Math.sin(Math.PI * (k + 0.5) / 16384)), true);
+  let sum = 0;
+  for (let k = 0; k &lt; 16384; k++) sum += samples.getFloat64(k * width, true);
+  return `${x},${sum / 16384},${process.pid}\n`;
+}
+/*
+  Start a Node child and represent its eventual result as a Promise.
+  Inputs: A value x and the parent-owned set of active child handles.
+  Outputs: A Promise for one CSV row; rejection reports launch or child failure.
+  Used by: main through Promise.all to coordinate each bounded process batch.
+*/
+function worker(x, active) {
+  return new Promise((resolve, reject) =&gt; {
+    const child = fork(fileURLToPath(import.meta.url), [&#x27;--worker&#x27;, String(x)],
+      { stdio: [&#x27;inherit&#x27;, &#x27;inherit&#x27;, &#x27;inherit&#x27;, &#x27;ipc&#x27;] });
+    // Retain the child so an enclosing failure can still terminate it.
+    active.add(child);
+    let row = &#x27;&#x27;;
+    // Receive the child result through Node IPC rather than parsing interleaved console output.
+    child.on(&#x27;message&#x27;, message =&gt; { if (typeof message === &#x27;string&#x27;) row = message; });
+    child.on(&#x27;error&#x27;, reject);
+    // Accept a result only once the child has exited successfully.
+    child.on(&#x27;close&#x27;, code =&gt; {
+      active.delete(child);
+      if (code === 0 &amp;&amp; row.length) resolve(row);
+      else reject(new Error(`worker failed (${code})`));
+    });
+  });
+}
+/*
+  Coordinate asynchronous input, process dispatch, and result-file output.
+  Inputs: The program arguments and, optionally, stdin.
+  Outputs: A resolved Promise after writing results, or a rejected Promise on failure.
+  Used by: The final invocation, whose catch handler sets the process exit status.
+*/
+async function main(args) {
+  if (args.length === 1 &amp;&amp; args[0] === &#x27;--help&#x27;) {
+    console.log(&#x27;Usage: node bessel.mjs [INPUT|- [OUTPUT [WORKERS 1..16]]]&#x27;); return;
+  }
+  if (args.length === 2 &amp;&amp; args[0] === &#x27;--worker&#x27;) {
+    const row = observe(number(args[1]));
+    // Use IPC when launched by the parent; retain stdout output for direct worker invocation.
+    if (process.send) process.send(row, () =&gt; process.disconnect());
+    else process.stdout.write(row);
+    return;
+  }
+  if (args.length &gt; 3) throw new Error(&#x27;too many arguments&#x27;);
+  const [source = &#x27;-&#x27;, target = &#x27;results.csv&#x27;, jobsText = &#x27;2&#x27;] = args;
+  const jobs = Number(jobsText);
+  if (!/^\d+$/.test(jobsText) || !Number.isInteger(jobs) || jobs &lt; 1 || jobs &gt; 16)
+    throw new Error(&#x27;workers must be 1..16&#x27;);
+  if (source === &#x27;-&#x27;) console.error(&#x27;Enter one x per line; blank line or EOF finishes:&#x27;);
+  const input = source === &#x27;-&#x27; ? process.stdin : createReadStream(source, { encoding: &#x27;utf8&#x27; });
+  const lines = createInterface({ input, crlfDelay: Infinity });
+  const values = [];
+  try {
+    // Consume lines as they arrive instead of requiring the entire input file in memory.
+    for await (const line of lines) {
+      const text = line.trim();
+      if (!text) break;
+      if (text.startsWith(&#x27;#&#x27;)) continue;
+      try { values.push(number(text)); }
+      catch (error) { console.error(`warning: ${error.message}; skipped`); }
+      if (values.length &gt; 4096) throw new Error(&#x27;at most 4096 values&#x27;);
+    }
+  // Release the readline interface and close owned file streams even after parsing failures.
+  } finally { lines.close(); if (source !== &#x27;-&#x27;) input.destroy(); }
+  if (!values.length) throw new Error(&#x27;no valid input values&#x27;);
+  const rows = []; const active = new Set();
+  try {
+    for (let i = 0; i &lt; values.length; i += jobs)
+      // Launch this group together and preserve input order in the returned Promise results.
+      rows.push(...await Promise.all(values.slice(i, i + jobs).map(x =&gt; worker(x, active))));
+  } finally { for (const child of active) child.kill(); }
+  // Write the final ordered CSV only after every batch has succeeded.
+  await writeFile(target, &#x27;x,j0,worker_pid\n&#x27; + rows.join(&#x27;&#x27;));
+  console.log(`Wrote ${rows.length} observations to ${target}`);
+}
+// Strip the Node executable/script arguments and report rejected work without a stack dump.
+main(process.argv.slice(2)).catch(error =&gt; { console.error(`error: ${error.message}`); process.exitCode = 1; });
+</textarea>
+<footer>Highlighted with Pygments using the JavaScript lexer. All assets are local. SHA-256: <code>50382f7e8bcb16dbfc809531f5624c42ddf8374dc8a547619e36325d5c2af007</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

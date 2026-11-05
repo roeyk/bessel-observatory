@@ -1,0 +1,815 @@
+{
+  "generated_utc": "2026-11-05T05:03:20.383698+00:00",
+  "method": "Black-box execution against stored 80-digit reference values; process IDs checked against parent PID. No assertion of bitwise equality or relative speed.",
+  "toolchains": "Some toolchains may be unpacked into /tmp through --overrides; no global installations are required.",
+  "results": [
+    {
+      "id": "pascal",
+      "language": "Pascal",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "1a0dc88c2cc5f92f03f6244c4fd384b1f055c8b7b24346bd3c7ce695f0897c95",
+      "observed_worker_pids": [
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17
+      ]
+    },
+    {
+      "id": "ada",
+      "language": "Ada",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "8153e89f29c215458f455624142c5acffb1320a0ec51a9035b8d2ba69d6b2b1f",
+      "observed_worker_pids": [
+        69,
+        70,
+        71,
+        72,
+        73,
+        74,
+        75,
+        76,
+        77,
+        78
+      ]
+    },
+    {
+      "id": "basic",
+      "language": "BASIC",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "0bc81b7f4f7c7222bcc1dba2ed7e409dc8c8568b8b0d61187b23d9f4f3660a40",
+      "observed_worker_pids": [
+        155,
+        156,
+        157,
+        158,
+        159,
+        160,
+        161,
+        162,
+        163,
+        164
+      ]
+    },
+    {
+      "id": "cobol",
+      "language": "COBOL",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "68701fc19d4bab9ae468d212031445030d3c5a9e54603dd0be9a7130f25d98b7",
+      "observed_worker_pids": [
+        213,
+        214,
+        215,
+        216,
+        217,
+        218,
+        219,
+        220,
+        221,
+        222
+      ]
+    },
+    {
+      "id": "fortran",
+      "language": "Fortran",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "30cba4d481bed04490587e06c869ba6715f6f87a3f1b7a18162454d59e37c5b4",
+      "observed_worker_pids": [
+        266,
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        273,
+        274,
+        275
+      ]
+    },
+    {
+      "id": "c",
+      "language": "C",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "056bb0842d8b520db029dce79fd47ae0509247e896507a00a53caf381bb6c333",
+      "observed_worker_pids": [
+        320,
+        321,
+        322,
+        323,
+        324,
+        325,
+        326,
+        327,
+        328,
+        329
+      ]
+    },
+    {
+      "id": "objc",
+      "language": "Objective-C",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "9293e1453d85afe9abea39a012b4a1a2b65125f8a963d41fbcc24b12c1917ac4",
+      "observed_worker_pids": [
+        372,
+        373,
+        374,
+        375,
+        376,
+        377,
+        378,
+        379,
+        380,
+        381
+      ]
+    },
+    {
+      "id": "smalltalk",
+      "language": "Smalltalk",
+      "status": "untested",
+      "checks": [],
+      "source_sha256": "d338c3bbe0e31b9a1b7639eeedb237e98b9fa055d7c9484b86befe4d7842df55",
+      "reason": "Tool or executable unavailable: gst"
+    },
+    {
+      "id": "cpp",
+      "language": "C++",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "fb0223912d0a2adea4b96d8a5348c546667edc55de452d45b3a0cc4e267b48d1",
+      "observed_worker_pids": [
+        426,
+        427,
+        428,
+        429,
+        430,
+        431,
+        432,
+        433,
+        434,
+        435
+      ]
+    },
+    {
+      "id": "rust",
+      "language": "Rust",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "f6ab8c3fafb710929463df8dfad0910e5761e11e1192c2542108c15a9b6b100a",
+      "observed_worker_pids": [
+        520,
+        521,
+        522,
+        523,
+        524,
+        525,
+        526,
+        527,
+        528,
+        529
+      ]
+    },
+    {
+      "id": "java",
+      "language": "Java",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "3fa37b4726a9d5cc48296880913e1a87d9961501478683be093c9fa0da82cd4a",
+      "observed_worker_pids": [
+        641,
+        663,
+        696,
+        697,
+        748,
+        749,
+        800,
+        801,
+        852,
+        853
+      ]
+    },
+    {
+      "id": "ruby",
+      "language": "Ruby",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "c113c4bc604d47d8e664a3947a42ca4a82b5aee3ed2aa5e8943903406df7b9da",
+      "observed_worker_pids": [
+        1848,
+        1851,
+        1854,
+        1857,
+        1860,
+        1863,
+        1866,
+        1869,
+        1872,
+        1875
+      ]
+    },
+    {
+      "id": "javascript",
+      "language": "JavaScript",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "50382f7e8bcb16dbfc809531f5624c42ddf8374dc8a547619e36325d5c2af007",
+      "observed_worker_pids": [
+        1995,
+        1996,
+        2009,
+        2010,
+        2023,
+        2024,
+        2037,
+        2038,
+        2051,
+        2052
+      ]
+    },
+    {
+      "id": "python",
+      "language": "Python",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "1c90d7e5c7da88e20a6cd3fcad4827c8d67713c50739030ab47cc674c44a5f05",
+      "observed_worker_pids": [
+        2351,
+        2354
+      ]
+    },
+    {
+      "id": "lua",
+      "language": "Lua",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "0f3bfe83221f806ef77944a64f68cf835d14a299942061160d411ed790c56b7c",
+      "observed_worker_pids": [
+        2388,
+        2389,
+        2390,
+        2391,
+        2392,
+        2393,
+        2394,
+        2395,
+        2396,
+        2397
+      ]
+    },
+    {
+      "id": "julia",
+      "language": "Julia",
+      "status": "untested",
+      "checks": [],
+      "source_sha256": "a43b91619425f09949afa661d6009687dcec09b623a467a36404e54a63c22726",
+      "reason": "Tool or executable unavailable: julia"
+    },
+    {
+      "id": "perl",
+      "language": "Perl",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "c198db8a94990f0b358672f905600a30f9a7592f1c0b0e2a99b4c4e143ee9a5c",
+      "observed_worker_pids": [
+        2437,
+        2438,
+        2439,
+        2440,
+        2441,
+        2442,
+        2443,
+        2444,
+        2445,
+        2446
+      ]
+    },
+    {
+      "id": "swift",
+      "language": "Swift",
+      "status": "untested",
+      "checks": [],
+      "source_sha256": "eb84d99fe1547a0182f4ed286490669308f1e80be8be725974486e4e7763d796",
+      "reason": "Tool or executable unavailable: swiftc"
+    },
+    {
+      "id": "erlang",
+      "language": "Erlang",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "a1498ed4005a7ebeffc247da2aa2167661c6f5792a1a5c1d9d32c43a2751462a",
+      "observed_worker_pids": [
+        2522,
+        2523,
+        2560,
+        2561,
+        2598,
+        2599,
+        2636,
+        2637,
+        2674,
+        2675
+      ]
+    },
+    {
+      "id": "haskell",
+      "language": "Haskell",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "510e65842f2bf1fc4765da4552193ce40ccd60fda18cea0427c90a13446fb76e",
+      "observed_worker_pids": [
+        3435,
+        3436,
+        3439,
+        3440,
+        3443,
+        3444,
+        3447,
+        3448,
+        3451,
+        3452
+      ]
+    },
+    {
+      "id": "ocaml",
+      "language": "OCaml",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "9041c79cf88d59f6da58aa6df1f094aa468f7d66e1a650f969eee6c6f2a90bc7",
+      "observed_worker_pids": [
+        3531,
+        3532,
+        3533,
+        3534,
+        3535,
+        3536,
+        3537,
+        3538,
+        3539,
+        3540
+      ]
+    },
+    {
+      "id": "lisp",
+      "language": "Lisp",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "e7e37a52dfe74b135f5de3e36ae0deb349afd93d63476e35f39c15c33109e40d",
+      "observed_worker_pids": [
+        3582,
+        3583,
+        3586,
+        3587,
+        3590,
+        3591,
+        3594,
+        3595,
+        3598,
+        3599
+      ]
+    },
+    {
+      "id": "prolog",
+      "language": "Prolog",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "35785b95935a14a981c3fe2e2dc90eba7ff434884711c2498399e3b446b51060",
+      "observed_worker_pids": [
+        3679,
+        3680,
+        3681,
+        3682,
+        3683,
+        3684,
+        3685,
+        3686,
+        3687,
+        3688
+      ]
+    },
+    {
+      "id": "kotlin",
+      "language": "Kotlin",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "90f3b0ecfe255bc24fab200406a2b38d04e22b0211679fd8d598ce209651a027",
+      "observed_worker_pids": [
+        3877,
+        3891,
+        3933,
+        3934,
+        3989,
+        3990,
+        4041,
+        4042,
+        4096,
+        4097
+      ]
+    },
+    {
+      "id": "go",
+      "language": "Go",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "8d6ce06b4031bc4694a5f42b8b3359892d6cbde7782c23b9d4058ddb8c2cead6",
+      "observed_worker_pids": [
+        5229,
+        5230,
+        5239,
+        5240,
+        5249,
+        5250,
+        5259,
+        5260,
+        5269,
+        5270
+      ]
+    },
+    {
+      "id": "sql",
+      "language": "SQL",
+      "status": "untested",
+      "checks": [],
+      "source_sha256": "75baef1b137ee93e278387138e9820e20e3c3bdcf498ece55f446f2ddb5b28d1",
+      "reason": "A local PostgreSQL 18 cluster was initialized, but the sandbox denies creating the server socket. No SQL integration execution is claimed."
+    },
+    {
+      "id": "oberon",
+      "language": "Oberon-2",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "89bf52e977bad2425272ca105e3b0bc2cbff9768338de358187d1fdc5af25c3b",
+      "observed_worker_pids": [
+        5496,
+        5497,
+        5498,
+        5499,
+        5500,
+        5501,
+        5502,
+        5503,
+        5504,
+        5505
+      ]
+    },
+    {
+      "id": "rpg",
+      "language": "RPG",
+      "status": "untested",
+      "checks": [],
+      "source_sha256": "00597442ac4e2996f1f1df24e64abbca5c92526bda8f4e69f0a45506b2674d40",
+      "reason": "Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt."
+    },
+    {
+      "id": "bash",
+      "language": "Bash",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "1b64897a9e444bd8d0cbc32a419b90f60d1ee4d245329398f4917cbf8aa2ab4b",
+      "observed_worker_pids": [
+        5556,
+        5557,
+        5558,
+        5559,
+        5560,
+        5561,
+        5562,
+        5563,
+        5564,
+        5565
+      ]
+    },
+    {
+      "id": "perligata",
+      "language": "Lingua::Romana::Perligata",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "5c21ee68440360d845caee4f4ec897b09ea890cb742b584b7dcb47ce834f3fe5",
+      "observed_worker_pids": [
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ]
+    }
+  ],
+  "notes": "25 editions passed all 11 checks. Five require unavailable runtimes/services and are explicitly untested. See validation.txt for toolchain and scope details."
+}
