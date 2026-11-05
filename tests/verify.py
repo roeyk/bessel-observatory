@@ -128,11 +128,17 @@ def verify(entry: dict) -> dict:
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--only", help="comma-separated language IDs")
+    parser.add_argument("--require-all", action="store_true",
+                        help="fail if any selected edition is unavailable or untested")
     parser.add_argument("--overrides", type=Path)
     parser.add_argument("--report", type=Path, default=ROOT / "tests/report.json")
     args = parser.parse_args()
     overrides = json.loads(args.overrides.read_text()) if args.overrides else {}
-    selected = set(args.only.split(",")) if args.only else None
+    selected = {name.strip() for name in args.only.split(",")} if args.only is not None else None
+    if selected is not None:
+        unknown = selected - {entry["id"] for entry in MANIFEST["languages"]}
+        if unknown:
+            parser.error("unknown language IDs: " + ", ".join(sorted(unknown)))
     for directory in ("build", "build/pascal", "build/ada", "build/fortran", "build/haskell"):
         (ROOT / directory).mkdir(exist_ok=True)
     results = []
@@ -148,8 +154,10 @@ def main():
         "method": "Black-box execution against stored 80-digit reference values; process IDs checked against parent PID. No assertion of bitwise equality or relative speed.",
         "toolchains": "Some toolchains may be unpacked into /tmp through --overrides; no global installations are required.",
         "results": results}
+    args.report.parent.mkdir(parents=True, exist_ok=True)
     args.report.write_text(json.dumps(report, indent=2) + "\n")
-    return int(any(r["status"] == "failed" for r in results))
+    return int(any(r["status"] == "failed" or
+                   (args.require_all and r["status"] != "passed") for r in results))
 
 
 if __name__ == "__main__":

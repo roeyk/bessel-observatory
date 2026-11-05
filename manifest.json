@@ -734,5 +734,7 @@
       "highlighted": "code/bessel-perligata.pl.html"
     }
   ],
-  "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics."
+  "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics.",
+  "repository": "https://github.com/roeyk/bessel-observatory",
+  "license": "GPL-3.0-only"
 }

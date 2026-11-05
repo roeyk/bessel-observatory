@@ -9,3 +9,12 @@ __pycache__/
 *.jar
 results.csv
 *-results.csv
+
+# Local development environments and fresh validation output.
+.venv/
+.ruff_cache/
+.pytest_cache/
+.mypy_cache/
+.DS_Store
+.env
+.env.*

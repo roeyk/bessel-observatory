@@ -544,7 +544,7 @@ main :- current_prolog_flag(argv, Args),
     catch((run(Args) -&gt; true ; throw(error(program_failed, _))),
           Error, (format(user_error, &#x27;error: ~w~n&#x27;, [Error]), halt(1))).
 </textarea>
-<footer>Highlighted with Pygments using the Prolog lexer. All assets are local. SHA-256: <code>35785b95935a14a981c3fe2e2dc90eba7ff434884711c2498399e3b446b51060</code></footer>
+<footer>Highlighted with Pygments using the Prolog lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>35785b95935a14a981c3fe2e2dc90eba7ff434884711c2498399e3b446b51060</code></footer>
 <script>
 document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
 document.querySelector('#copy').addEventListener('click',async()=>{

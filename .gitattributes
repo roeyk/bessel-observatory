@@ -1,0 +1,7 @@
+* text=auto eol=lf
+
+# Retain generated HTML for offline readers while keeping language statistics useful.
+code/** linguist-generated=true
+index.html linguist-generated=true
+*.sqlrpgle linguist-language=RPGLE
+Bessel.Mod linguist-language=Oberon

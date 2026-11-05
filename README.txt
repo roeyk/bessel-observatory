@@ -1,5 +1,8 @@
 BESSEL OBSERVATORY — 30 languages
 
+Project guide: README.md. Development workflow: CONTRIBUTING.md.
+Change history: CHANGELOG.md and Git. License: GPL-3.0-only (see LICENSE).
+
 Open index.html for source links, build/run instructions, the mathematical
 definition, methodology, dialect choices and per-language verification status.
 manifest.json is the machine-readable project description and specification.

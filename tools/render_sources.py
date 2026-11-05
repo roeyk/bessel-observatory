@@ -64,7 +64,7 @@ for i, item in enumerate(languages):
 <a href="../{item['source']}" download>Download source</a><button id="copy" type="button">Copy code</button>
 <button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
 <main id="listing">{rendered}</main><textarea id="raw" hidden>{e(source)}</textarea>
-<footer>Highlighted with Pygments using the {e(lexer.name)} lexer. All assets are local. SHA-256: <code>{digest}</code></footer>
+<footer>Highlighted with Pygments using the {e(lexer.name)} lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>{digest}</code></footer>
 <script>
 document.querySelector('#wrap').addEventListener('click',event=>{{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));}});
 document.querySelector('#copy').addEventListener('click',async()=>{{
