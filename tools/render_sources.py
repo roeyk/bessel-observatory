@@ -36,7 +36,7 @@ for parent in manifest["languages"]:
     for source in parent.get("support", []):
         if source.endswith(".txt"):
             continue
-        languages.append({"id": {".c":"c", ".sh":"bash", ".sql":"sql"}[Path(source).suffix],
+        languages.append({"id": {".c":"c", ".sh":"bash", ".sql":"sql", ".pm":"perl"}[Path(source).suffix],
                           "name": parent["name"]+" support", "source": source,
                           "runtime": parent["runtime"], "idioms": "Support interface for "+parent["source"],
                           "support_page": True})

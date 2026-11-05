@@ -62,7 +62,7 @@
     "Use the supplied BASIC build helper: FreeBASIC generates a C intermediate, so compiling the same basename in the source directory can collide with the C edition.",
     "Bash orchestrates the embedded awk numerical kernel because Bash arithmetic is integer-only.",
     "Oberon-2 uses the supplied C adapter for checked OS and stdio interfaces; its quadrature and raw-address traversal are Oberon.",
-    "Perligata uses an explicitly marked Perl prelude for regex validation, lexical filehandles, and checked process services; the Latin portion owns quadrature and scheduling.",
+    "Perligata uses BesselPerligata.pm for regex validation, unchanged line reads, temporary storage and checked POSIX/exception services. Native perlege converts Roman numerals, so it cannot preserve this input contract. Opening/writing/closing files, quadrature and scheduling remain in Latin.",
     "RPG requires IBM i setup described in rpg_setup.txt; failed or timed-out runs retain work rows, and submitted jobs may finish after parent failure.",
     "Raw pointer arithmetic is unavailable in several listed languages; their native reference/offset models are documented instead."
   ],
@@ -727,11 +727,17 @@
         "perl",
         "bessel-perligata.pl"
       ],
-      "idioms": "Latin declensions, Roman numerals, sic/cis blocks, adnota comments and ecce documentation; explicit small Perl compatibility prelude.",
-      "multiprocessing": "Latin scheduling loop uses a Perl fork bridge, bounded PID batches and private per-observation files.",
-      "memory": "Latin ad creates a scalar reference for in-place trim; Perl references preserve owners. No raw pointer arithmetic.",
-      "strings": "Latin excerpementum (substr), serementum (concatenation), chr punctuation, and a regex-based Perl validation bridge.",
-      "highlighted": "code/bessel-perligata.pl.html"
+      "idioms": "Latin-root vocabulary, inflected nouns and verbs, Roman numerals, sic/cis blocks, native evolute/scribe/claude I/O, adnota and ecce comments; separately browsable Perl compatibility module.",
+      "multiprocessing": "Latin scheduling loop uses registered Perl fork calls, bounded PID batches, checked waitpid and private per-observation files with parent-owned cleanup.",
+      "memory": "Latin ad creates a scalar reference for in-place trim; agtorem supplies a code reference to the exception boundary. Perl references retain their owners. No raw pointer arithmetic.",
+      "strings": "Latin excerpementum (substr), serementum (concatenation), chr punctuation and a regex validation bridge; raw reads preserve decimal input instead of converting Roman numerals.",
+      "highlighted": "code/bessel-perligata.pl.html",
+      "support": [
+        "BesselPerligata.pm"
+      ],
+      "validation_dependencies": [
+        "BesselPerligata.pm"
+      ]
     }
   ],
   "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics.",

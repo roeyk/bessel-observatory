@@ -29,7 +29,7 @@ Verification:
 
 Each edition implements its own numerical kernel. Bash uses an embedded awk
 loop for floating-point math. Oberon uses the included C adapter for checked
-OS/stdio calls; Perligata explicitly marks its small Perl syntax/OS bridge.
+OS/stdio calls; Perligata exposes its Perl compatibility module as BesselPerligata.pm.
 Some historical languages use POSIX bindings for processes. See the manifest for platform and
 ABI requirements. Untested editions are explicitly marked; the presence of
 source does not imply that an unavailable toolchain was tested.
@@ -52,7 +52,9 @@ RPG targets IBM i; rpg_setup.txt explains compilation, queue setup, native CALL
 parameters, job-message errors, and the differences from the Unix interface.
 Oberon-2 targets Oxford OBC 3; tools/build_oberon.sh isolates build products.
 Install Perligata with cpanm Lingua::Romana::Perligata. Its Latin program uses
-adnota line comments and ecce documentation blocks.
+Latin roots, native file open/write/close, adnota and ecce comments. The linked
+BesselPerligata.pm handles regexes, raw line reads and checked OS/exception
+services; the native reader would convert Roman numerals in decimal input.
 
 Functions have purpose/input/output/caller comments. Blocks explain their
 functional effect. Native block-comment forms are used where supported;

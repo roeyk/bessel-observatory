@@ -26,6 +26,13 @@ REFERENCE = json.loads((ROOT / "tests/reference.json").read_text())
 def verify(entry: dict) -> dict:
     result = {"id": entry["id"], "language": entry["name"], "status": "untested", "checks": []}
     result["source_sha256"] = hashlib.sha256((ROOT / entry["source"]).read_bytes()).hexdigest()
+    # Bind execution evidence to declared helper code as well as the main listing.
+    # The catalogue rejects stale helper hashes when an edition declares dependencies.
+    if entry.get("validation_dependencies"):
+        result["dependency_sha256"] = {
+            source: hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
+            for source in entry["validation_dependencies"]
+        }
     if entry.get("integration_required") or entry["id"] == "sql":
         result["reason"] = entry.get("integration_required", "Requires an explicitly configured PostgreSQL database; see SQL integration instructions.")
         return result
@@ -99,6 +106,11 @@ def verify(entry: dict) -> dict:
             parent, _, warnings = invoke(["examples/mixed.txt", str(output), "2"])
             check_rows([(x, refs[x]) for x in [0, 1, 5]], parent)
             assert any(word in warnings.lower() for word in ("warning", "skipping"))
+            if entry["id"] == "perligata":
+                # Native perlege rewrites Roman numerals; raw input must stay invalid.
+                parent, _, warnings = invoke(["-", str(output), "2"], "I\nV\nIX\n0\n1\n")
+                check_rows([(x, refs[x]) for x in [0, 1]], parent)
+                assert warnings.count("Skipping invalid value") == 3
             passed("invalid lines skipped with diagnostics")
             parent, _, _ = invoke(["-", str(output), "2"], "0\ninvalid\n1\n\n5\n")
             check_rows([(x, refs[x]) for x in [0, 1]], parent)

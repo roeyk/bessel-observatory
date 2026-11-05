@@ -3,6 +3,17 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-05 — Perligata Latin prose
+
+- Rewrote the Perligata listing around Latin-root vocabulary, native file
+  opening/writing/closing, and documented scalar and code references.
+- Removed its large Perl prelude. The separately linked and highlighted
+  BesselPerligata.pm retains regex, unchanged-input and checked OS services;
+  numerical work and bounded process orchestration remain in Latin.
+- Preserved functional comments, CLI/CSV behavior and all eleven shared checks.
+- Bound fresh Perligata validation evidence to both the main and helper source;
+  the offline catalogue now contains 34 highlighted main/support views.
+
 ## 2026-11-05 — Project established
 
 - Established Git history, public GitHub hosting, and GPL-3.0-only licensing.

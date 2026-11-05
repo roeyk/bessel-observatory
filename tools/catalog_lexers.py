@@ -41,10 +41,10 @@ class RpgLexer(RegexLexer):
     ]}
 
 
-# Color the real Latin program while delegating its marked prelude to PerlLexer.
-# Inputs: complete hybrid source. Outputs: tokens. Used by the Perligata page.
+# Color the Latin program while delegating its Perl import header to PerlLexer.
+# Inputs: the main program source. Outputs: tokens. Used by the Perligata page.
 class PerligataLexer(RegexLexer):
-    name = 'Perligata + explicit Perl bridge (project lexer)'
+    name = 'Perligata with Perl imports (project lexer)'
     tokens = {
         'root': [(r'(?s)(.*?)(use Lingua::Romana::Perligata;)',
                   bygroups(using(PerlLexer), Keyword.Namespace), 'latin')],

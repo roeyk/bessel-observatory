@@ -1,329 +1,191 @@
 #!/usr/bin/env perl
-
-=pod
-
-Bessel Observatory in Lingua::Romana::Perligata 0.605 on POSIX Perl.
-The Latin program below owns the mathematics, input loop, bounded fork batches,
-and ordered output. This small Perl prelude bridges lexical filehandles,
-regular expressions (unimplemented in the Latin grammar), and checked OS calls.
-No numerical work is delegated to the prelude.
-
-=cut
-
-use POSIX qw(isfinite _exit);
-use File::Temp qw(tempdir);
-use Errno qw(EINTR);
-my @live;
-my $owner = $$;
-my $directory;
-
-=pod
-
-Normalize an input string and validate decimal observations or worker counts.
-Inputs: trim takes a scalar reference; valid and jobs take strings.
-Outputs: trim updates its referent; valid returns a Boolean; jobs returns a count.
-Used by: Latin run to clean lines and enforce the shared input contract.
-
-=cut
-
-=pod
-
-Trim surrounding whitespace through a scalar reference.
-Inputs: Reference to the caller string.
-Outputs: Modified referent, no return contract.
-Used by: Latin run before line classification.
-
-=cut
-
-sub trim { ${$_[0]} =~ s/^\s+|\s+$//g; }
-=pod
-
-Check complete decimal spelling, finiteness and the input domain.
-Inputs: One input token.
-Outputs: Boolean acceptance.
-Used by: Latin run to skip malformed observations.
-
-=cut
-
-sub valid { $_[0] =~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/ &&
-                    isfinite(0+$_[0]) && abs($_[0]) <= 1000 }
-=pod
-
-Convert a bounded worker-count argument.
-Inputs: Decimal argument text.
-Outputs: Integer 1..16, or an exception.
-Used by: Latin run to limit process batches.
-
-=cut
-
-sub jobs { $_[0] =~ /^\d+$/ && $_[0] >= 1 && $_[0] <= 16 or die "workers must be 1..16\n"; 0+$_[0] }
-
-=pod
-
-Open, read, write, and close lexical handles with explicit error checks.
-Inputs: paths for input/output; handles for readrow, emit, and shut; text for emit.
-Outputs: handles, a line or undef at EOF, or a die exception on an I/O failure.
-Used by: Latin run and its children for console/file input and ordered CSV.
-
-=cut
-
-=pod
-
-Open the named input stream or borrow standard input.
-Inputs: Path or dash.
-Outputs: Lexical filehandle reference, or exception.
-Used by: Latin run for original input and completed row files.
-
-=cut
-
-sub input { return \*STDIN if $_[0] eq '-'; open my $f, '<', $_[0] or die "open: $!\n"; $f }
-=pod
-
-Create a file for checked output.
-Inputs: Target path.
-Outputs: Writable lexical handle reference, or exception.
-Used by: Latin workers and the parent CSV publisher.
-
-=cut
-
-sub output { open my $f, '>', $_[0] or die "open output: $!\n"; $f }
-=pod
-
-Read one line while distinguishing EOF from an I/O error.
-Inputs: Readable handle.
-Outputs: Line string, undef at EOF, or exception.
-Used by: Latin run in both reading loops.
-
-=cut
-
-sub readrow { my $f=shift; $!=0; my $s=<$f>; die "read: $!\n" if !defined($s) && $!; $s }
-=pod
-
-Write a complete string through a handle reference.
-Inputs: Writable handle and text.
-Outputs: Written bytes, or exception.
-Used by: Latin workers and the ordered CSV output loop.
-
-=cut
-
-sub emit { my ($f,$s)=@_; print {$f} $s or die "write: $!\n"; }
-=pod
-
-Close a file and check buffered writes.
-Inputs: Handle reference.
-Outputs: Closed stream, or exception.
-Used by: Latin run and finish to complete I/O.
-
-=cut
-
-sub shut { close $_[0] or die "close: $!\n"; }
-
-=pod
-
-Provide process bookkeeping and a private path for each observation.
-Inputs: track/reap take a PID; rowpath takes an ordinal; finish takes a handle.
-Outputs: checked child completion, a path, or immediate successful child exit.
-Used by: Latin run after fork, at batch boundaries, and when publishing rows.
-The parent owns the temporary directory so a child's exit cannot remove it.
-
-=cut
-
-=pod
-
-Name an observation file inside a private temporary directory.
-Inputs: Observation ordinal.
-Outputs: Unique per-run pathname.
-Used by: Latin scheduler before forking and while gathering rows.
-
-=cut
-
-sub rowpath { $directory //= tempdir(CLEANUP=>0); "$directory/$_[0].csv" }
-=pod
-
-Record a child for cleanup if a later operation fails.
-Inputs: Child PID.
-Outputs: Updated live-child list.
-Used by: Latin parent immediately after a successful fork.
-
-=cut
-
-sub track { push @live,$_[0]; }
-=pod
-
-Wait through interruptions and reject unsuccessful workers.
-Inputs: Child PID.
-Outputs: Reaped child and updated live list, or exception.
-Used by: Latin parent at each bounded batch boundary.
-
-=cut
-
-sub reap {
-    my $pid=shift; my $got;
-    do { $got=waitpid($pid,0) } while $got<0 && $! == EINTR;
-    die "worker $pid failed\n" if $got!=$pid || $?;
-    @live=grep { $_!=$pid } @live;
-}
-=pod
-
-Expose Perl fork, whose no-argument form lacks a Latin grammar rule.
-Inputs: None.
-Outputs: Child PID, zero in child, or undef on failure.
-Used by: Latin run to branch into a numeric worker.
-
-=cut
-
-sub spawn { fork() }
-=pod
-
-Read the actual OS identity of this process.
-Inputs: None.
-Outputs: Numeric PID.
-Used by: Latin worker when constructing its CSV row.
-
-=cut
-
-sub identity { $$ }
-=pod
-
-Provide a punctuation-leading CLI token to the Latin grammar.
-Inputs: None.
-Outputs: The --help string.
-Used by: Latin run while recognizing usage requests.
-
-=cut
-
-sub help { "--help" }
-=pod
-
-Flush a worker row and exit without inherited stream cleanup.
-Inputs: Worker output handle.
-Outputs: Child process exits successfully; close errors throw.
-Used by: Latin worker after emitting its observation.
-
-=cut
-
-sub finish { shut($_[0]); _exit(0); }
-
-# The bootstrap catches exceptions thrown anywhere in the Latin program.
-# Inputs: CLI/stdin. Outputs: CSV or stderr and nonzero status. Used by Perl startup.
-my $ok=eval { run(); 1 };
-my $error=$@;
-if ($$ == $owner) {
-    for (@live) { kill 'TERM',$_; waitpid($_,0); }
-    if (defined $directory) { unlink glob "$directory/*.csv"; rmdir $directory; }
-}
-if (!$ok) { print STDERR "bessel: $error"; exit 1; }
-exit 0;
-
+use FindBin qw($RealBin);
+use lib $RealBin;
+use BesselPerligata;
 use Lingua::Romana::Perligata;
 
 ecce explico
-Calculate J0 with midpoint quadrature entirely in Latin syntax.
-Inputs: One validated real in haec (Perl's argument list).
-Outputs: The average of 16384 samples as a floating-point scalar.
-Used by: run's forked children to calculate their assigned observations.
+Bessel Observatory, expressed in Perligata's modified Latin grammar.
+The calculation, file opening/writing/closing, argument handling, string
+assembly and bounded worker orchestration below all use the Latin notation.
+BesselPerligata.pm supplies documented regex, raw-read and OS services; its
+source has a separate highlighted link in the catalogue.
+
+Vocabulary: numerum is an observation, summum a sum, angulum an angle,
+terminum a term, indicum an index, librum an open book (file handle),
+fontum the source, destinatum the destination, filium a child process,
+observata the accepted observations, and vinculum a reference (a bond).
+Perligata regularizes all nouns and user verbs; these are Latin roots under
+its grammar, rather than a claim to unrestricted classical Latin.
+
+An -o ending marks a scalar destination; -um marks its value. Arrays use
+-is and -a respectively. Verbs such as da, scribe and claude state the action.
+English functional comments explain what each sentence or paragraph achieves.
 ecce seco
-observeere sic
-    meis xo haec da.
+
+ecce explico
+pendere (weigh): calculate J0 by averaging midpoint samples of its integral.
+Inputs: one validated observation in haec, the argument list.
+Outputs: floating-point J0 approximation using 16384 samples.
+Used by: agere's children to do the numerical work locally in Latin syntax.
+ecce seco
+pendere sic
+    meis numero haec da.
     meo pio da unum tum unum angulamentum tum IV multiplicamentum.
-    meo summao nullum da.
-    meo indiceo nullum da.
-    dum indiceum tum ((I))I))MCCCLXXXIV praestantiam fac sic
-        adnota Form the midpoint angle, then evaluate its oscillating integrand.
-        meo anguloo indiceum tum unum secundum addementum da.
-        anguloo anguloum tum pium multiplicamentum tum ((I))I))MCCCLXXXIV dividementum da.
-        meo termoo anguloum opponementum da.
-        termoo termoum tum xum multiplicamentum da.
-        termoo termoum accubamentum da.
-        summao summaum tum termoum addementum da.
-        indiceo postincresce.
+    meo summo nullum da.
+    meo indico nullum da.
+    dum indicum tum ((I))I))MCCCLXXXIV praestantiam fac sic
+        adnota Form the midpoint angle, then cos(x sin(angle)), and accumulate it.
+        meo angulo indicum tum unum secundum addementum da.
+        angulo angulum tum pium multiplicamentum tum ((I))I))MCCCLXXXIV dividementum da.
+        meo termino angulum opponementum da.
+        termino terminum tum numerum multiplicamentum da.
+        termino terminum accubamentum da.
+        summo summum tum terminum addementum da.
+        indico postincresce.
     cis
-    summaum tum ((I))I))MCCCLXXXIV dividementum redde.
+    summum tum ((I))I))MCCCLXXXIV dividementum redde.
 cis
 
 ecce explico
-Run the public CLI and preserve input order across bounded process batches.
-Inputs: parametra (ARGV), stdin or the selected file, and the helper interfaces.
-Outputs: CSV rows or exceptions caught by the bootstrap; normal return is void.
-Used by: the Perl bootstrap once at process startup.
+pandere (open): obtain a checked lexical filehandle using native evolute.
+Inputs: open mode and path, or descriptor zero with mode less-than-ampersand.
+Outputs: owning handle reference, or exception on failure.
+Used by: agere to open observations, private rows and final CSV output.
+Three-argument open treats a path as a filename, never a shell command.
 ecce seco
-runere sic
-    meo argco parametra da.
-    meo helppo helpementum da.
-    si argcum tum unum aequalitam fac sic
-      si nullimum parametrorum tum helppum aequalitas fac sic
-        dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis tum novumversum egresso scribe.
-        nullum redde.
-      cis
+pandere sic
+    meo modo his decapitamentum da.
+    meo viao his decapitamentum da.
+    meo libro.
+    nisi libro modum tum viaum evolutementum fac sic
+        dictum sic Cannot open file: cis tum stadium tum viaum tum novumversum mori.
     cis
-    si argcum tum IV non praestantiam fac sic dictum sic too many arguments cis mori. cis
-    meo sourceo XLV indementum da.
-    meo targeto dictum sic results.csv cis da.
-    meo counto II da.
-    si argcum tum unum non praestantiam fac sic sourceo nullimum parametrorum da. cis
-    si argcum tum duo non praestantiam fac sic targeto primum parametrorum da. cis
-    si argcum tum tres non praestantiam fac sic counto secundum parametrorum jobsementum da. cis
-    meo ino sourceum inputementum da.
-    meis valis.
-    meo limito LXIV tum LXIV multiplicamentum da.
+    librum redde.
+cis
+
+ecce explico
+fundere (pour): write a complete string using native scribe and check success.
+Inputs: writable handle reference and text. Outputs: written text or exception.
+Used by: agere's workers for rows and the parent for ordered CSV publication.
+The caller closes the handle separately to check delayed buffered-write errors.
+ecce seco
+fundere sic
+    meo libro his decapitamentum da.
+    meo textoo his decapitamentum da.
+    nisi libro textoum scribementum fac sic
+        dictum sic Cannot write output cis tum novumversum mori.
+    cis
+cis
+
+ecce explico
+agere (act): read observations, schedule bounded workers, and publish CSV.
+Inputs: parametra (ARGV), stdin or the selected file, and compatibility services.
+Outputs: ordered CSV or an exception; normal return carries no result.
+Used by: tege agtorem at startup, which catches errors and cleans child resources.
+An ad reference lets tergere trim the caller's string in place. Perl retains
+that scalar while the reference exists; raw pointer arithmetic is unavailable.
+ecce seco
+agere sic
+    adnota Recognize help, reject excess arguments, and apply the public defaults.
+    meo copio parametra da.
+    meo signo XLV indementum da.
+    meo auxilio signum tum signum tum dictum sic help cis serementum da.
+    si copium tum unum aequalitam fac sic
+        si nullimum parametrorum tum auxilium aequalitas fac sic
+            dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis tum novumversum egresso scribe.
+            nullum redde.
+        cis
+    cis
+    si copium tum IV non praestantiam fac sic
+        dictum sic too many arguments cis mori.
+    cis
+    meo fonto signum da.
+    meo destinato dictum sic results.csv cis da.
+    meo opero II da.
+    si copium tum unum non praestantiam fac sic fonto nullimum parametrorum da. cis
+    si copium tum duo non praestantiam fac sic destinato primum parametrorum da. cis
+    si copium tum tres non praestantiam fac sic opero secundum parametrorum regementum da. cis
+
+    adnota Build open modes from characters; duplicate stdin for the dash input.
+    meo legendo LX indementum da.
+    meo scribendo LXII indementum da.
+    si fontum tum signum aequalitas fac sic
+        legendo legendum tum cum XXXVIII indementum serementum da.
+        fonto nullum da.
+    cis
+    meo libro legendum tum fontum pandementum da.
+    meis observatis.
+    meo fino LXIV tum LXIV multiplicamentum da.
     meo textoo.
     dum unum fac sic
-        textoo inum readrowementum da.
+        adnota Preserve original input bytes; native perlege would translate Roman numerals.
+        textoo librum accipementum da.
         nisi textoum confirmamentum fac sic ultimus. cis
-        adnota Pass a scalar reference so trim can change the caller's string.
-        meo refo da ad textoo.
-        trime refum.
+        meo vinculo da ad textoo.
+        terge vinculum.
         si textoum metamentum tum nullum aequalitam fac sic ultimus. cis
-        meo firsto textoum tum nullum tum unum excerpementum da.
-        meo hasho XXXV indementum da.
-        si firstum tum hashum aequalitas fac sic posterus. cis
-        nisi textoum validementum fac sic dictum sic Skipping invalid value cis tum novumversum mone. posterus. cis
-        valis textoum cumula.
-        meo sizeo vala da.
-        si limitum tum sizeum praestantiam fac sic dictum sic at most 4096 observations cis mori. cis
-    cis
-    shute inum.
-    meo sizeo vala da.
-    nisi sizeum fac sic dictum sic no valid observations cis mori. cis
-
-    adnota Launch one child per observation, waiting after each full batch.
-    meis pidis.
-    meo indexo nullum da.
-    dum indexum tum sizeum praestantiam fac sic
-        meo patho indexum rowpathementum da.
-        meo xo valis decapitamentum da.
-        meo pido spawnementum da.
-        nisi pidum confirmamentum fac sic dictum sic fork failed cis mori. cis
-        nisi pidum fac sic
-            meo yo xum observeementum da.
-            meo outo pathum outputementum da.
-            meo selfo identityementum da.
-            meo texto xum tum comma tum yum tum comma tum selfum tum novumversum serementum da.
-            emite outum tum textum.
-            finishe outum.
+        adnota Inspect the first character after trimming, then validate decimal spelling.
+        meo capito textoum tum nullum tum unum excerpementum da.
+        meo noto XXXV indementum da.
+        si capitum tum notum aequalitas fac sic posterus. cis
+        nisi textoum probementum fac sic
+            dictum sic Skipping invalid value cis tum novumversum mone.
+            posterus.
         cis
-        tracke pidum.
-        pidis pidum cumula.
-        indexo postincresce.
-        meo activeo pida da.
-        meo fullo activeum tum countum aequalitam da.
-        meo doneo indexum tum sizeum aequalitam da.
-        si fullum vel doneum fac sic
-            per quisque childum in pidis fac sic reape childum. cis
-            pidis iani.
+        observatis textoum cumula.
+        meo copio observata da.
+        si finum tum copium praestantiam fac sic
+            dictum sic at most 4096 observations cis mori.
         cis
     cis
+    nisi libro claudementum fac sic dictum sic Cannot close input cis mori. cis
+    meo copio observata da.
+    nisi copium fac sic dictum sic no valid observations cis mori. cis
 
-    adnota Publish only completed rows, using explicit ordinals to restore order.
-    meo outo targetum outputementum da.
-    emite outum tum cum dictum sic x,j0,worker_pid cis tum novumversum serementum.
-    indexo nullum da.
-    dum indexum tum sizeum praestantiam fac sic
-        meo rowo indexum rowpathementum inputementum da.
-        meo texto rowum readrowementum da.
-        emite outum tum textum.
-        shute rowum.
-        indexo postincresce.
+    adnota Start one OS child per observation, waiting after each bounded batch.
+    meis filiis.
+    meo indico nullum da.
+    dum indicum tum copium praestantiam fac sic
+        meo viao indicum locementum da.
+        meo numero observatis decapitamentum da.
+        meo filio gignementum da.
+        nisi filium fac sic
+            adnota Calculate in this child, assemble one CSV row and close it before exit.
+            meo responso numerum pendementum da.
+            meo libro scribendum tum viaum pandementum da.
+            meo proprio cognoscementum da.
+            meo textoo numerum tum comma tum responsum tum comma tum proprium tum novumversum serementum da.
+            funde librum tum textoum.
+            nisi libro claudementum fac sic dictum sic Cannot close worker row cis mori. cis
+            discede.
+        cis
+        filiis filium cumula.
+        indico postincresce.
+        meo vivo filia da.
+        meo pleno vivum tum operum aequalitam da.
+        meo ultimo indicum tum copium aequalitam da.
+        si plenum vel ultimum fac sic
+            per quisque filium in filiis fac sic collige filium. cis
+            filiis iani.
+        cis
     cis
-    shute outum.
+
+    adnota Publish only successful rows, restoring input order through their ordinals.
+    legendo LX indementum da.
+    libro scribendum tum destinatum pandementum da.
+    funde librum tum cum dictum sic x,j0,worker_pid cis tum novumversum serementum.
+    indico nullum da.
+    dum indicum tum copium praestantiam fac sic
+        meo viao indicum locementum da.
+        meo paginao legendum tum viaum pandementum da.
+        meo textoo paginaum accipementum da.
+        funde librum tum textoum.
+        nisi paginao claudementum fac sic dictum sic Cannot close worker row cis mori. cis
+        indico postincresce.
+    cis
+    nisi libro claudementum fac sic dictum sic Cannot close output cis mori. cis
 cis
+
+adnota Protect the whole run by passing a code reference to the exception boundary.
+tege agtorem.

@@ -1,11 +1,11 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="5c21ee68440360d845caee4f4ec897b09ea890cb742b584b7dcb47ce834f3fe5">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="49f78f081cb45692a338ba8f3487c6e05ee09542a6f60994373658fd699ea4e7">
 <title>Lingua::Romana::Perligata — bessel-perligata.pl — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
 <body><header><nav><a href="../index.html#languages">← All 30 languages</a>
 <a href="bessel.sh.html">← Bash</a><a href="bessel-oberon-posix.c.html">Oberon-2 support →</a></nav>
 <h1>Lingua::Romana::Perligata <code>bessel-perligata.pl</code></h1>
-<p>POSIX Perl + CPAN Lingua::Romana::Perligata 0.605 · Latin declensions, Roman numerals, sic/cis blocks, adnota comments and ecce documentation; explicit small Perl compatibility prelude.</p>
-<p><strong>Memory:</strong> Latin ad creates a scalar reference for in-place trim; Perl references preserve owners. No raw pointer arithmetic.<br><strong>Strings:</strong> Latin excerpementum (substr), serementum (concatenation), chr punctuation, and a regex-based Perl validation bridge.</p>
+<p>POSIX Perl + CPAN Lingua::Romana::Perligata 0.605 · Latin-root vocabulary, inflected nouns and verbs, Roman numerals, sic/cis blocks, native evolute/scribe/claude I/O, adnota and ecce comments; separately browsable Perl compatibility module.</p>
+<p><strong>Memory:</strong> Latin ad creates a scalar reference for in-place trim; agtorem supplies a code reference to the exception boundary. Perl references retain their owners. No raw pointer arithmetic.<br><strong>Strings:</strong> Latin excerpementum (substr), serementum (concatenation), chr punctuation and a regex validation bridge; raw reads preserve decimal input instead of converting Roman numerals.</p>
 <div class="actions"><a href="../bessel-perligata.pl">Open raw source</a>
 <a href="../bessel-perligata.pl" download>Download source</a><button id="copy" type="button">Copy code</button>
 <button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
@@ -199,805 +199,391 @@
 <span class="normal"><a href="#L-188">188</a></span>
 <span class="normal"><a href="#L-189">189</a></span>
 <span class="normal"><a href="#L-190">190</a></span>
-<span class="normal"><a href="#L-191">191</a></span>
-<span class="normal"><a href="#L-192">192</a></span>
-<span class="normal"><a href="#L-193">193</a></span>
-<span class="normal"><a href="#L-194">194</a></span>
-<span class="normal"><a href="#L-195">195</a></span>
-<span class="normal"><a href="#L-196">196</a></span>
-<span class="normal"><a href="#L-197">197</a></span>
-<span class="normal"><a href="#L-198">198</a></span>
-<span class="normal"><a href="#L-199">199</a></span>
-<span class="normal"><a href="#L-200">200</a></span>
-<span class="normal"><a href="#L-201">201</a></span>
-<span class="normal"><a href="#L-202">202</a></span>
-<span class="normal"><a href="#L-203">203</a></span>
-<span class="normal"><a href="#L-204">204</a></span>
-<span class="normal"><a href="#L-205">205</a></span>
-<span class="normal"><a href="#L-206">206</a></span>
-<span class="normal"><a href="#L-207">207</a></span>
-<span class="normal"><a href="#L-208">208</a></span>
-<span class="normal"><a href="#L-209">209</a></span>
-<span class="normal"><a href="#L-210">210</a></span>
-<span class="normal"><a href="#L-211">211</a></span>
-<span class="normal"><a href="#L-212">212</a></span>
-<span class="normal"><a href="#L-213">213</a></span>
-<span class="normal"><a href="#L-214">214</a></span>
-<span class="normal"><a href="#L-215">215</a></span>
-<span class="normal"><a href="#L-216">216</a></span>
-<span class="normal"><a href="#L-217">217</a></span>
-<span class="normal"><a href="#L-218">218</a></span>
-<span class="normal"><a href="#L-219">219</a></span>
-<span class="normal"><a href="#L-220">220</a></span>
-<span class="normal"><a href="#L-221">221</a></span>
-<span class="normal"><a href="#L-222">222</a></span>
-<span class="normal"><a href="#L-223">223</a></span>
-<span class="normal"><a href="#L-224">224</a></span>
-<span class="normal"><a href="#L-225">225</a></span>
-<span class="normal"><a href="#L-226">226</a></span>
-<span class="normal"><a href="#L-227">227</a></span>
-<span class="normal"><a href="#L-228">228</a></span>
-<span class="normal"><a href="#L-229">229</a></span>
-<span class="normal"><a href="#L-230">230</a></span>
-<span class="normal"><a href="#L-231">231</a></span>
-<span class="normal"><a href="#L-232">232</a></span>
-<span class="normal"><a href="#L-233">233</a></span>
-<span class="normal"><a href="#L-234">234</a></span>
-<span class="normal"><a href="#L-235">235</a></span>
-<span class="normal"><a href="#L-236">236</a></span>
-<span class="normal"><a href="#L-237">237</a></span>
-<span class="normal"><a href="#L-238">238</a></span>
-<span class="normal"><a href="#L-239">239</a></span>
-<span class="normal"><a href="#L-240">240</a></span>
-<span class="normal"><a href="#L-241">241</a></span>
-<span class="normal"><a href="#L-242">242</a></span>
-<span class="normal"><a href="#L-243">243</a></span>
-<span class="normal"><a href="#L-244">244</a></span>
-<span class="normal"><a href="#L-245">245</a></span>
-<span class="normal"><a href="#L-246">246</a></span>
-<span class="normal"><a href="#L-247">247</a></span>
-<span class="normal"><a href="#L-248">248</a></span>
-<span class="normal"><a href="#L-249">249</a></span>
-<span class="normal"><a href="#L-250">250</a></span>
-<span class="normal"><a href="#L-251">251</a></span>
-<span class="normal"><a href="#L-252">252</a></span>
-<span class="normal"><a href="#L-253">253</a></span>
-<span class="normal"><a href="#L-254">254</a></span>
-<span class="normal"><a href="#L-255">255</a></span>
-<span class="normal"><a href="#L-256">256</a></span>
-<span class="normal"><a href="#L-257">257</a></span>
-<span class="normal"><a href="#L-258">258</a></span>
-<span class="normal"><a href="#L-259">259</a></span>
-<span class="normal"><a href="#L-260">260</a></span>
-<span class="normal"><a href="#L-261">261</a></span>
-<span class="normal"><a href="#L-262">262</a></span>
-<span class="normal"><a href="#L-263">263</a></span>
-<span class="normal"><a href="#L-264">264</a></span>
-<span class="normal"><a href="#L-265">265</a></span>
-<span class="normal"><a href="#L-266">266</a></span>
-<span class="normal"><a href="#L-267">267</a></span>
-<span class="normal"><a href="#L-268">268</a></span>
-<span class="normal"><a href="#L-269">269</a></span>
-<span class="normal"><a href="#L-270">270</a></span>
-<span class="normal"><a href="#L-271">271</a></span>
-<span class="normal"><a href="#L-272">272</a></span>
-<span class="normal"><a href="#L-273">273</a></span>
-<span class="normal"><a href="#L-274">274</a></span>
-<span class="normal"><a href="#L-275">275</a></span>
-<span class="normal"><a href="#L-276">276</a></span>
-<span class="normal"><a href="#L-277">277</a></span>
-<span class="normal"><a href="#L-278">278</a></span>
-<span class="normal"><a href="#L-279">279</a></span>
-<span class="normal"><a href="#L-280">280</a></span>
-<span class="normal"><a href="#L-281">281</a></span>
-<span class="normal"><a href="#L-282">282</a></span>
-<span class="normal"><a href="#L-283">283</a></span>
-<span class="normal"><a href="#L-284">284</a></span>
-<span class="normal"><a href="#L-285">285</a></span>
-<span class="normal"><a href="#L-286">286</a></span>
-<span class="normal"><a href="#L-287">287</a></span>
-<span class="normal"><a href="#L-288">288</a></span>
-<span class="normal"><a href="#L-289">289</a></span>
-<span class="normal"><a href="#L-290">290</a></span>
-<span class="normal"><a href="#L-291">291</a></span>
-<span class="normal"><a href="#L-292">292</a></span>
-<span class="normal"><a href="#L-293">293</a></span>
-<span class="normal"><a href="#L-294">294</a></span>
-<span class="normal"><a href="#L-295">295</a></span>
-<span class="normal"><a href="#L-296">296</a></span>
-<span class="normal"><a href="#L-297">297</a></span>
-<span class="normal"><a href="#L-298">298</a></span>
-<span class="normal"><a href="#L-299">299</a></span>
-<span class="normal"><a href="#L-300">300</a></span>
-<span class="normal"><a href="#L-301">301</a></span>
-<span class="normal"><a href="#L-302">302</a></span>
-<span class="normal"><a href="#L-303">303</a></span>
-<span class="normal"><a href="#L-304">304</a></span>
-<span class="normal"><a href="#L-305">305</a></span>
-<span class="normal"><a href="#L-306">306</a></span>
-<span class="normal"><a href="#L-307">307</a></span>
-<span class="normal"><a href="#L-308">308</a></span>
-<span class="normal"><a href="#L-309">309</a></span>
-<span class="normal"><a href="#L-310">310</a></span>
-<span class="normal"><a href="#L-311">311</a></span>
-<span class="normal"><a href="#L-312">312</a></span>
-<span class="normal"><a href="#L-313">313</a></span>
-<span class="normal"><a href="#L-314">314</a></span>
-<span class="normal"><a href="#L-315">315</a></span>
-<span class="normal"><a href="#L-316">316</a></span>
-<span class="normal"><a href="#L-317">317</a></span>
-<span class="normal"><a href="#L-318">318</a></span>
-<span class="normal"><a href="#L-319">319</a></span>
-<span class="normal"><a href="#L-320">320</a></span>
-<span class="normal"><a href="#L-321">321</a></span>
-<span class="normal"><a href="#L-322">322</a></span>
-<span class="normal"><a href="#L-323">323</a></span>
-<span class="normal"><a href="#L-324">324</a></span>
-<span class="normal"><a href="#L-325">325</a></span>
-<span class="normal"><a href="#L-326">326</a></span>
-<span class="normal"><a href="#L-327">327</a></span>
-<span class="normal"><a href="#L-328">328</a></span>
-<span class="normal"><a href="#L-329">329</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/usr/bin/env perl</span>
-<a id="L-2" name="L-2"></a>
-<a id="L-3" name="L-3"></a><span class="cm">=pod</span>
-<a id="L-4" name="L-4"></a>
-<a id="L-5" name="L-5"></a><span class="cm">Bessel Observatory in Lingua::Romana::Perligata 0.605 on POSIX Perl.</span>
-<a id="L-6" name="L-6"></a><span class="cm">The Latin program below owns the mathematics, input loop, bounded fork batches,</span>
-<a id="L-7" name="L-7"></a><span class="cm">and ordered output. This small Perl prelude bridges lexical filehandles,</span>
-<a id="L-8" name="L-8"></a><span class="cm">regular expressions (unimplemented in the Latin grammar), and checked OS calls.</span>
-<a id="L-9" name="L-9"></a><span class="cm">No numerical work is delegated to the prelude.</span>
-<a id="L-10" name="L-10"></a>
-<a id="L-11" name="L-11"></a><span class="cm">=cut</span>
-<a id="L-12" name="L-12"></a>
-<a id="L-13" name="L-13"></a><span class="k">use</span><span class="w"> </span><span class="nn">POSIX</span><span class="w"> </span><span class="sx">qw(isfinite _exit)</span><span class="p">;</span>
-<a id="L-14" name="L-14"></a><span class="k">use</span><span class="w"> </span><span class="nn">File::Temp</span><span class="w"> </span><span class="sx">qw(tempdir)</span><span class="p">;</span>
-<a id="L-15" name="L-15"></a><span class="k">use</span><span class="w"> </span><span class="nn">Errno</span><span class="w"> </span><span class="sx">qw(EINTR)</span><span class="p">;</span>
-<a id="L-16" name="L-16"></a><span class="k">my</span><span class="w"> </span><span class="nv">@live</span><span class="p">;</span>
-<a id="L-17" name="L-17"></a><span class="k">my</span><span class="w"> </span><span class="nv">$owner</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="vg">$$</span><span class="p">;</span>
-<a id="L-18" name="L-18"></a><span class="k">my</span><span class="w"> </span><span class="nv">$directory</span><span class="p">;</span>
-<a id="L-19" name="L-19"></a>
-<a id="L-20" name="L-20"></a><span class="cm">=pod</span>
-<a id="L-21" name="L-21"></a>
-<a id="L-22" name="L-22"></a><span class="cm">Normalize an input string and validate decimal observations or worker counts.</span>
-<a id="L-23" name="L-23"></a><span class="cm">Inputs: trim takes a scalar reference; valid and jobs take strings.</span>
-<a id="L-24" name="L-24"></a><span class="cm">Outputs: trim updates its referent; valid returns a Boolean; jobs returns a count.</span>
-<a id="L-25" name="L-25"></a><span class="cm">Used by: Latin run to clean lines and enforce the shared input contract.</span>
-<a id="L-26" name="L-26"></a>
-<a id="L-27" name="L-27"></a><span class="cm">=cut</span>
-<a id="L-28" name="L-28"></a>
-<a id="L-29" name="L-29"></a><span class="cm">=pod</span>
-<a id="L-30" name="L-30"></a>
-<a id="L-31" name="L-31"></a><span class="cm">Trim surrounding whitespace through a scalar reference.</span>
-<a id="L-32" name="L-32"></a><span class="cm">Inputs: Reference to the caller string.</span>
-<a id="L-33" name="L-33"></a><span class="cm">Outputs: Modified referent, no return contract.</span>
-<a id="L-34" name="L-34"></a><span class="cm">Used by: Latin run before line classification.</span>
-<a id="L-35" name="L-35"></a>
-<a id="L-36" name="L-36"></a><span class="cm">=cut</span>
-<a id="L-37" name="L-37"></a>
-<a id="L-38" name="L-38"></a><span class="k">sub</span><span class="w"> </span><span class="nf">trim</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$</span><span class="p">{</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]}</span><span class="w"> </span><span class="o">=~</span><span class="w"> </span><span class="sr">s/^\s+|\s+$//g</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-39" name="L-39"></a><span class="cm">=pod</span>
-<a id="L-40" name="L-40"></a>
-<a id="L-41" name="L-41"></a><span class="cm">Check complete decimal spelling, finiteness and the input domain.</span>
-<a id="L-42" name="L-42"></a><span class="cm">Inputs: One input token.</span>
-<a id="L-43" name="L-43"></a><span class="cm">Outputs: Boolean acceptance.</span>
-<a id="L-44" name="L-44"></a><span class="cm">Used by: Latin run to skip malformed observations.</span>
-<a id="L-45" name="L-45"></a>
-<a id="L-46" name="L-46"></a><span class="cm">=cut</span>
-<a id="L-47" name="L-47"></a>
-<a id="L-48" name="L-48"></a><span class="k">sub</span><span class="w"> </span><span class="nf">valid</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/</span><span class="w"> </span><span class="o">&amp;&amp;</span>
-<a id="L-49" name="L-49"></a><span class="w">                    </span><span class="n">isfinite</span><span class="p">(</span><span class="mi">0</span><span class="o">+</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">abs</span><span class="p">(</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">1000</span><span class="w"> </span><span class="p">}</span>
-<a id="L-50" name="L-50"></a><span class="cm">=pod</span>
-<a id="L-51" name="L-51"></a>
-<a id="L-52" name="L-52"></a><span class="cm">Convert a bounded worker-count argument.</span>
-<a id="L-53" name="L-53"></a><span class="cm">Inputs: Decimal argument text.</span>
-<a id="L-54" name="L-54"></a><span class="cm">Outputs: Integer 1..16, or an exception.</span>
-<a id="L-55" name="L-55"></a><span class="cm">Used by: Latin run to limit process batches.</span>
-<a id="L-56" name="L-56"></a>
-<a id="L-57" name="L-57"></a><span class="cm">=cut</span>
-<a id="L-58" name="L-58"></a>
-<a id="L-59" name="L-59"></a><span class="k">sub</span><span class="w"> </span><span class="nf">jobs</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=~</span><span class="sr"> /^\d+$/</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&gt;=</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="mi">16</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;workers must be 1..16\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="mi">0</span><span class="o">+</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="p">}</span>
-<a id="L-60" name="L-60"></a>
-<a id="L-61" name="L-61"></a><span class="cm">=pod</span>
-<a id="L-62" name="L-62"></a>
-<a id="L-63" name="L-63"></a><span class="cm">Open, read, write, and close lexical handles with explicit error checks.</span>
-<a id="L-64" name="L-64"></a><span class="cm">Inputs: paths for input/output; handles for readrow, emit, and shut; text for emit.</span>
-<a id="L-65" name="L-65"></a><span class="cm">Outputs: handles, a line or undef at EOF, or a die exception on an I/O failure.</span>
-<a id="L-66" name="L-66"></a><span class="cm">Used by: Latin run and its children for console/file input and ordered CSV.</span>
-<a id="L-67" name="L-67"></a>
-<a id="L-68" name="L-68"></a><span class="cm">=cut</span>
-<a id="L-69" name="L-69"></a>
-<a id="L-70" name="L-70"></a><span class="cm">=pod</span>
-<a id="L-71" name="L-71"></a>
-<a id="L-72" name="L-72"></a><span class="cm">Open the named input stream or borrow standard input.</span>
-<a id="L-73" name="L-73"></a><span class="cm">Inputs: Path or dash.</span>
-<a id="L-74" name="L-74"></a><span class="cm">Outputs: Lexical filehandle reference, or exception.</span>
-<a id="L-75" name="L-75"></a><span class="cm">Used by: Latin run for original input and completed row files.</span>
-<a id="L-76" name="L-76"></a>
-<a id="L-77" name="L-77"></a><span class="cm">=cut</span>
-<a id="L-78" name="L-78"></a>
-<a id="L-79" name="L-79"></a><span class="k">sub</span><span class="w"> </span><span class="nf">input</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">return</span><span class="w"> </span><span class="o">\*</span><span class="bp">STDIN</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="ow">eq</span><span class="w"> </span><span class="s">&#39;-&#39;</span><span class="p">;</span><span class="w"> </span><span class="nb">open</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$f</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;&lt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;open: $!\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="nv">$f</span><span class="w"> </span><span class="p">}</span>
-<a id="L-80" name="L-80"></a><span class="cm">=pod</span>
-<a id="L-81" name="L-81"></a>
-<a id="L-82" name="L-82"></a><span class="cm">Create a file for checked output.</span>
-<a id="L-83" name="L-83"></a><span class="cm">Inputs: Target path.</span>
-<a id="L-84" name="L-84"></a><span class="cm">Outputs: Writable lexical handle reference, or exception.</span>
-<a id="L-85" name="L-85"></a><span class="cm">Used by: Latin workers and the parent CSV publisher.</span>
-<a id="L-86" name="L-86"></a>
-<a id="L-87" name="L-87"></a><span class="cm">=cut</span>
-<a id="L-88" name="L-88"></a>
-<a id="L-89" name="L-89"></a><span class="k">sub</span><span class="w"> </span><span class="nf">output</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">open</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$f</span><span class="p">,</span><span class="w"> </span><span class="s">&#39;&gt;&#39;</span><span class="p">,</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;open output: $!\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="nv">$f</span><span class="w"> </span><span class="p">}</span>
-<a id="L-90" name="L-90"></a><span class="cm">=pod</span>
-<a id="L-91" name="L-91"></a>
-<a id="L-92" name="L-92"></a><span class="cm">Read one line while distinguishing EOF from an I/O error.</span>
-<a id="L-93" name="L-93"></a><span class="cm">Inputs: Readable handle.</span>
-<a id="L-94" name="L-94"></a><span class="cm">Outputs: Line string, undef at EOF, or exception.</span>
-<a id="L-95" name="L-95"></a><span class="cm">Used by: Latin run in both reading loops.</span>
-<a id="L-96" name="L-96"></a>
-<a id="L-97" name="L-97"></a><span class="cm">=cut</span>
-<a id="L-98" name="L-98"></a>
-<a id="L-99" name="L-99"></a><span class="k">sub</span><span class="w"> </span><span class="nf">readrow</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$f</span><span class="o">=</span><span class="nb">shift</span><span class="p">;</span><span class="w"> </span><span class="vg">$!</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$s</span><span class="o">=</span><span class="sr">&lt;$f&gt;</span><span class="p">;</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;read: $!\n&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="o">!</span><span class="nb">defined</span><span class="p">(</span><span class="nv">$s</span><span class="p">)</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="vg">$!</span><span class="p">;</span><span class="w"> </span><span class="nv">$s</span><span class="w"> </span><span class="p">}</span>
-<a id="L-100" name="L-100"></a><span class="cm">=pod</span>
-<a id="L-101" name="L-101"></a>
-<a id="L-102" name="L-102"></a><span class="cm">Write a complete string through a handle reference.</span>
-<a id="L-103" name="L-103"></a><span class="cm">Inputs: Writable handle and text.</span>
-<a id="L-104" name="L-104"></a><span class="cm">Outputs: Written bytes, or exception.</span>
-<a id="L-105" name="L-105"></a><span class="cm">Used by: Latin workers and the ordered CSV output loop.</span>
-<a id="L-106" name="L-106"></a>
-<a id="L-107" name="L-107"></a><span class="cm">=cut</span>
-<a id="L-108" name="L-108"></a>
-<a id="L-109" name="L-109"></a><span class="k">sub</span><span class="w"> </span><span class="nf">emit</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="p">(</span><span class="nv">$f</span><span class="p">,</span><span class="nv">$s</span><span class="p">)</span><span class="o">=</span><span class="nv">@_</span><span class="p">;</span><span class="w"> </span><span class="k">print</span><span class="w"> </span><span class="p">{</span><span class="nv">$f</span><span class="p">}</span><span class="w"> </span><span class="nv">$s</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;write: $!\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-110" name="L-110"></a><span class="cm">=pod</span>
-<a id="L-111" name="L-111"></a>
-<a id="L-112" name="L-112"></a><span class="cm">Close a file and check buffered writes.</span>
-<a id="L-113" name="L-113"></a><span class="cm">Inputs: Handle reference.</span>
-<a id="L-114" name="L-114"></a><span class="cm">Outputs: Closed stream, or exception.</span>
-<a id="L-115" name="L-115"></a><span class="cm">Used by: Latin run and finish to complete I/O.</span>
-<a id="L-116" name="L-116"></a>
-<a id="L-117" name="L-117"></a><span class="cm">=cut</span>
-<a id="L-118" name="L-118"></a>
-<a id="L-119" name="L-119"></a><span class="k">sub</span><span class="w"> </span><span class="nf">shut</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">close</span><span class="w"> </span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;close: $!\n&quot;</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-120" name="L-120"></a>
-<a id="L-121" name="L-121"></a><span class="cm">=pod</span>
-<a id="L-122" name="L-122"></a>
-<a id="L-123" name="L-123"></a><span class="cm">Provide process bookkeeping and a private path for each observation.</span>
-<a id="L-124" name="L-124"></a><span class="cm">Inputs: track/reap take a PID; rowpath takes an ordinal; finish takes a handle.</span>
-<a id="L-125" name="L-125"></a><span class="cm">Outputs: checked child completion, a path, or immediate successful child exit.</span>
-<a id="L-126" name="L-126"></a><span class="cm">Used by: Latin run after fork, at batch boundaries, and when publishing rows.</span>
-<a id="L-127" name="L-127"></a><span class="cm">The parent owns the temporary directory so a child&#39;s exit cannot remove it.</span>
-<a id="L-128" name="L-128"></a>
-<a id="L-129" name="L-129"></a><span class="cm">=cut</span>
-<a id="L-130" name="L-130"></a>
-<a id="L-131" name="L-131"></a><span class="cm">=pod</span>
-<a id="L-132" name="L-132"></a>
-<a id="L-133" name="L-133"></a><span class="cm">Name an observation file inside a private temporary directory.</span>
-<a id="L-134" name="L-134"></a><span class="cm">Inputs: Observation ordinal.</span>
-<a id="L-135" name="L-135"></a><span class="cm">Outputs: Unique per-run pathname.</span>
-<a id="L-136" name="L-136"></a><span class="cm">Used by: Latin scheduler before forking and while gathering rows.</span>
-<a id="L-137" name="L-137"></a>
-<a id="L-138" name="L-138"></a><span class="cm">=cut</span>
-<a id="L-139" name="L-139"></a>
-<a id="L-140" name="L-140"></a><span class="k">sub</span><span class="w"> </span><span class="nf">rowpath</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$directory</span><span class="w"> </span><span class="sr">//</span><span class="o">=</span><span class="w"> </span><span class="n">tempdir</span><span class="p">(</span><span class="n">CLEANUP</span><span class="o">=&gt;</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="s">&quot;$directory/$_[0].csv&quot;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-141" name="L-141"></a><span class="cm">=pod</span>
-<a id="L-142" name="L-142"></a>
-<a id="L-143" name="L-143"></a><span class="cm">Record a child for cleanup if a later operation fails.</span>
-<a id="L-144" name="L-144"></a><span class="cm">Inputs: Child PID.</span>
-<a id="L-145" name="L-145"></a><span class="cm">Outputs: Updated live-child list.</span>
-<a id="L-146" name="L-146"></a><span class="cm">Used by: Latin parent immediately after a successful fork.</span>
-<a id="L-147" name="L-147"></a>
-<a id="L-148" name="L-148"></a><span class="cm">=cut</span>
-<a id="L-149" name="L-149"></a>
-<a id="L-150" name="L-150"></a><span class="k">sub</span><span class="w"> </span><span class="nf">track</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">push</span><span class="w"> </span><span class="nv">@live</span><span class="p">,</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span><span class="w"> </span><span class="p">}</span>
-<a id="L-151" name="L-151"></a><span class="cm">=pod</span>
-<a id="L-152" name="L-152"></a>
-<a id="L-153" name="L-153"></a><span class="cm">Wait through interruptions and reject unsuccessful workers.</span>
-<a id="L-154" name="L-154"></a><span class="cm">Inputs: Child PID.</span>
-<a id="L-155" name="L-155"></a><span class="cm">Outputs: Reaped child and updated live list, or exception.</span>
-<a id="L-156" name="L-156"></a><span class="cm">Used by: Latin parent at each bounded batch boundary.</span>
-<a id="L-157" name="L-157"></a>
-<a id="L-158" name="L-158"></a><span class="cm">=cut</span>
-<a id="L-159" name="L-159"></a>
-<a id="L-160" name="L-160"></a><span class="k">sub</span><span class="w"> </span><span class="nf">reap</span><span class="w"> </span><span class="p">{</span>
-<a id="L-161" name="L-161"></a><span class="w">    </span><span class="k">my</span><span class="w"> </span><span class="nv">$pid</span><span class="o">=</span><span class="nb">shift</span><span class="p">;</span><span class="w"> </span><span class="k">my</span><span class="w"> </span><span class="nv">$got</span><span class="p">;</span>
-<a id="L-162" name="L-162"></a><span class="w">    </span><span class="k">do</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$got</span><span class="o">=</span><span class="nb">waitpid</span><span class="p">(</span><span class="nv">$pid</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="k">while</span><span class="w"> </span><span class="nv">$got</span><span class="o">&lt;</span><span class="mi">0</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="vg">$!</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">EINTR</span><span class="p">;</span>
-<a id="L-163" name="L-163"></a><span class="w">    </span><span class="nb">die</span><span class="w"> </span><span class="s">&quot;worker $pid failed\n&quot;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="nv">$got</span><span class="o">!=</span><span class="nv">$pid</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="vg">$?</span><span class="p">;</span>
-<a id="L-164" name="L-164"></a><span class="w">    </span><span class="nv">@live</span><span class="o">=</span><span class="nb">grep</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">$_</span><span class="o">!=</span><span class="nv">$pid</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nv">@live</span><span class="p">;</span>
-<a id="L-165" name="L-165"></a><span class="p">}</span>
-<a id="L-166" name="L-166"></a><span class="cm">=pod</span>
-<a id="L-167" name="L-167"></a>
-<a id="L-168" name="L-168"></a><span class="cm">Expose Perl fork, whose no-argument form lacks a Latin grammar rule.</span>
-<a id="L-169" name="L-169"></a><span class="cm">Inputs: None.</span>
-<a id="L-170" name="L-170"></a><span class="cm">Outputs: Child PID, zero in child, or undef on failure.</span>
-<a id="L-171" name="L-171"></a><span class="cm">Used by: Latin run to branch into a numeric worker.</span>
-<a id="L-172" name="L-172"></a>
-<a id="L-173" name="L-173"></a><span class="cm">=cut</span>
-<a id="L-174" name="L-174"></a>
-<a id="L-175" name="L-175"></a><span class="k">sub</span><span class="w"> </span><span class="nf">spawn</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">fork</span><span class="p">()</span><span class="w"> </span><span class="p">}</span>
-<a id="L-176" name="L-176"></a><span class="cm">=pod</span>
-<a id="L-177" name="L-177"></a>
-<a id="L-178" name="L-178"></a><span class="cm">Read the actual OS identity of this process.</span>
-<a id="L-179" name="L-179"></a><span class="cm">Inputs: None.</span>
-<a id="L-180" name="L-180"></a><span class="cm">Outputs: Numeric PID.</span>
-<a id="L-181" name="L-181"></a><span class="cm">Used by: Latin worker when constructing its CSV row.</span>
-<a id="L-182" name="L-182"></a>
-<a id="L-183" name="L-183"></a><span class="cm">=cut</span>
-<a id="L-184" name="L-184"></a>
-<a id="L-185" name="L-185"></a><span class="k">sub</span><span class="w"> </span><span class="nf">identity</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="vg">$$</span><span class="w"> </span><span class="p">}</span>
-<a id="L-186" name="L-186"></a><span class="cm">=pod</span>
-<a id="L-187" name="L-187"></a>
-<a id="L-188" name="L-188"></a><span class="cm">Provide a punctuation-leading CLI token to the Latin grammar.</span>
-<a id="L-189" name="L-189"></a><span class="cm">Inputs: None.</span>
-<a id="L-190" name="L-190"></a><span class="cm">Outputs: The --help string.</span>
-<a id="L-191" name="L-191"></a><span class="cm">Used by: Latin run while recognizing usage requests.</span>
-<a id="L-192" name="L-192"></a>
-<a id="L-193" name="L-193"></a><span class="cm">=cut</span>
-<a id="L-194" name="L-194"></a>
-<a id="L-195" name="L-195"></a><span class="k">sub</span><span class="w"> </span><span class="nf">help</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">&quot;--help&quot;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-196" name="L-196"></a><span class="cm">=pod</span>
-<a id="L-197" name="L-197"></a>
-<a id="L-198" name="L-198"></a><span class="cm">Flush a worker row and exit without inherited stream cleanup.</span>
-<a id="L-199" name="L-199"></a><span class="cm">Inputs: Worker output handle.</span>
-<a id="L-200" name="L-200"></a><span class="cm">Outputs: Child process exits successfully; close errors throw.</span>
-<a id="L-201" name="L-201"></a><span class="cm">Used by: Latin worker after emitting its observation.</span>
-<a id="L-202" name="L-202"></a>
-<a id="L-203" name="L-203"></a><span class="cm">=cut</span>
-<a id="L-204" name="L-204"></a>
-<a id="L-205" name="L-205"></a><span class="k">sub</span><span class="w"> </span><span class="nf">finish</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">shut</span><span class="p">(</span><span class="nv">$_</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span><span class="w"> </span><span class="n">_exit</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
-<a id="L-206" name="L-206"></a>
-<a id="L-207" name="L-207"></a><span class="c1"># The bootstrap catches exceptions thrown anywhere in the Latin program.</span>
-<a id="L-208" name="L-208"></a><span class="c1"># Inputs: CLI/stdin. Outputs: CSV or stderr and nonzero status. Used by Perl startup.</span>
-<a id="L-209" name="L-209"></a><span class="k">my</span><span class="w"> </span><span class="nv">$ok</span><span class="o">=</span><span class="nb">eval</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">run</span><span class="p">();</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="p">};</span>
-<a id="L-210" name="L-210"></a><span class="k">my</span><span class="w"> </span><span class="nv">$error</span><span class="o">=</span><span class="vg">$@</span><span class="p">;</span>
-<a id="L-211" name="L-211"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="vg">$$</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nv">$owner</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
-<a id="L-212" name="L-212"></a><span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="nv">@live</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">kill</span><span class="w"> </span><span class="s">&#39;TERM&#39;</span><span class="p">,</span><span class="nv">$_</span><span class="p">;</span><span class="w"> </span><span class="nb">waitpid</span><span class="p">(</span><span class="nv">$_</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="w"> </span><span class="p">}</span>
-<a id="L-213" name="L-213"></a><span class="w">    </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="nb">defined</span><span class="w"> </span><span class="nv">$directory</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nb">unlink</span><span class="w"> </span><span class="nb">glob</span><span class="w"> </span><span class="s">&quot;$directory/*.csv&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">rmdir</span><span class="w"> </span><span class="nv">$directory</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-214" name="L-214"></a><span class="p">}</span>
-<a id="L-215" name="L-215"></a><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="o">!</span><span class="nv">$ok</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="k">print</span><span class="w"> </span><span class="bp">STDERR</span><span class="w"> </span><span class="s">&quot;bessel: $error&quot;</span><span class="p">;</span><span class="w"> </span><span class="nb">exit</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"> </span><span class="p">}</span>
-<a id="L-216" name="L-216"></a><span class="nb">exit</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span>
-<a id="L-217" name="L-217"></a>
-<a id="L-218" name="L-218"></a><span class="kn">use Lingua::Romana::Perligata;</span>
-<a id="L-219" name="L-219"></a>
-<a id="L-220" name="L-220"></a><span class="cm">ecce explico</span>
-<a id="L-221" name="L-221"></a><span class="cm">Calculate J0 with midpoint quadrature entirely in Latin syntax.</span>
-<a id="L-222" name="L-222"></a><span class="cm">Inputs: One validated real in haec (Perl&#39;s argument list).</span>
-<a id="L-223" name="L-223"></a><span class="cm">Outputs: The average of 16384 samples as a floating-point scalar.</span>
-<a id="L-224" name="L-224"></a><span class="cm">Used by: run&#39;s forked children to calculate their assigned observations.</span>
-<a id="L-225" name="L-225"></a><span class="cm">ecce seco</span>
-<a id="L-226" name="L-226"></a><span class="nf">observeere</span> <span class="k">sic</span>
-<a id="L-227" name="L-227"></a>    <span class="k">meis</span> <span class="nv">xo</span> <span class="n">haec</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-228" name="L-228"></a>    <span class="k">meo</span> <span class="nv">pio</span> <span class="k">da</span> <span class="m">unum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="nb">angulamentum</span> <span class="k">tum</span> <span class="m">IV</span> <span class="nb">multiplicamentum</span><span class="p">.</span>
-<a id="L-229" name="L-229"></a>    <span class="k">meo</span> <span class="nv">summao</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-230" name="L-230"></a>    <span class="k">meo</span> <span class="nv">indiceo</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-231" name="L-231"></a>    <span class="k">dum</span> <span class="nv">indiceum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-232" name="L-232"></a>        <span class="c1">adnota Form the midpoint angle, then evaluate its oscillating integrand.</span>
-<a id="L-233" name="L-233"></a>        <span class="k">meo</span> <span class="nv">anguloo</span> <span class="nv">indiceum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="m">secundum</span> <span class="nb">addementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-234" name="L-234"></a>        <span class="nv">anguloo</span> <span class="nv">anguloum</span> <span class="k">tum</span> <span class="nv">pium</span> <span class="nb">multiplicamentum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="nb">dividementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-235" name="L-235"></a>        <span class="k">meo</span> <span class="nv">termoo</span> <span class="nv">anguloum</span> <span class="nb">opponementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-236" name="L-236"></a>        <span class="nv">termoo</span> <span class="nv">termoum</span> <span class="k">tum</span> <span class="nv">xum</span> <span class="nb">multiplicamentum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-237" name="L-237"></a>        <span class="nv">termoo</span> <span class="nv">termoum</span> <span class="nb">accubamentum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-238" name="L-238"></a>        <span class="nv">summao</span> <span class="nv">summaum</span> <span class="k">tum</span> <span class="nv">termoum</span> <span class="nb">addementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-239" name="L-239"></a>        <span class="nv">indiceo</span> <span class="n">postincresce</span><span class="p">.</span>
-<a id="L-240" name="L-240"></a>    <span class="k">cis</span>
-<a id="L-241" name="L-241"></a>    <span class="nv">summaum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="nb">dividementum</span> <span class="k">redde</span><span class="p">.</span>
-<a id="L-242" name="L-242"></a><span class="k">cis</span>
-<a id="L-243" name="L-243"></a>
-<a id="L-244" name="L-244"></a><span class="cm">ecce explico</span>
-<a id="L-245" name="L-245"></a><span class="cm">Run the public CLI and preserve input order across bounded process batches.</span>
-<a id="L-246" name="L-246"></a><span class="cm">Inputs: parametra (ARGV), stdin or the selected file, and the helper interfaces.</span>
-<a id="L-247" name="L-247"></a><span class="cm">Outputs: CSV rows or exceptions caught by the bootstrap; normal return is void.</span>
-<a id="L-248" name="L-248"></a><span class="cm">Used by: the Perl bootstrap once at process startup.</span>
-<a id="L-249" name="L-249"></a><span class="cm">ecce seco</span>
-<a id="L-250" name="L-250"></a><span class="nf">runere</span> <span class="k">sic</span>
-<a id="L-251" name="L-251"></a>    <span class="k">meo</span> <span class="nv">argco</span> <span class="n">parametra</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-252" name="L-252"></a>    <span class="k">meo</span> <span class="nv">helppo</span> <span class="nb">helpementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-253" name="L-253"></a>    <span class="k">si</span> <span class="nv">argcum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="n">aequalitam</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-254" name="L-254"></a>      <span class="k">si</span> <span class="nv">nullimum</span> <span class="nv">parametrorum</span> <span class="k">tum</span> <span class="nv">helppum</span> <span class="n">aequalitas</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-255" name="L-255"></a>        <span class="s">dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nv">egresso</span> <span class="n">scribe</span><span class="p">.</span>
-<a id="L-256" name="L-256"></a>        <span class="m">nullum</span> <span class="k">redde</span><span class="p">.</span>
-<a id="L-257" name="L-257"></a>      <span class="k">cis</span>
-<a id="L-258" name="L-258"></a>    <span class="k">cis</span>
-<a id="L-259" name="L-259"></a>    <span class="k">si</span> <span class="nv">argcum</span> <span class="k">tum</span> <span class="m">IV</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic too many arguments cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-260" name="L-260"></a>    <span class="k">meo</span> <span class="nv">sourceo</span> <span class="m">XLV</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-261" name="L-261"></a>    <span class="k">meo</span> <span class="nv">targeto</span> <span class="s">dictum sic results.csv cis</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-262" name="L-262"></a>    <span class="k">meo</span> <span class="nv">counto</span> <span class="m">II</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-263" name="L-263"></a>    <span class="k">si</span> <span class="nv">argcum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">sourceo</span> <span class="nv">nullimum</span> <span class="nv">parametrorum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-264" name="L-264"></a>    <span class="k">si</span> <span class="nv">argcum</span> <span class="k">tum</span> <span class="m">duo</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">targeto</span> <span class="nv">primum</span> <span class="nv">parametrorum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-265" name="L-265"></a>    <span class="k">si</span> <span class="nv">argcum</span> <span class="k">tum</span> <span class="m">tres</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">counto</span> <span class="m">secundum</span> <span class="nv">parametrorum</span> <span class="nb">jobsementum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-266" name="L-266"></a>    <span class="k">meo</span> <span class="nv">ino</span> <span class="nv">sourceum</span> <span class="nb">inputementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-267" name="L-267"></a>    <span class="k">meis</span> <span class="nv">valis</span><span class="p">.</span>
-<a id="L-268" name="L-268"></a>    <span class="k">meo</span> <span class="nv">limito</span> <span class="m">LXIV</span> <span class="k">tum</span> <span class="m">LXIV</span> <span class="nb">multiplicamentum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-269" name="L-269"></a>    <span class="k">meo</span> <span class="nv">textoo</span><span class="p">.</span>
-<a id="L-270" name="L-270"></a>    <span class="k">dum</span> <span class="m">unum</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-271" name="L-271"></a>        <span class="nv">textoo</span> <span class="nv">inum</span> <span class="nb">readrowementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-272" name="L-272"></a>        <span class="k">nisi</span> <span class="nv">textoum</span> <span class="nb">confirmamentum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">ultimus</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-273" name="L-273"></a>        <span class="c1">adnota Pass a scalar reference so trim can change the caller&#39;s string.</span>
-<a id="L-274" name="L-274"></a>        <span class="k">meo</span> <span class="nv">refo</span> <span class="k">da</span> <span class="k">ad</span> <span class="nv">textoo</span><span class="p">.</span>
-<a id="L-275" name="L-275"></a>        <span class="n">trime</span> <span class="nv">refum</span><span class="p">.</span>
-<a id="L-276" name="L-276"></a>        <span class="k">si</span> <span class="nv">textoum</span> <span class="nb">metamentum</span> <span class="k">tum</span> <span class="m">nullum</span> <span class="n">aequalitam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">ultimus</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-277" name="L-277"></a>        <span class="k">meo</span> <span class="nv">firsto</span> <span class="nv">textoum</span> <span class="k">tum</span> <span class="m">nullum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="nb">excerpementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-278" name="L-278"></a>        <span class="k">meo</span> <span class="nv">hasho</span> <span class="m">XXXV</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-279" name="L-279"></a>        <span class="k">si</span> <span class="nv">firstum</span> <span class="k">tum</span> <span class="nv">hashum</span> <span class="n">aequalitas</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">posterus</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-280" name="L-280"></a>        <span class="k">nisi</span> <span class="nv">textoum</span> <span class="nb">validementum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic Skipping invalid value cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="n">mone</span><span class="p">.</span> <span class="k">posterus</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-281" name="L-281"></a>        <span class="nv">valis</span> <span class="nv">textoum</span> <span class="n">cumula</span><span class="p">.</span>
-<a id="L-282" name="L-282"></a>        <span class="k">meo</span> <span class="nv">sizeo</span> <span class="n">vala</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-283" name="L-283"></a>        <span class="k">si</span> <span class="nv">limitum</span> <span class="k">tum</span> <span class="nv">sizeum</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic at most 4096 observations cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-284" name="L-284"></a>    <span class="k">cis</span>
-<a id="L-285" name="L-285"></a>    <span class="n">shute</span> <span class="nv">inum</span><span class="p">.</span>
-<a id="L-286" name="L-286"></a>    <span class="k">meo</span> <span class="nv">sizeo</span> <span class="n">vala</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-287" name="L-287"></a>    <span class="k">nisi</span> <span class="nv">sizeum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic no valid observations cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-288" name="L-288"></a>
-<a id="L-289" name="L-289"></a>    <span class="c1">adnota Launch one child per observation, waiting after each full batch.</span>
-<a id="L-290" name="L-290"></a>    <span class="k">meis</span> <span class="nv">pidis</span><span class="p">.</span>
-<a id="L-291" name="L-291"></a>    <span class="k">meo</span> <span class="nv">indexo</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-292" name="L-292"></a>    <span class="k">dum</span> <span class="nv">indexum</span> <span class="k">tum</span> <span class="nv">sizeum</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-293" name="L-293"></a>        <span class="k">meo</span> <span class="nv">patho</span> <span class="nv">indexum</span> <span class="nb">rowpathementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-294" name="L-294"></a>        <span class="k">meo</span> <span class="nv">xo</span> <span class="nv">valis</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-295" name="L-295"></a>        <span class="k">meo</span> <span class="nv">pido</span> <span class="nb">spawnementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-296" name="L-296"></a>        <span class="k">nisi</span> <span class="nv">pidum</span> <span class="nb">confirmamentum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic fork failed cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-297" name="L-297"></a>        <span class="k">nisi</span> <span class="nv">pidum</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-298" name="L-298"></a>            <span class="k">meo</span> <span class="nv">yo</span> <span class="nv">xum</span> <span class="nb">observeementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-299" name="L-299"></a>            <span class="k">meo</span> <span class="nv">outo</span> <span class="nv">pathum</span> <span class="nb">outputementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-300" name="L-300"></a>            <span class="k">meo</span> <span class="nv">selfo</span> <span class="nb">identityementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-301" name="L-301"></a>            <span class="k">meo</span> <span class="nv">texto</span> <span class="nv">xum</span> <span class="k">tum</span> <span class="n">comma</span> <span class="k">tum</span> <span class="nv">yum</span> <span class="k">tum</span> <span class="n">comma</span> <span class="k">tum</span> <span class="nv">selfum</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nb">serementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-302" name="L-302"></a>            <span class="n">emite</span> <span class="nv">outum</span> <span class="k">tum</span> <span class="nv">textum</span><span class="p">.</span>
-<a id="L-303" name="L-303"></a>            <span class="n">finishe</span> <span class="nv">outum</span><span class="p">.</span>
-<a id="L-304" name="L-304"></a>        <span class="k">cis</span>
-<a id="L-305" name="L-305"></a>        <span class="n">tracke</span> <span class="nv">pidum</span><span class="p">.</span>
-<a id="L-306" name="L-306"></a>        <span class="nv">pidis</span> <span class="nv">pidum</span> <span class="n">cumula</span><span class="p">.</span>
-<a id="L-307" name="L-307"></a>        <span class="nv">indexo</span> <span class="n">postincresce</span><span class="p">.</span>
-<a id="L-308" name="L-308"></a>        <span class="k">meo</span> <span class="nv">activeo</span> <span class="n">pida</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-309" name="L-309"></a>        <span class="k">meo</span> <span class="nv">fullo</span> <span class="nv">activeum</span> <span class="k">tum</span> <span class="nv">countum</span> <span class="n">aequalitam</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-310" name="L-310"></a>        <span class="k">meo</span> <span class="nv">doneo</span> <span class="nv">indexum</span> <span class="k">tum</span> <span class="nv">sizeum</span> <span class="n">aequalitam</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-311" name="L-311"></a>        <span class="k">si</span> <span class="nv">fullum</span> <span class="k">vel</span> <span class="nv">doneum</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-312" name="L-312"></a>            <span class="k">per</span> <span class="k">quisque</span> <span class="nv">childum</span> <span class="k">in</span> <span class="nv">pidis</span> <span class="k">fac</span> <span class="k">sic</span> <span class="n">reape</span> <span class="nv">childum</span><span class="p">.</span> <span class="k">cis</span>
-<a id="L-313" name="L-313"></a>            <span class="nv">pidis</span> <span class="n">iani</span><span class="p">.</span>
-<a id="L-314" name="L-314"></a>        <span class="k">cis</span>
-<a id="L-315" name="L-315"></a>    <span class="k">cis</span>
-<a id="L-316" name="L-316"></a>
-<a id="L-317" name="L-317"></a>    <span class="c1">adnota Publish only completed rows, using explicit ordinals to restore order.</span>
-<a id="L-318" name="L-318"></a>    <span class="k">meo</span> <span class="nv">outo</span> <span class="nv">targetum</span> <span class="nb">outputementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-319" name="L-319"></a>    <span class="n">emite</span> <span class="nv">outum</span> <span class="k">tum</span> <span class="k">cum</span> <span class="s">dictum sic x,j0,worker_pid cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nb">serementum</span><span class="p">.</span>
-<a id="L-320" name="L-320"></a>    <span class="nv">indexo</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-321" name="L-321"></a>    <span class="k">dum</span> <span class="nv">indexum</span> <span class="k">tum</span> <span class="nv">sizeum</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
-<a id="L-322" name="L-322"></a>        <span class="k">meo</span> <span class="nv">rowo</span> <span class="nv">indexum</span> <span class="nb">rowpathementum</span> <span class="nb">inputementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-323" name="L-323"></a>        <span class="k">meo</span> <span class="nv">texto</span> <span class="nv">rowum</span> <span class="nb">readrowementum</span> <span class="k">da</span><span class="p">.</span>
-<a id="L-324" name="L-324"></a>        <span class="n">emite</span> <span class="nv">outum</span> <span class="k">tum</span> <span class="nv">textum</span><span class="p">.</span>
-<a id="L-325" name="L-325"></a>        <span class="n">shute</span> <span class="nv">rowum</span><span class="p">.</span>
-<a id="L-326" name="L-326"></a>        <span class="nv">indexo</span> <span class="n">postincresce</span><span class="p">.</span>
-<a id="L-327" name="L-327"></a>    <span class="k">cis</span>
-<a id="L-328" name="L-328"></a>    <span class="n">shute</span> <span class="nv">outum</span><span class="p">.</span>
-<a id="L-329" name="L-329"></a><span class="k">cis</span>
+<span class="normal"><a href="#L-191">191</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="ch">#!/usr/bin/env perl</span>
+<a id="L-2" name="L-2"></a><span class="k">use</span><span class="w"> </span><span class="nn">FindBin</span><span class="w"> </span><span class="sx">qw($RealBin)</span><span class="p">;</span>
+<a id="L-3" name="L-3"></a><span class="k">use</span><span class="w"> </span><span class="nn">lib</span><span class="w"> </span><span class="nv">$RealBin</span><span class="p">;</span>
+<a id="L-4" name="L-4"></a><span class="k">use</span><span class="w"> </span><span class="nn">BesselPerligata</span><span class="p">;</span>
+<a id="L-5" name="L-5"></a><span class="kn">use Lingua::Romana::Perligata;</span>
+<a id="L-6" name="L-6"></a>
+<a id="L-7" name="L-7"></a><span class="cm">ecce explico</span>
+<a id="L-8" name="L-8"></a><span class="cm">Bessel Observatory, expressed in Perligata&#39;s modified Latin grammar.</span>
+<a id="L-9" name="L-9"></a><span class="cm">The calculation, file opening/writing/closing, argument handling, string</span>
+<a id="L-10" name="L-10"></a><span class="cm">assembly and bounded worker orchestration below all use the Latin notation.</span>
+<a id="L-11" name="L-11"></a><span class="cm">BesselPerligata.pm supplies documented regex, raw-read and OS services; its</span>
+<a id="L-12" name="L-12"></a><span class="cm">source has a separate highlighted link in the catalogue.</span>
+<a id="L-13" name="L-13"></a>
+<a id="L-14" name="L-14"></a><span class="cm">Vocabulary: numerum is an observation, summum a sum, angulum an angle,</span>
+<a id="L-15" name="L-15"></a><span class="cm">terminum a term, indicum an index, librum an open book (file handle),</span>
+<a id="L-16" name="L-16"></a><span class="cm">fontum the source, destinatum the destination, filium a child process,</span>
+<a id="L-17" name="L-17"></a><span class="cm">observata the accepted observations, and vinculum a reference (a bond).</span>
+<a id="L-18" name="L-18"></a><span class="cm">Perligata regularizes all nouns and user verbs; these are Latin roots under</span>
+<a id="L-19" name="L-19"></a><span class="cm">its grammar, rather than a claim to unrestricted classical Latin.</span>
+<a id="L-20" name="L-20"></a>
+<a id="L-21" name="L-21"></a><span class="cm">An -o ending marks a scalar destination; -um marks its value. Arrays use</span>
+<a id="L-22" name="L-22"></a><span class="cm">-is and -a respectively. Verbs such as da, scribe and claude state the action.</span>
+<a id="L-23" name="L-23"></a><span class="cm">English functional comments explain what each sentence or paragraph achieves.</span>
+<a id="L-24" name="L-24"></a><span class="cm">ecce seco</span>
+<a id="L-25" name="L-25"></a>
+<a id="L-26" name="L-26"></a><span class="cm">ecce explico</span>
+<a id="L-27" name="L-27"></a><span class="cm">pendere (weigh): calculate J0 by averaging midpoint samples of its integral.</span>
+<a id="L-28" name="L-28"></a><span class="cm">Inputs: one validated observation in haec, the argument list.</span>
+<a id="L-29" name="L-29"></a><span class="cm">Outputs: floating-point J0 approximation using 16384 samples.</span>
+<a id="L-30" name="L-30"></a><span class="cm">Used by: agere&#39;s children to do the numerical work locally in Latin syntax.</span>
+<a id="L-31" name="L-31"></a><span class="cm">ecce seco</span>
+<a id="L-32" name="L-32"></a><span class="nf">pendere</span> <span class="k">sic</span>
+<a id="L-33" name="L-33"></a>    <span class="k">meis</span> <span class="nv">numero</span> <span class="n">haec</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-34" name="L-34"></a>    <span class="k">meo</span> <span class="nv">pio</span> <span class="k">da</span> <span class="m">unum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="nb">angulamentum</span> <span class="k">tum</span> <span class="m">IV</span> <span class="nb">multiplicamentum</span><span class="p">.</span>
+<a id="L-35" name="L-35"></a>    <span class="k">meo</span> <span class="nv">summo</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-36" name="L-36"></a>    <span class="k">meo</span> <span class="nv">indico</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-37" name="L-37"></a>    <span class="k">dum</span> <span class="nv">indicum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-38" name="L-38"></a>        <span class="c1">adnota Form the midpoint angle, then cos(x sin(angle)), and accumulate it.</span>
+<a id="L-39" name="L-39"></a>        <span class="k">meo</span> <span class="nv">angulo</span> <span class="nv">indicum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="m">secundum</span> <span class="nb">addementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-40" name="L-40"></a>        <span class="nv">angulo</span> <span class="nv">angulum</span> <span class="k">tum</span> <span class="nv">pium</span> <span class="nb">multiplicamentum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="nb">dividementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-41" name="L-41"></a>        <span class="k">meo</span> <span class="nv">termino</span> <span class="nv">angulum</span> <span class="nb">opponementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-42" name="L-42"></a>        <span class="nv">termino</span> <span class="nv">terminum</span> <span class="k">tum</span> <span class="nv">numerum</span> <span class="nb">multiplicamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-43" name="L-43"></a>        <span class="nv">termino</span> <span class="nv">terminum</span> <span class="nb">accubamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-44" name="L-44"></a>        <span class="nv">summo</span> <span class="nv">summum</span> <span class="k">tum</span> <span class="nv">terminum</span> <span class="nb">addementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-45" name="L-45"></a>        <span class="nv">indico</span> <span class="n">postincresce</span><span class="p">.</span>
+<a id="L-46" name="L-46"></a>    <span class="k">cis</span>
+<a id="L-47" name="L-47"></a>    <span class="nv">summum</span> <span class="k">tum</span> <span class="m">((I))I))MCCCLXXXIV</span> <span class="nb">dividementum</span> <span class="k">redde</span><span class="p">.</span>
+<a id="L-48" name="L-48"></a><span class="k">cis</span>
+<a id="L-49" name="L-49"></a>
+<a id="L-50" name="L-50"></a><span class="cm">ecce explico</span>
+<a id="L-51" name="L-51"></a><span class="cm">pandere (open): obtain a checked lexical filehandle using native evolute.</span>
+<a id="L-52" name="L-52"></a><span class="cm">Inputs: open mode and path, or descriptor zero with mode less-than-ampersand.</span>
+<a id="L-53" name="L-53"></a><span class="cm">Outputs: owning handle reference, or exception on failure.</span>
+<a id="L-54" name="L-54"></a><span class="cm">Used by: agere to open observations, private rows and final CSV output.</span>
+<a id="L-55" name="L-55"></a><span class="cm">Three-argument open treats a path as a filename, never a shell command.</span>
+<a id="L-56" name="L-56"></a><span class="cm">ecce seco</span>
+<a id="L-57" name="L-57"></a><span class="nf">pandere</span> <span class="k">sic</span>
+<a id="L-58" name="L-58"></a>    <span class="k">meo</span> <span class="nv">modo</span> <span class="nv">his</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-59" name="L-59"></a>    <span class="k">meo</span> <span class="nv">viao</span> <span class="nv">his</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-60" name="L-60"></a>    <span class="k">meo</span> <span class="nv">libro</span><span class="p">.</span>
+<a id="L-61" name="L-61"></a>    <span class="k">nisi</span> <span class="nv">libro</span> <span class="nv">modum</span> <span class="k">tum</span> <span class="nv">viaum</span> <span class="nb">evolutementum</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-62" name="L-62"></a>        <span class="s">dictum sic Cannot open file: cis</span> <span class="k">tum</span> <span class="nv">stadium</span> <span class="k">tum</span> <span class="nv">viaum</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="n">mori</span><span class="p">.</span>
+<a id="L-63" name="L-63"></a>    <span class="k">cis</span>
+<a id="L-64" name="L-64"></a>    <span class="nv">librum</span> <span class="k">redde</span><span class="p">.</span>
+<a id="L-65" name="L-65"></a><span class="k">cis</span>
+<a id="L-66" name="L-66"></a>
+<a id="L-67" name="L-67"></a><span class="cm">ecce explico</span>
+<a id="L-68" name="L-68"></a><span class="cm">fundere (pour): write a complete string using native scribe and check success.</span>
+<a id="L-69" name="L-69"></a><span class="cm">Inputs: writable handle reference and text. Outputs: written text or exception.</span>
+<a id="L-70" name="L-70"></a><span class="cm">Used by: agere&#39;s workers for rows and the parent for ordered CSV publication.</span>
+<a id="L-71" name="L-71"></a><span class="cm">The caller closes the handle separately to check delayed buffered-write errors.</span>
+<a id="L-72" name="L-72"></a><span class="cm">ecce seco</span>
+<a id="L-73" name="L-73"></a><span class="nf">fundere</span> <span class="k">sic</span>
+<a id="L-74" name="L-74"></a>    <span class="k">meo</span> <span class="nv">libro</span> <span class="nv">his</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-75" name="L-75"></a>    <span class="k">meo</span> <span class="nv">textoo</span> <span class="nv">his</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-76" name="L-76"></a>    <span class="k">nisi</span> <span class="nv">libro</span> <span class="nv">textoum</span> <span class="nb">scribementum</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-77" name="L-77"></a>        <span class="s">dictum sic Cannot write output cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="n">mori</span><span class="p">.</span>
+<a id="L-78" name="L-78"></a>    <span class="k">cis</span>
+<a id="L-79" name="L-79"></a><span class="k">cis</span>
+<a id="L-80" name="L-80"></a>
+<a id="L-81" name="L-81"></a><span class="cm">ecce explico</span>
+<a id="L-82" name="L-82"></a><span class="cm">agere (act): read observations, schedule bounded workers, and publish CSV.</span>
+<a id="L-83" name="L-83"></a><span class="cm">Inputs: parametra (ARGV), stdin or the selected file, and compatibility services.</span>
+<a id="L-84" name="L-84"></a><span class="cm">Outputs: ordered CSV or an exception; normal return carries no result.</span>
+<a id="L-85" name="L-85"></a><span class="cm">Used by: tege agtorem at startup, which catches errors and cleans child resources.</span>
+<a id="L-86" name="L-86"></a><span class="cm">An ad reference lets tergere trim the caller&#39;s string in place. Perl retains</span>
+<a id="L-87" name="L-87"></a><span class="cm">that scalar while the reference exists; raw pointer arithmetic is unavailable.</span>
+<a id="L-88" name="L-88"></a><span class="cm">ecce seco</span>
+<a id="L-89" name="L-89"></a><span class="nf">agere</span> <span class="k">sic</span>
+<a id="L-90" name="L-90"></a>    <span class="c1">adnota Recognize help, reject excess arguments, and apply the public defaults.</span>
+<a id="L-91" name="L-91"></a>    <span class="k">meo</span> <span class="nv">copio</span> <span class="n">parametra</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-92" name="L-92"></a>    <span class="k">meo</span> <span class="nv">signo</span> <span class="m">XLV</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-93" name="L-93"></a>    <span class="k">meo</span> <span class="nv">auxilio</span> <span class="nv">signum</span> <span class="k">tum</span> <span class="nv">signum</span> <span class="k">tum</span> <span class="s">dictum sic help cis</span> <span class="nb">serementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-94" name="L-94"></a>    <span class="k">si</span> <span class="nv">copium</span> <span class="k">tum</span> <span class="m">unum</span> <span class="n">aequalitam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-95" name="L-95"></a>        <span class="k">si</span> <span class="nv">nullimum</span> <span class="nv">parametrorum</span> <span class="k">tum</span> <span class="nv">auxilium</span> <span class="n">aequalitas</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-96" name="L-96"></a>            <span class="s">dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nv">egresso</span> <span class="n">scribe</span><span class="p">.</span>
+<a id="L-97" name="L-97"></a>            <span class="m">nullum</span> <span class="k">redde</span><span class="p">.</span>
+<a id="L-98" name="L-98"></a>        <span class="k">cis</span>
+<a id="L-99" name="L-99"></a>    <span class="k">cis</span>
+<a id="L-100" name="L-100"></a>    <span class="k">si</span> <span class="nv">copium</span> <span class="k">tum</span> <span class="m">IV</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-101" name="L-101"></a>        <span class="s">dictum sic too many arguments cis</span> <span class="n">mori</span><span class="p">.</span>
+<a id="L-102" name="L-102"></a>    <span class="k">cis</span>
+<a id="L-103" name="L-103"></a>    <span class="k">meo</span> <span class="nv">fonto</span> <span class="nv">signum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-104" name="L-104"></a>    <span class="k">meo</span> <span class="nv">destinato</span> <span class="s">dictum sic results.csv cis</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-105" name="L-105"></a>    <span class="k">meo</span> <span class="nv">opero</span> <span class="m">II</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-106" name="L-106"></a>    <span class="k">si</span> <span class="nv">copium</span> <span class="k">tum</span> <span class="m">unum</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">fonto</span> <span class="nv">nullimum</span> <span class="nv">parametrorum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-107" name="L-107"></a>    <span class="k">si</span> <span class="nv">copium</span> <span class="k">tum</span> <span class="m">duo</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">destinato</span> <span class="nv">primum</span> <span class="nv">parametrorum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-108" name="L-108"></a>    <span class="k">si</span> <span class="nv">copium</span> <span class="k">tum</span> <span class="m">tres</span> <span class="k">non</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="nv">opero</span> <span class="m">secundum</span> <span class="nv">parametrorum</span> <span class="nb">regementum</span> <span class="k">da</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-109" name="L-109"></a>
+<a id="L-110" name="L-110"></a>    <span class="c1">adnota Build open modes from characters; duplicate stdin for the dash input.</span>
+<a id="L-111" name="L-111"></a>    <span class="k">meo</span> <span class="nv">legendo</span> <span class="m">LX</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-112" name="L-112"></a>    <span class="k">meo</span> <span class="nv">scribendo</span> <span class="m">LXII</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-113" name="L-113"></a>    <span class="k">si</span> <span class="nv">fontum</span> <span class="k">tum</span> <span class="nv">signum</span> <span class="n">aequalitas</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-114" name="L-114"></a>        <span class="nv">legendo</span> <span class="nv">legendum</span> <span class="k">tum</span> <span class="k">cum</span> <span class="m">XXXVIII</span> <span class="nb">indementum</span> <span class="nb">serementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-115" name="L-115"></a>        <span class="nv">fonto</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-116" name="L-116"></a>    <span class="k">cis</span>
+<a id="L-117" name="L-117"></a>    <span class="k">meo</span> <span class="nv">libro</span> <span class="nv">legendum</span> <span class="k">tum</span> <span class="nv">fontum</span> <span class="nb">pandementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-118" name="L-118"></a>    <span class="k">meis</span> <span class="nv">observatis</span><span class="p">.</span>
+<a id="L-119" name="L-119"></a>    <span class="k">meo</span> <span class="nv">fino</span> <span class="m">LXIV</span> <span class="k">tum</span> <span class="m">LXIV</span> <span class="nb">multiplicamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-120" name="L-120"></a>    <span class="k">meo</span> <span class="nv">textoo</span><span class="p">.</span>
+<a id="L-121" name="L-121"></a>    <span class="k">dum</span> <span class="m">unum</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-122" name="L-122"></a>        <span class="c1">adnota Preserve original input bytes; native perlege would translate Roman numerals.</span>
+<a id="L-123" name="L-123"></a>        <span class="nv">textoo</span> <span class="nv">librum</span> <span class="nb">accipementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-124" name="L-124"></a>        <span class="k">nisi</span> <span class="nv">textoum</span> <span class="nb">confirmamentum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">ultimus</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-125" name="L-125"></a>        <span class="k">meo</span> <span class="nv">vinculo</span> <span class="k">da</span> <span class="k">ad</span> <span class="nv">textoo</span><span class="p">.</span>
+<a id="L-126" name="L-126"></a>        <span class="n">terge</span> <span class="nv">vinculum</span><span class="p">.</span>
+<a id="L-127" name="L-127"></a>        <span class="k">si</span> <span class="nv">textoum</span> <span class="nb">metamentum</span> <span class="k">tum</span> <span class="m">nullum</span> <span class="n">aequalitam</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">ultimus</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-128" name="L-128"></a>        <span class="c1">adnota Inspect the first character after trimming, then validate decimal spelling.</span>
+<a id="L-129" name="L-129"></a>        <span class="k">meo</span> <span class="nv">capito</span> <span class="nv">textoum</span> <span class="k">tum</span> <span class="m">nullum</span> <span class="k">tum</span> <span class="m">unum</span> <span class="nb">excerpementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-130" name="L-130"></a>        <span class="k">meo</span> <span class="nv">noto</span> <span class="m">XXXV</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-131" name="L-131"></a>        <span class="k">si</span> <span class="nv">capitum</span> <span class="k">tum</span> <span class="nv">notum</span> <span class="n">aequalitas</span> <span class="k">fac</span> <span class="k">sic</span> <span class="k">posterus</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-132" name="L-132"></a>        <span class="k">nisi</span> <span class="nv">textoum</span> <span class="nb">probementum</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-133" name="L-133"></a>            <span class="s">dictum sic Skipping invalid value cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="n">mone</span><span class="p">.</span>
+<a id="L-134" name="L-134"></a>            <span class="k">posterus</span><span class="p">.</span>
+<a id="L-135" name="L-135"></a>        <span class="k">cis</span>
+<a id="L-136" name="L-136"></a>        <span class="nv">observatis</span> <span class="nv">textoum</span> <span class="n">cumula</span><span class="p">.</span>
+<a id="L-137" name="L-137"></a>        <span class="k">meo</span> <span class="nv">copio</span> <span class="n">observata</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-138" name="L-138"></a>        <span class="k">si</span> <span class="nv">finum</span> <span class="k">tum</span> <span class="nv">copium</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-139" name="L-139"></a>            <span class="s">dictum sic at most 4096 observations cis</span> <span class="n">mori</span><span class="p">.</span>
+<a id="L-140" name="L-140"></a>        <span class="k">cis</span>
+<a id="L-141" name="L-141"></a>    <span class="k">cis</span>
+<a id="L-142" name="L-142"></a>    <span class="k">nisi</span> <span class="nv">libro</span> <span class="nb">claudementum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic Cannot close input cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-143" name="L-143"></a>    <span class="k">meo</span> <span class="nv">copio</span> <span class="n">observata</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-144" name="L-144"></a>    <span class="k">nisi</span> <span class="nv">copium</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic no valid observations cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-145" name="L-145"></a>
+<a id="L-146" name="L-146"></a>    <span class="c1">adnota Start one OS child per observation, waiting after each bounded batch.</span>
+<a id="L-147" name="L-147"></a>    <span class="k">meis</span> <span class="nv">filiis</span><span class="p">.</span>
+<a id="L-148" name="L-148"></a>    <span class="k">meo</span> <span class="nv">indico</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-149" name="L-149"></a>    <span class="k">dum</span> <span class="nv">indicum</span> <span class="k">tum</span> <span class="nv">copium</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-150" name="L-150"></a>        <span class="k">meo</span> <span class="nv">viao</span> <span class="nv">indicum</span> <span class="nb">locementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-151" name="L-151"></a>        <span class="k">meo</span> <span class="nv">numero</span> <span class="nv">observatis</span> <span class="nb">decapitamentum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-152" name="L-152"></a>        <span class="k">meo</span> <span class="nv">filio</span> <span class="nb">gignementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-153" name="L-153"></a>        <span class="k">nisi</span> <span class="nv">filium</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-154" name="L-154"></a>            <span class="c1">adnota Calculate in this child, assemble one CSV row and close it before exit.</span>
+<a id="L-155" name="L-155"></a>            <span class="k">meo</span> <span class="nv">responso</span> <span class="nv">numerum</span> <span class="nb">pendementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-156" name="L-156"></a>            <span class="k">meo</span> <span class="nv">libro</span> <span class="nv">scribendum</span> <span class="k">tum</span> <span class="nv">viaum</span> <span class="nb">pandementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-157" name="L-157"></a>            <span class="k">meo</span> <span class="nv">proprio</span> <span class="nb">cognoscementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-158" name="L-158"></a>            <span class="k">meo</span> <span class="nv">textoo</span> <span class="nv">numerum</span> <span class="k">tum</span> <span class="n">comma</span> <span class="k">tum</span> <span class="nv">responsum</span> <span class="k">tum</span> <span class="n">comma</span> <span class="k">tum</span> <span class="nv">proprium</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nb">serementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-159" name="L-159"></a>            <span class="n">funde</span> <span class="nv">librum</span> <span class="k">tum</span> <span class="nv">textoum</span><span class="p">.</span>
+<a id="L-160" name="L-160"></a>            <span class="k">nisi</span> <span class="nv">libro</span> <span class="nb">claudementum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic Cannot close worker row cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-161" name="L-161"></a>            <span class="n">discede</span><span class="p">.</span>
+<a id="L-162" name="L-162"></a>        <span class="k">cis</span>
+<a id="L-163" name="L-163"></a>        <span class="nv">filiis</span> <span class="nv">filium</span> <span class="n">cumula</span><span class="p">.</span>
+<a id="L-164" name="L-164"></a>        <span class="nv">indico</span> <span class="n">postincresce</span><span class="p">.</span>
+<a id="L-165" name="L-165"></a>        <span class="k">meo</span> <span class="nv">vivo</span> <span class="n">filia</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-166" name="L-166"></a>        <span class="k">meo</span> <span class="nv">pleno</span> <span class="nv">vivum</span> <span class="k">tum</span> <span class="nv">operum</span> <span class="n">aequalitam</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-167" name="L-167"></a>        <span class="k">meo</span> <span class="nv">ultimo</span> <span class="nv">indicum</span> <span class="k">tum</span> <span class="nv">copium</span> <span class="n">aequalitam</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-168" name="L-168"></a>        <span class="k">si</span> <span class="nv">plenum</span> <span class="k">vel</span> <span class="nv">ultimum</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-169" name="L-169"></a>            <span class="k">per</span> <span class="k">quisque</span> <span class="nv">filium</span> <span class="k">in</span> <span class="nv">filiis</span> <span class="k">fac</span> <span class="k">sic</span> <span class="n">collige</span> <span class="nv">filium</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-170" name="L-170"></a>            <span class="nv">filiis</span> <span class="n">iani</span><span class="p">.</span>
+<a id="L-171" name="L-171"></a>        <span class="k">cis</span>
+<a id="L-172" name="L-172"></a>    <span class="k">cis</span>
+<a id="L-173" name="L-173"></a>
+<a id="L-174" name="L-174"></a>    <span class="c1">adnota Publish only successful rows, restoring input order through their ordinals.</span>
+<a id="L-175" name="L-175"></a>    <span class="nv">legendo</span> <span class="m">LX</span> <span class="nb">indementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-176" name="L-176"></a>    <span class="nv">libro</span> <span class="nv">scribendum</span> <span class="k">tum</span> <span class="nv">destinatum</span> <span class="nb">pandementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-177" name="L-177"></a>    <span class="n">funde</span> <span class="nv">librum</span> <span class="k">tum</span> <span class="k">cum</span> <span class="s">dictum sic x,j0,worker_pid cis</span> <span class="k">tum</span> <span class="nv">novumversum</span> <span class="nb">serementum</span><span class="p">.</span>
+<a id="L-178" name="L-178"></a>    <span class="nv">indico</span> <span class="m">nullum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-179" name="L-179"></a>    <span class="k">dum</span> <span class="nv">indicum</span> <span class="k">tum</span> <span class="nv">copium</span> <span class="n">praestantiam</span> <span class="k">fac</span> <span class="k">sic</span>
+<a id="L-180" name="L-180"></a>        <span class="k">meo</span> <span class="nv">viao</span> <span class="nv">indicum</span> <span class="nb">locementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-181" name="L-181"></a>        <span class="k">meo</span> <span class="nv">paginao</span> <span class="nv">legendum</span> <span class="k">tum</span> <span class="nv">viaum</span> <span class="nb">pandementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-182" name="L-182"></a>        <span class="k">meo</span> <span class="nv">textoo</span> <span class="nv">paginaum</span> <span class="nb">accipementum</span> <span class="k">da</span><span class="p">.</span>
+<a id="L-183" name="L-183"></a>        <span class="n">funde</span> <span class="nv">librum</span> <span class="k">tum</span> <span class="nv">textoum</span><span class="p">.</span>
+<a id="L-184" name="L-184"></a>        <span class="k">nisi</span> <span class="nv">paginao</span> <span class="nb">claudementum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic Cannot close worker row cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-185" name="L-185"></a>        <span class="nv">indico</span> <span class="n">postincresce</span><span class="p">.</span>
+<a id="L-186" name="L-186"></a>    <span class="k">cis</span>
+<a id="L-187" name="L-187"></a>    <span class="k">nisi</span> <span class="nv">libro</span> <span class="nb">claudementum</span> <span class="k">fac</span> <span class="k">sic</span> <span class="s">dictum sic Cannot close output cis</span> <span class="n">mori</span><span class="p">.</span> <span class="k">cis</span>
+<a id="L-188" name="L-188"></a><span class="k">cis</span>
+<a id="L-189" name="L-189"></a>
+<a id="L-190" name="L-190"></a><span class="c1">adnota Protect the whole run by passing a code reference to the exception boundary.</span>
+<a id="L-191" name="L-191"></a><span class="n">tege</span> <span class="n">agtorem</span><span class="p">.</span>
 </pre></div></td></tr></table></div>
 </main><textarea id="raw" hidden>#!/usr/bin/env perl
-
-=pod
-
-Bessel Observatory in Lingua::Romana::Perligata 0.605 on POSIX Perl.
-The Latin program below owns the mathematics, input loop, bounded fork batches,
-and ordered output. This small Perl prelude bridges lexical filehandles,
-regular expressions (unimplemented in the Latin grammar), and checked OS calls.
-No numerical work is delegated to the prelude.
-
-=cut
-
-use POSIX qw(isfinite _exit);
-use File::Temp qw(tempdir);
-use Errno qw(EINTR);
-my @live;
-my $owner = $$;
-my $directory;
-
-=pod
-
-Normalize an input string and validate decimal observations or worker counts.
-Inputs: trim takes a scalar reference; valid and jobs take strings.
-Outputs: trim updates its referent; valid returns a Boolean; jobs returns a count.
-Used by: Latin run to clean lines and enforce the shared input contract.
-
-=cut
-
-=pod
-
-Trim surrounding whitespace through a scalar reference.
-Inputs: Reference to the caller string.
-Outputs: Modified referent, no return contract.
-Used by: Latin run before line classification.
-
-=cut
-
-sub trim { ${$_[0]} =~ s/^\s+|\s+$//g; }
-=pod
-
-Check complete decimal spelling, finiteness and the input domain.
-Inputs: One input token.
-Outputs: Boolean acceptance.
-Used by: Latin run to skip malformed observations.
-
-=cut
-
-sub valid { $_[0] =~ /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?$/ &amp;&amp;
-                    isfinite(0+$_[0]) &amp;&amp; abs($_[0]) &lt;= 1000 }
-=pod
-
-Convert a bounded worker-count argument.
-Inputs: Decimal argument text.
-Outputs: Integer 1..16, or an exception.
-Used by: Latin run to limit process batches.
-
-=cut
-
-sub jobs { $_[0] =~ /^\d+$/ &amp;&amp; $_[0] &gt;= 1 &amp;&amp; $_[0] &lt;= 16 or die &quot;workers must be 1..16\n&quot;; 0+$_[0] }
-
-=pod
-
-Open, read, write, and close lexical handles with explicit error checks.
-Inputs: paths for input/output; handles for readrow, emit, and shut; text for emit.
-Outputs: handles, a line or undef at EOF, or a die exception on an I/O failure.
-Used by: Latin run and its children for console/file input and ordered CSV.
-
-=cut
-
-=pod
-
-Open the named input stream or borrow standard input.
-Inputs: Path or dash.
-Outputs: Lexical filehandle reference, or exception.
-Used by: Latin run for original input and completed row files.
-
-=cut
-
-sub input { return \*STDIN if $_[0] eq &#x27;-&#x27;; open my $f, &#x27;&lt;&#x27;, $_[0] or die &quot;open: $!\n&quot;; $f }
-=pod
-
-Create a file for checked output.
-Inputs: Target path.
-Outputs: Writable lexical handle reference, or exception.
-Used by: Latin workers and the parent CSV publisher.
-
-=cut
-
-sub output { open my $f, &#x27;&gt;&#x27;, $_[0] or die &quot;open output: $!\n&quot;; $f }
-=pod
-
-Read one line while distinguishing EOF from an I/O error.
-Inputs: Readable handle.
-Outputs: Line string, undef at EOF, or exception.
-Used by: Latin run in both reading loops.
-
-=cut
-
-sub readrow { my $f=shift; $!=0; my $s=&lt;$f&gt;; die &quot;read: $!\n&quot; if !defined($s) &amp;&amp; $!; $s }
-=pod
-
-Write a complete string through a handle reference.
-Inputs: Writable handle and text.
-Outputs: Written bytes, or exception.
-Used by: Latin workers and the ordered CSV output loop.
-
-=cut
-
-sub emit { my ($f,$s)=@_; print {$f} $s or die &quot;write: $!\n&quot;; }
-=pod
-
-Close a file and check buffered writes.
-Inputs: Handle reference.
-Outputs: Closed stream, or exception.
-Used by: Latin run and finish to complete I/O.
-
-=cut
-
-sub shut { close $_[0] or die &quot;close: $!\n&quot;; }
-
-=pod
-
-Provide process bookkeeping and a private path for each observation.
-Inputs: track/reap take a PID; rowpath takes an ordinal; finish takes a handle.
-Outputs: checked child completion, a path, or immediate successful child exit.
-Used by: Latin run after fork, at batch boundaries, and when publishing rows.
-The parent owns the temporary directory so a child&#x27;s exit cannot remove it.
-
-=cut
-
-=pod
-
-Name an observation file inside a private temporary directory.
-Inputs: Observation ordinal.
-Outputs: Unique per-run pathname.
-Used by: Latin scheduler before forking and while gathering rows.
-
-=cut
-
-sub rowpath { $directory //= tempdir(CLEANUP=&gt;0); &quot;$directory/$_[0].csv&quot; }
-=pod
-
-Record a child for cleanup if a later operation fails.
-Inputs: Child PID.
-Outputs: Updated live-child list.
-Used by: Latin parent immediately after a successful fork.
-
-=cut
-
-sub track { push @live,$_[0]; }
-=pod
-
-Wait through interruptions and reject unsuccessful workers.
-Inputs: Child PID.
-Outputs: Reaped child and updated live list, or exception.
-Used by: Latin parent at each bounded batch boundary.
-
-=cut
-
-sub reap {
-    my $pid=shift; my $got;
-    do { $got=waitpid($pid,0) } while $got&lt;0 &amp;&amp; $! == EINTR;
-    die &quot;worker $pid failed\n&quot; if $got!=$pid || $?;
-    @live=grep { $_!=$pid } @live;
-}
-=pod
-
-Expose Perl fork, whose no-argument form lacks a Latin grammar rule.
-Inputs: None.
-Outputs: Child PID, zero in child, or undef on failure.
-Used by: Latin run to branch into a numeric worker.
-
-=cut
-
-sub spawn { fork() }
-=pod
-
-Read the actual OS identity of this process.
-Inputs: None.
-Outputs: Numeric PID.
-Used by: Latin worker when constructing its CSV row.
-
-=cut
-
-sub identity { $$ }
-=pod
-
-Provide a punctuation-leading CLI token to the Latin grammar.
-Inputs: None.
-Outputs: The --help string.
-Used by: Latin run while recognizing usage requests.
-
-=cut
-
-sub help { &quot;--help&quot; }
-=pod
-
-Flush a worker row and exit without inherited stream cleanup.
-Inputs: Worker output handle.
-Outputs: Child process exits successfully; close errors throw.
-Used by: Latin worker after emitting its observation.
-
-=cut
-
-sub finish { shut($_[0]); _exit(0); }
-
-# The bootstrap catches exceptions thrown anywhere in the Latin program.
-# Inputs: CLI/stdin. Outputs: CSV or stderr and nonzero status. Used by Perl startup.
-my $ok=eval { run(); 1 };
-my $error=$@;
-if ($$ == $owner) {
-    for (@live) { kill &#x27;TERM&#x27;,$_; waitpid($_,0); }
-    if (defined $directory) { unlink glob &quot;$directory/*.csv&quot;; rmdir $directory; }
-}
-if (!$ok) { print STDERR &quot;bessel: $error&quot;; exit 1; }
-exit 0;
-
+use FindBin qw($RealBin);
+use lib $RealBin;
+use BesselPerligata;
 use Lingua::Romana::Perligata;
 
 ecce explico
-Calculate J0 with midpoint quadrature entirely in Latin syntax.
-Inputs: One validated real in haec (Perl&#x27;s argument list).
-Outputs: The average of 16384 samples as a floating-point scalar.
-Used by: run&#x27;s forked children to calculate their assigned observations.
+Bessel Observatory, expressed in Perligata&#x27;s modified Latin grammar.
+The calculation, file opening/writing/closing, argument handling, string
+assembly and bounded worker orchestration below all use the Latin notation.
+BesselPerligata.pm supplies documented regex, raw-read and OS services; its
+source has a separate highlighted link in the catalogue.
+
+Vocabulary: numerum is an observation, summum a sum, angulum an angle,
+terminum a term, indicum an index, librum an open book (file handle),
+fontum the source, destinatum the destination, filium a child process,
+observata the accepted observations, and vinculum a reference (a bond).
+Perligata regularizes all nouns and user verbs; these are Latin roots under
+its grammar, rather than a claim to unrestricted classical Latin.
+
+An -o ending marks a scalar destination; -um marks its value. Arrays use
+-is and -a respectively. Verbs such as da, scribe and claude state the action.
+English functional comments explain what each sentence or paragraph achieves.
 ecce seco
-observeere sic
-    meis xo haec da.
+
+ecce explico
+pendere (weigh): calculate J0 by averaging midpoint samples of its integral.
+Inputs: one validated observation in haec, the argument list.
+Outputs: floating-point J0 approximation using 16384 samples.
+Used by: agere&#x27;s children to do the numerical work locally in Latin syntax.
+ecce seco
+pendere sic
+    meis numero haec da.
     meo pio da unum tum unum angulamentum tum IV multiplicamentum.
-    meo summao nullum da.
-    meo indiceo nullum da.
-    dum indiceum tum ((I))I))MCCCLXXXIV praestantiam fac sic
-        adnota Form the midpoint angle, then evaluate its oscillating integrand.
-        meo anguloo indiceum tum unum secundum addementum da.
-        anguloo anguloum tum pium multiplicamentum tum ((I))I))MCCCLXXXIV dividementum da.
-        meo termoo anguloum opponementum da.
-        termoo termoum tum xum multiplicamentum da.
-        termoo termoum accubamentum da.
-        summao summaum tum termoum addementum da.
-        indiceo postincresce.
+    meo summo nullum da.
+    meo indico nullum da.
+    dum indicum tum ((I))I))MCCCLXXXIV praestantiam fac sic
+        adnota Form the midpoint angle, then cos(x sin(angle)), and accumulate it.
+        meo angulo indicum tum unum secundum addementum da.
+        angulo angulum tum pium multiplicamentum tum ((I))I))MCCCLXXXIV dividementum da.
+        meo termino angulum opponementum da.
+        termino terminum tum numerum multiplicamentum da.
+        termino terminum accubamentum da.
+        summo summum tum terminum addementum da.
+        indico postincresce.
     cis
-    summaum tum ((I))I))MCCCLXXXIV dividementum redde.
+    summum tum ((I))I))MCCCLXXXIV dividementum redde.
 cis
 
 ecce explico
-Run the public CLI and preserve input order across bounded process batches.
-Inputs: parametra (ARGV), stdin or the selected file, and the helper interfaces.
-Outputs: CSV rows or exceptions caught by the bootstrap; normal return is void.
-Used by: the Perl bootstrap once at process startup.
+pandere (open): obtain a checked lexical filehandle using native evolute.
+Inputs: open mode and path, or descriptor zero with mode less-than-ampersand.
+Outputs: owning handle reference, or exception on failure.
+Used by: agere to open observations, private rows and final CSV output.
+Three-argument open treats a path as a filename, never a shell command.
 ecce seco
-runere sic
-    meo argco parametra da.
-    meo helppo helpementum da.
-    si argcum tum unum aequalitam fac sic
-      si nullimum parametrorum tum helppum aequalitas fac sic
-        dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis tum novumversum egresso scribe.
-        nullum redde.
-      cis
+pandere sic
+    meo modo his decapitamentum da.
+    meo viao his decapitamentum da.
+    meo libro.
+    nisi libro modum tum viaum evolutementum fac sic
+        dictum sic Cannot open file: cis tum stadium tum viaum tum novumversum mori.
     cis
-    si argcum tum IV non praestantiam fac sic dictum sic too many arguments cis mori. cis
-    meo sourceo XLV indementum da.
-    meo targeto dictum sic results.csv cis da.
-    meo counto II da.
-    si argcum tum unum non praestantiam fac sic sourceo nullimum parametrorum da. cis
-    si argcum tum duo non praestantiam fac sic targeto primum parametrorum da. cis
-    si argcum tum tres non praestantiam fac sic counto secundum parametrorum jobsementum da. cis
-    meo ino sourceum inputementum da.
-    meis valis.
-    meo limito LXIV tum LXIV multiplicamentum da.
+    librum redde.
+cis
+
+ecce explico
+fundere (pour): write a complete string using native scribe and check success.
+Inputs: writable handle reference and text. Outputs: written text or exception.
+Used by: agere&#x27;s workers for rows and the parent for ordered CSV publication.
+The caller closes the handle separately to check delayed buffered-write errors.
+ecce seco
+fundere sic
+    meo libro his decapitamentum da.
+    meo textoo his decapitamentum da.
+    nisi libro textoum scribementum fac sic
+        dictum sic Cannot write output cis tum novumversum mori.
+    cis
+cis
+
+ecce explico
+agere (act): read observations, schedule bounded workers, and publish CSV.
+Inputs: parametra (ARGV), stdin or the selected file, and compatibility services.
+Outputs: ordered CSV or an exception; normal return carries no result.
+Used by: tege agtorem at startup, which catches errors and cleans child resources.
+An ad reference lets tergere trim the caller&#x27;s string in place. Perl retains
+that scalar while the reference exists; raw pointer arithmetic is unavailable.
+ecce seco
+agere sic
+    adnota Recognize help, reject excess arguments, and apply the public defaults.
+    meo copio parametra da.
+    meo signo XLV indementum da.
+    meo auxilio signum tum signum tum dictum sic help cis serementum da.
+    si copium tum unum aequalitam fac sic
+        si nullimum parametrorum tum auxilium aequalitas fac sic
+            dictum sic Usage: perl bessel-perligata.pl [INPUT|- [OUTPUT [WORKERS]]] cis tum novumversum egresso scribe.
+            nullum redde.
+        cis
+    cis
+    si copium tum IV non praestantiam fac sic
+        dictum sic too many arguments cis mori.
+    cis
+    meo fonto signum da.
+    meo destinato dictum sic results.csv cis da.
+    meo opero II da.
+    si copium tum unum non praestantiam fac sic fonto nullimum parametrorum da. cis
+    si copium tum duo non praestantiam fac sic destinato primum parametrorum da. cis
+    si copium tum tres non praestantiam fac sic opero secundum parametrorum regementum da. cis
+
+    adnota Build open modes from characters; duplicate stdin for the dash input.
+    meo legendo LX indementum da.
+    meo scribendo LXII indementum da.
+    si fontum tum signum aequalitas fac sic
+        legendo legendum tum cum XXXVIII indementum serementum da.
+        fonto nullum da.
+    cis
+    meo libro legendum tum fontum pandementum da.
+    meis observatis.
+    meo fino LXIV tum LXIV multiplicamentum da.
     meo textoo.
     dum unum fac sic
-        textoo inum readrowementum da.
+        adnota Preserve original input bytes; native perlege would translate Roman numerals.
+        textoo librum accipementum da.
         nisi textoum confirmamentum fac sic ultimus. cis
-        adnota Pass a scalar reference so trim can change the caller&#x27;s string.
-        meo refo da ad textoo.
-        trime refum.
+        meo vinculo da ad textoo.
+        terge vinculum.
         si textoum metamentum tum nullum aequalitam fac sic ultimus. cis
-        meo firsto textoum tum nullum tum unum excerpementum da.
-        meo hasho XXXV indementum da.
-        si firstum tum hashum aequalitas fac sic posterus. cis
-        nisi textoum validementum fac sic dictum sic Skipping invalid value cis tum novumversum mone. posterus. cis
-        valis textoum cumula.
-        meo sizeo vala da.
-        si limitum tum sizeum praestantiam fac sic dictum sic at most 4096 observations cis mori. cis
-    cis
-    shute inum.
-    meo sizeo vala da.
-    nisi sizeum fac sic dictum sic no valid observations cis mori. cis
-
-    adnota Launch one child per observation, waiting after each full batch.
-    meis pidis.
-    meo indexo nullum da.
-    dum indexum tum sizeum praestantiam fac sic
-        meo patho indexum rowpathementum da.
-        meo xo valis decapitamentum da.
-        meo pido spawnementum da.
-        nisi pidum confirmamentum fac sic dictum sic fork failed cis mori. cis
-        nisi pidum fac sic
-            meo yo xum observeementum da.
-            meo outo pathum outputementum da.
-            meo selfo identityementum da.
-            meo texto xum tum comma tum yum tum comma tum selfum tum novumversum serementum da.
-            emite outum tum textum.
-            finishe outum.
+        adnota Inspect the first character after trimming, then validate decimal spelling.
+        meo capito textoum tum nullum tum unum excerpementum da.
+        meo noto XXXV indementum da.
+        si capitum tum notum aequalitas fac sic posterus. cis
+        nisi textoum probementum fac sic
+            dictum sic Skipping invalid value cis tum novumversum mone.
+            posterus.
         cis
-        tracke pidum.
-        pidis pidum cumula.
-        indexo postincresce.
-        meo activeo pida da.
-        meo fullo activeum tum countum aequalitam da.
-        meo doneo indexum tum sizeum aequalitam da.
-        si fullum vel doneum fac sic
-            per quisque childum in pidis fac sic reape childum. cis
-            pidis iani.
+        observatis textoum cumula.
+        meo copio observata da.
+        si finum tum copium praestantiam fac sic
+            dictum sic at most 4096 observations cis mori.
         cis
     cis
+    nisi libro claudementum fac sic dictum sic Cannot close input cis mori. cis
+    meo copio observata da.
+    nisi copium fac sic dictum sic no valid observations cis mori. cis
 
-    adnota Publish only completed rows, using explicit ordinals to restore order.
-    meo outo targetum outputementum da.
-    emite outum tum cum dictum sic x,j0,worker_pid cis tum novumversum serementum.
-    indexo nullum da.
-    dum indexum tum sizeum praestantiam fac sic
-        meo rowo indexum rowpathementum inputementum da.
-        meo texto rowum readrowementum da.
-        emite outum tum textum.
-        shute rowum.
-        indexo postincresce.
+    adnota Start one OS child per observation, waiting after each bounded batch.
+    meis filiis.
+    meo indico nullum da.
+    dum indicum tum copium praestantiam fac sic
+        meo viao indicum locementum da.
+        meo numero observatis decapitamentum da.
+        meo filio gignementum da.
+        nisi filium fac sic
+            adnota Calculate in this child, assemble one CSV row and close it before exit.
+            meo responso numerum pendementum da.
+            meo libro scribendum tum viaum pandementum da.
+            meo proprio cognoscementum da.
+            meo textoo numerum tum comma tum responsum tum comma tum proprium tum novumversum serementum da.
+            funde librum tum textoum.
+            nisi libro claudementum fac sic dictum sic Cannot close worker row cis mori. cis
+            discede.
+        cis
+        filiis filium cumula.
+        indico postincresce.
+        meo vivo filia da.
+        meo pleno vivum tum operum aequalitam da.
+        meo ultimo indicum tum copium aequalitam da.
+        si plenum vel ultimum fac sic
+            per quisque filium in filiis fac sic collige filium. cis
+            filiis iani.
+        cis
     cis
-    shute outum.
+
+    adnota Publish only successful rows, restoring input order through their ordinals.
+    legendo LX indementum da.
+    libro scribendum tum destinatum pandementum da.
+    funde librum tum cum dictum sic x,j0,worker_pid cis tum novumversum serementum.
+    indico nullum da.
+    dum indicum tum copium praestantiam fac sic
+        meo viao indicum locementum da.
+        meo paginao legendum tum viaum pandementum da.
+        meo textoo paginaum accipementum da.
+        funde librum tum textoum.
+        nisi paginao claudementum fac sic dictum sic Cannot close worker row cis mori. cis
+        indico postincresce.
+    cis
+    nisi libro claudementum fac sic dictum sic Cannot close output cis mori. cis
 cis
+
+adnota Protect the whole run by passing a code reference to the exception boundary.
+tege agtorem.
 </textarea>
-<footer>Highlighted with Pygments using the Perligata + explicit Perl bridge (project lexer) lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>5c21ee68440360d845caee4f4ec897b09ea890cb742b584b7dcb47ce834f3fe5</code></footer>
+<footer>Highlighted with Pygments using the Perligata with Perl imports (project lexer) lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>49f78f081cb45692a338ba8f3487c6e05ee09542a6f60994373658fd699ea4e7</code></footer>
 <script>
 document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
 document.querySelector('#copy').addEventListener('click',async()=>{

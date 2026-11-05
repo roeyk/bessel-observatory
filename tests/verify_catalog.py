@@ -75,6 +75,13 @@ for entry in entries:
     assert source in index.links and entry['highlighted'] in index.links
     digest = hashlib.sha256((ROOT / source).read_bytes()).hexdigest()
     assert evidence[entry['id']]['source_sha256'] == digest, f'stale evidence: {source}'
+    # A changed bridge invalidates a pass even when the Latin listing is unchanged.
+    dependencies = {
+        path: hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+        for path in entry.get('validation_dependencies', [])
+    }
+    assert evidence[entry['id']].get('dependency_sha256', {}) == dependencies, \
+        f'stale dependency evidence: {source}'
     sources.append(source)
     sources.extend(file for file in entry.get('support', []) if not file.endswith('.txt'))
 

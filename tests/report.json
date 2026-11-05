@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-05T05:03:20.383698+00:00",
+  "generated_utc": "2026-11-05T16:14:21.009003+00:00",
   "method": "Black-box execution against stored 80-digit reference values; process IDs checked against parent PID. No assertion of bitwise equality or relative speed.",
   "toolchains": "Some toolchains may be unpacked into /tmp through --overrides; no global installations are required.",
   "results": [
@@ -796,18 +796,21 @@
         "excess arguments",
         "input size bound"
       ],
-      "source_sha256": "5c21ee68440360d845caee4f4ec897b09ea890cb742b584b7dcb47ce834f3fe5",
+      "source_sha256": "49f78f081cb45692a338ba8f3487c6e05ee09542a6f60994373658fd699ea4e7",
+      "dependency_sha256": {
+        "BesselPerligata.pm": "6b2ad61a8dc8667a56f585f2edf64738f8412f94a5df41724a480aa67200f85d"
+      },
       "observed_worker_pids": [
-        6,
-        7,
-        8,
-        9,
-        10,
-        11,
-        12,
-        13,
-        14,
-        15
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
       ]
     }
   ],

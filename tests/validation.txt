@@ -53,9 +53,21 @@ Untested:
 These are source implementations, not runtime-verified claims.
 
 Offline HTML checks:
-  python3 tests/verify_catalog.py verifies all 30 language entries, all 33
+  python3 tests/verify_catalog.py verifies all 30 language entries, all 34
   highlighted main/support source views, embedded raw source equality,
   SHA-256 hashes, report/source correspondence, and every local link/anchor.
   Pygments supplies bundled lexers; tools/catalog_lexers.py covers Oberon-2,
   free RPG, Perligata's Latin/Perl boundary, and FreeBASIC block comments.
   Highlighting does not act as a compiler or syntax validator.
+
+Perligata revision (2026-11-05):
+  Re-ran all eleven shared checks with Lingua::Romana::Perligata 0.605 after
+  replacing English-root identifiers and moving native open/write/close into
+  the Latin listing. BesselPerligata.pm is a visible compatibility dependency,
+  recorded in dependency_sha256; catalogue validation checks both source hashes.
+  Other editions retain their earlier evidence. The merged report timestamp
+  indicates the latest update, not a simultaneous rerun of every language.
+  The invalid-input check also rejects I/V/IX without converting them to numbers.
+  Additional local probes verified execution from another working directory,
+  filenames with spaces/metacharacters, directory-read errors, delayed writes
+  to /dev/full, and simulated fork/child failures with process/file cleanup.

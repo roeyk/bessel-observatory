@@ -42,8 +42,14 @@ buffer-offset, or relational model. All editions manipulate input/output strings
 - Bash embeds an `awk` floating-point kernel because shell arithmetic is integer-only.
 - Oberon-2 uses the supplied C adapter for checked POSIX and stdio interfaces;
   its quadrature and address traversal remain Oberon.
-- Perligata uses a marked Perl bridge for syntax and OS interfaces missing from
-  the Latin grammar. Install `Lingua::Romana::Perligata` from CPAN.
+- Perligata uses Latin-root vocabulary and native file opening, writing and
+  closing. [BesselPerligata.pm](BesselPerligata.pm) provides regex validation,
+  unchanged line reads and checked OS/exception services; its highlighted view
+  is linked beside the main listing. Native `perlege` converts Roman numerals,
+  so the bridge preserves the shared decimal-input contract. Install
+  `Lingua::Romana::Perligata` 0.605 from CPAN. Its
+  [grammar](https://metacpan.org/dist/Lingua-Romana-Perligata/view/lib/Lingua/Romana/Perligata.pm)
+  uses regularized Latin nouns and verbs within a restricted syntax.
 - SQL targets PostgreSQL, `psql`, and `dblink`; setup is in the HTML catalogue.
 - RPG targets IBM i. Read [rpg_setup.txt](rpg_setup.txt) before compiling or
   configuring its batch queue. Its CALL parameters and job-message errors are
@@ -63,7 +69,8 @@ certified numerical library.
 
 The recorded baseline has **25 editions passing all 11 behavioral checks**.
 Smalltalk, Julia, Swift, SQL, and RPG are explicitly untested in that baseline.
-[tests/report.json](tests/report.json) ties the evidence to source hashes;
+[tests/report.json](tests/report.json) ties the evidence to source hashes
+(and the declared Perligata helper dependency);
 [tests/validation.txt](tests/validation.txt) explains toolchains, test scope,
 limitations, and independent 80-digit reference values.
 

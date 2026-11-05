@@ -58,7 +58,8 @@ edition; missing runtimes and integration services are reported as untested.
 
 Do not overwrite `tests/report.json` with a partial run. When intentionally
 updating the committed baseline, merge fresh evidence for changed editions,
-retain evidence only for unchanged source hashes, and mark unavailable changed
+retain evidence only for unchanged source hashes (including any manifest
+`validation_dependencies`), and mark unavailable changed
 editions untested. Then regenerate and verify the catalogue. A source review is
 not execution evidence. CI reports belong in CI artifacts or ignored `build/`.
 
