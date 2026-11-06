@@ -4,10 +4,12 @@ The same numerical program in **31 languages**, with an offline, syntax-highligh
 source catalogue. Each edition reads observations, calculates Bessel J₀ in
 separate operating-system processes, and writes ordered CSV results.
 
-Open [index.html](index.html) from a local checkout for the alphabetical language
-table, adjacent highlighted-code and raw-source links, build instructions,
-memory and string examples, and validation status. GitHub's file viewer shows
-HTML source; download or clone the repository to use the interactive catalogue.
+**[Open the interactive catalogue →](https://roeyk.github.io/bessel-observatory/)**
+
+Browse the alphabetical language table, highlighted code and raw sources,
+build instructions, memory and string examples, and validation status.
+The site is hosted on GitHub Pages. For offline browsing, download or clone
+this repository and open [index.html](index.html) locally.
 
 ## Run an edition
 
@@ -59,7 +61,7 @@ buffer-offset, or relational model. All editions manipulate input/output strings
   `gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps examples/values.txt results.csv 2`.
   OS policies must permit these process/file operations; `-dNOSAFER` does not
   override a restricted AppArmor profile. See the
-  [PostScript design explanation](index.html#postscript).
+  [PostScript design explanation](https://roeyk.github.io/bessel-observatory/#postscript).
 - RPG targets IBM i. Read [rpg_setup.txt](rpg_setup.txt) before compiling or
   configuring its batch queue. Its CALL parameters and job-message errors are
   native IBM i interfaces.
@@ -96,6 +98,8 @@ make check
 Python, Bash, Perl, and Ruby editions. Install their toolchains first. It writes
 fresh evidence under `build/` and preserves the committed 31-language baseline.
 GitHub Actions runs the same checks and verifies reproducible generated HTML.
+GitHub Pages publishes the committed static catalogue from the root of `main`;
+`.nojekyll` keeps the generated HTML and linked source files intact.
 
 ```sh
 # Check a selected edition without replacing the committed baseline report.

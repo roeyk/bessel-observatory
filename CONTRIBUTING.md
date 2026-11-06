@@ -67,6 +67,10 @@ Pygments is pinned in `requirements-dev.txt` so generated pages are reproducible
 The HTML is committed for offline browsing; edit its generators or source files,
 then run `make docs`. Keep the index alphabetized.
 
+GitHub Pages publishes the root of `main` at
+https://roeyk.github.io/bessel-observatory/. Keep `.nojekyll` and commit regenerated
+HTML with source changes; the same relative links support online and offline use.
+
 ## Boundaries
 
 Only source, portable docs, examples, reviewed validation records, and generated

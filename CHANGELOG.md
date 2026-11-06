@@ -3,6 +3,13 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-06 — Online catalogue
+
+- Published the existing static catalogue with GitHub Pages, with a prominent
+  README link and repository About website link.
+- Kept offline browsing and relative source links; `.nojekyll` publishes the
+  committed files from `main` without a Jekyll transformation.
+
 ## 2026-11-06 — PostScript with software numerical precision
 
 - Added the 31st edition, with decimal parsing, 52-bit fractional fixed-point
