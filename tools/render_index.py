@@ -46,6 +46,10 @@ passed = sum(result.get("status") == "passed" for result in results.values())
 source_links = ' · '.join(f'<a href="{s["url"]}">{escape(s["title"])}</a>' for s in manifest['sources'])
 methodology = ''.join(f'<li>{escape(text)}</li>' for text in manifest['methodology'])
 limitations = ''.join(f'<li>{escape(text)}</li>' for text in manifest['limitations'])
+postscript_design = ''.join(
+    f'<p>{escape(manifest["postscript_design"][key])}</p>'
+    for key in ("choice", "reason", "arithmetic", "method", "processes", "setup", "input_limit")
+)
 page = '''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Bessel Observatory — __COUNT__ languages</title>
@@ -75,7 +79,7 @@ li{margin-bottom:8px}footer{margin-top:50px;border-top:1px solid var(--line);pad
 :focus-visible{outline:2px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}
 @media print{body{background:white;color:black}nav,.filter,.plot input{display:none}small{color:#555}a{color:#173f32}details{display:block}main{padding:0}.badge{background:white;color:black}}
 </style></head><body><main>
-<nav aria-label="Project navigation"><a href="#languages">Languages</a><a href="#contract">Shared behavior</a><a href="#method">Methodology</a><a href="#sql">SQL edition</a><a href="manifest.json">Manifest JSON</a><a href="README.md">Project guide</a><a href="CHANGELOG.md">Changelog</a><a href="tests/report.json">Test evidence</a></nav>
+<nav aria-label="Project navigation"><a href="#languages">Languages</a><a href="#contract">Shared behavior</a><a href="#method">Methodology</a><a href="#postscript">PostScript design</a><a href="#sql">SQL edition</a><a href="manifest.json">Manifest JSON</a><a href="README.md">Project guide</a><a href="CHANGELOG.md">Changelog</a><a href="tests/report.json">Test evidence</a></nav>
 <div class="eyebrow">A comparative programming experiment</div>
 <h1>Bessel Observatory<br><span style="color:var(--accent)">__COUNT__ languages. One wave.</span></h1>
 <p class="intro">Read numbers. Launch worker processes. Compute an oscillating special function. Write a CSV. The same small experiment, expressed in the native style of each language.</p>
@@ -104,6 +108,10 @@ python3 bessel.py - results.csv 4</pre><p>Run commands from this project directo
 python3 tests/verify.py --only python,c,rust
 python3 tools/render_sources.py  # requires Pygments to regenerate pages
 python3 tools/render_index.py</pre><p>The runner builds available editions and checks reference values, CSV ordering, subprocess IDs, a single-worker run, malformed lines, stdin, argument errors, file failures, empty input and the input-size bound. Missing toolchains are recorded as untested. Reference values were generated with <code>mpmath.besselj</code> at 80 decimal digits; the absolute comparison tolerance is 10⁻¹⁰. See <a href="tests/reference.json">reference data</a> and <a href="tests/report.json">recorded results</a>.</p>
+<h2 id="postscript">PostScript: preserving precision in the language</h2>
+__POSTSCRIPT__
+<pre>gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps examples/values.txt results.csv 2</pre>
+<p>Open the <a href="code/bessel.ps.html">commented PostScript implementation</a> for the arithmetic and process contracts. The <a href="https://ghostscript.readthedocs.io/en/latest/Language.html">Ghostscript language reference</a> documents native real precision and the pipe extension; this edition checks the required 64-bit integer support at startup.</p>
 <h2 id="sql">SQL: a database-native edition</h2><p><code>bessel.sql</code> targets PostgreSQL with PL/pgSQL and <code>dblink</code>. Run it in a dedicated database. The script creates the extension if absent and temporary tables for the session. Each worker connection has a separate backend OS process; its numerical kernel is an aggregate over <code>generate_series</code>.</p>
 <pre>psql -X -d observatory -v values='0,1,5,10' -v workers=2 -v output=results.csv -f bessel.sql
 # Interactive comma-separated input:
@@ -124,7 +132,7 @@ const slider=document.querySelector('#x');function update(){const x=Number(slide
 '''
 for marker, value in {"__COUNT__": str(len(manifest["languages"])), "__PASSED__": str(passed), "__ROWS__": "\n".join(rows),
                       "__METHOD__": methodology, "__LIMITS__": limitations,
-                      "__SOURCES__": source_links}.items():
+                      "__SOURCES__": source_links, "__POSTSCRIPT__": postscript_design}.items():
     page = page.replace(marker, value)
 (ROOT / "index.html").write_text(page)
 print(f"Rendered {len(rows)} source links; {passed} editions passed checks.")

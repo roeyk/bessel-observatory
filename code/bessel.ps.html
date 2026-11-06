@@ -1,0 +1,1197 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="9075c06dd8ec864b723d09e749f78246c174f3b126d8c49a43a90a29c52342ca">
+<title>PostScript — bessel.ps — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 31 languages</a>
+<a href="bessel-perligata.pl.html">← Lingua::Romana::Perligata</a><a href="bessel-oberon-posix.c.html">Oberon-2 support →</a></nav>
+<h1>PostScript <code>bessel.ps</code></h1>
+<p>64-bit Ghostscript on Linux; %pipe% and /proc access required · Operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits.</p>
+<p><strong>Memory:</strong> Arrays and strings are reference objects; getinterval shares a bounded view. Input slices are copied before the line buffer is reused. No raw pointer arithmetic.<br><strong>Strings:</strong> ASCII trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered CSV serialization.</p>
+<div class="actions"><a href="../bessel.ps">Open raw source</a>
+<a href="../bessel.ps" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span>
+<span class="normal"><a href="#L-172">172</a></span>
+<span class="normal"><a href="#L-173">173</a></span>
+<span class="normal"><a href="#L-174">174</a></span>
+<span class="normal"><a href="#L-175">175</a></span>
+<span class="normal"><a href="#L-176">176</a></span>
+<span class="normal"><a href="#L-177">177</a></span>
+<span class="normal"><a href="#L-178">178</a></span>
+<span class="normal"><a href="#L-179">179</a></span>
+<span class="normal"><a href="#L-180">180</a></span>
+<span class="normal"><a href="#L-181">181</a></span>
+<span class="normal"><a href="#L-182">182</a></span>
+<span class="normal"><a href="#L-183">183</a></span>
+<span class="normal"><a href="#L-184">184</a></span>
+<span class="normal"><a href="#L-185">185</a></span>
+<span class="normal"><a href="#L-186">186</a></span>
+<span class="normal"><a href="#L-187">187</a></span>
+<span class="normal"><a href="#L-188">188</a></span>
+<span class="normal"><a href="#L-189">189</a></span>
+<span class="normal"><a href="#L-190">190</a></span>
+<span class="normal"><a href="#L-191">191</a></span>
+<span class="normal"><a href="#L-192">192</a></span>
+<span class="normal"><a href="#L-193">193</a></span>
+<span class="normal"><a href="#L-194">194</a></span>
+<span class="normal"><a href="#L-195">195</a></span>
+<span class="normal"><a href="#L-196">196</a></span>
+<span class="normal"><a href="#L-197">197</a></span>
+<span class="normal"><a href="#L-198">198</a></span>
+<span class="normal"><a href="#L-199">199</a></span>
+<span class="normal"><a href="#L-200">200</a></span>
+<span class="normal"><a href="#L-201">201</a></span>
+<span class="normal"><a href="#L-202">202</a></span>
+<span class="normal"><a href="#L-203">203</a></span>
+<span class="normal"><a href="#L-204">204</a></span>
+<span class="normal"><a href="#L-205">205</a></span>
+<span class="normal"><a href="#L-206">206</a></span>
+<span class="normal"><a href="#L-207">207</a></span>
+<span class="normal"><a href="#L-208">208</a></span>
+<span class="normal"><a href="#L-209">209</a></span>
+<span class="normal"><a href="#L-210">210</a></span>
+<span class="normal"><a href="#L-211">211</a></span>
+<span class="normal"><a href="#L-212">212</a></span>
+<span class="normal"><a href="#L-213">213</a></span>
+<span class="normal"><a href="#L-214">214</a></span>
+<span class="normal"><a href="#L-215">215</a></span>
+<span class="normal"><a href="#L-216">216</a></span>
+<span class="normal"><a href="#L-217">217</a></span>
+<span class="normal"><a href="#L-218">218</a></span>
+<span class="normal"><a href="#L-219">219</a></span>
+<span class="normal"><a href="#L-220">220</a></span>
+<span class="normal"><a href="#L-221">221</a></span>
+<span class="normal"><a href="#L-222">222</a></span>
+<span class="normal"><a href="#L-223">223</a></span>
+<span class="normal"><a href="#L-224">224</a></span>
+<span class="normal"><a href="#L-225">225</a></span>
+<span class="normal"><a href="#L-226">226</a></span>
+<span class="normal"><a href="#L-227">227</a></span>
+<span class="normal"><a href="#L-228">228</a></span>
+<span class="normal"><a href="#L-229">229</a></span>
+<span class="normal"><a href="#L-230">230</a></span>
+<span class="normal"><a href="#L-231">231</a></span>
+<span class="normal"><a href="#L-232">232</a></span>
+<span class="normal"><a href="#L-233">233</a></span>
+<span class="normal"><a href="#L-234">234</a></span>
+<span class="normal"><a href="#L-235">235</a></span>
+<span class="normal"><a href="#L-236">236</a></span>
+<span class="normal"><a href="#L-237">237</a></span>
+<span class="normal"><a href="#L-238">238</a></span>
+<span class="normal"><a href="#L-239">239</a></span>
+<span class="normal"><a href="#L-240">240</a></span>
+<span class="normal"><a href="#L-241">241</a></span>
+<span class="normal"><a href="#L-242">242</a></span>
+<span class="normal"><a href="#L-243">243</a></span>
+<span class="normal"><a href="#L-244">244</a></span>
+<span class="normal"><a href="#L-245">245</a></span>
+<span class="normal"><a href="#L-246">246</a></span>
+<span class="normal"><a href="#L-247">247</a></span>
+<span class="normal"><a href="#L-248">248</a></span>
+<span class="normal"><a href="#L-249">249</a></span>
+<span class="normal"><a href="#L-250">250</a></span>
+<span class="normal"><a href="#L-251">251</a></span>
+<span class="normal"><a href="#L-252">252</a></span>
+<span class="normal"><a href="#L-253">253</a></span>
+<span class="normal"><a href="#L-254">254</a></span>
+<span class="normal"><a href="#L-255">255</a></span>
+<span class="normal"><a href="#L-256">256</a></span>
+<span class="normal"><a href="#L-257">257</a></span>
+<span class="normal"><a href="#L-258">258</a></span>
+<span class="normal"><a href="#L-259">259</a></span>
+<span class="normal"><a href="#L-260">260</a></span>
+<span class="normal"><a href="#L-261">261</a></span>
+<span class="normal"><a href="#L-262">262</a></span>
+<span class="normal"><a href="#L-263">263</a></span>
+<span class="normal"><a href="#L-264">264</a></span>
+<span class="normal"><a href="#L-265">265</a></span>
+<span class="normal"><a href="#L-266">266</a></span>
+<span class="normal"><a href="#L-267">267</a></span>
+<span class="normal"><a href="#L-268">268</a></span>
+<span class="normal"><a href="#L-269">269</a></span>
+<span class="normal"><a href="#L-270">270</a></span>
+<span class="normal"><a href="#L-271">271</a></span>
+<span class="normal"><a href="#L-272">272</a></span>
+<span class="normal"><a href="#L-273">273</a></span>
+<span class="normal"><a href="#L-274">274</a></span>
+<span class="normal"><a href="#L-275">275</a></span>
+<span class="normal"><a href="#L-276">276</a></span>
+<span class="normal"><a href="#L-277">277</a></span>
+<span class="normal"><a href="#L-278">278</a></span>
+<span class="normal"><a href="#L-279">279</a></span>
+<span class="normal"><a href="#L-280">280</a></span>
+<span class="normal"><a href="#L-281">281</a></span>
+<span class="normal"><a href="#L-282">282</a></span>
+<span class="normal"><a href="#L-283">283</a></span>
+<span class="normal"><a href="#L-284">284</a></span>
+<span class="normal"><a href="#L-285">285</a></span>
+<span class="normal"><a href="#L-286">286</a></span>
+<span class="normal"><a href="#L-287">287</a></span>
+<span class="normal"><a href="#L-288">288</a></span>
+<span class="normal"><a href="#L-289">289</a></span>
+<span class="normal"><a href="#L-290">290</a></span>
+<span class="normal"><a href="#L-291">291</a></span>
+<span class="normal"><a href="#L-292">292</a></span>
+<span class="normal"><a href="#L-293">293</a></span>
+<span class="normal"><a href="#L-294">294</a></span>
+<span class="normal"><a href="#L-295">295</a></span>
+<span class="normal"><a href="#L-296">296</a></span>
+<span class="normal"><a href="#L-297">297</a></span>
+<span class="normal"><a href="#L-298">298</a></span>
+<span class="normal"><a href="#L-299">299</a></span>
+<span class="normal"><a href="#L-300">300</a></span>
+<span class="normal"><a href="#L-301">301</a></span>
+<span class="normal"><a href="#L-302">302</a></span>
+<span class="normal"><a href="#L-303">303</a></span>
+<span class="normal"><a href="#L-304">304</a></span>
+<span class="normal"><a href="#L-305">305</a></span>
+<span class="normal"><a href="#L-306">306</a></span>
+<span class="normal"><a href="#L-307">307</a></span>
+<span class="normal"><a href="#L-308">308</a></span>
+<span class="normal"><a href="#L-309">309</a></span>
+<span class="normal"><a href="#L-310">310</a></span>
+<span class="normal"><a href="#L-311">311</a></span>
+<span class="normal"><a href="#L-312">312</a></span>
+<span class="normal"><a href="#L-313">313</a></span>
+<span class="normal"><a href="#L-314">314</a></span>
+<span class="normal"><a href="#L-315">315</a></span>
+<span class="normal"><a href="#L-316">316</a></span>
+<span class="normal"><a href="#L-317">317</a></span>
+<span class="normal"><a href="#L-318">318</a></span>
+<span class="normal"><a href="#L-319">319</a></span>
+<span class="normal"><a href="#L-320">320</a></span>
+<span class="normal"><a href="#L-321">321</a></span>
+<span class="normal"><a href="#L-322">322</a></span>
+<span class="normal"><a href="#L-323">323</a></span>
+<span class="normal"><a href="#L-324">324</a></span>
+<span class="normal"><a href="#L-325">325</a></span>
+<span class="normal"><a href="#L-326">326</a></span>
+<span class="normal"><a href="#L-327">327</a></span>
+<span class="normal"><a href="#L-328">328</a></span>
+<span class="normal"><a href="#L-329">329</a></span>
+<span class="normal"><a href="#L-330">330</a></span>
+<span class="normal"><a href="#L-331">331</a></span>
+<span class="normal"><a href="#L-332">332</a></span>
+<span class="normal"><a href="#L-333">333</a></span>
+<span class="normal"><a href="#L-334">334</a></span>
+<span class="normal"><a href="#L-335">335</a></span>
+<span class="normal"><a href="#L-336">336</a></span>
+<span class="normal"><a href="#L-337">337</a></span>
+<span class="normal"><a href="#L-338">338</a></span>
+<span class="normal"><a href="#L-339">339</a></span>
+<span class="normal"><a href="#L-340">340</a></span>
+<span class="normal"><a href="#L-341">341</a></span>
+<span class="normal"><a href="#L-342">342</a></span>
+<span class="normal"><a href="#L-343">343</a></span>
+<span class="normal"><a href="#L-344">344</a></span>
+<span class="normal"><a href="#L-345">345</a></span>
+<span class="normal"><a href="#L-346">346</a></span>
+<span class="normal"><a href="#L-347">347</a></span>
+<span class="normal"><a href="#L-348">348</a></span>
+<span class="normal"><a href="#L-349">349</a></span>
+<span class="normal"><a href="#L-350">350</a></span>
+<span class="normal"><a href="#L-351">351</a></span>
+<span class="normal"><a href="#L-352">352</a></span>
+<span class="normal"><a href="#L-353">353</a></span>
+<span class="normal"><a href="#L-354">354</a></span>
+<span class="normal"><a href="#L-355">355</a></span>
+<span class="normal"><a href="#L-356">356</a></span>
+<span class="normal"><a href="#L-357">357</a></span>
+<span class="normal"><a href="#L-358">358</a></span>
+<span class="normal"><a href="#L-359">359</a></span>
+<span class="normal"><a href="#L-360">360</a></span>
+<span class="normal"><a href="#L-361">361</a></span>
+<span class="normal"><a href="#L-362">362</a></span>
+<span class="normal"><a href="#L-363">363</a></span>
+<span class="normal"><a href="#L-364">364</a></span>
+<span class="normal"><a href="#L-365">365</a></span>
+<span class="normal"><a href="#L-366">366</a></span>
+<span class="normal"><a href="#L-367">367</a></span>
+<span class="normal"><a href="#L-368">368</a></span>
+<span class="normal"><a href="#L-369">369</a></span>
+<span class="normal"><a href="#L-370">370</a></span>
+<span class="normal"><a href="#L-371">371</a></span>
+<span class="normal"><a href="#L-372">372</a></span>
+<span class="normal"><a href="#L-373">373</a></span>
+<span class="normal"><a href="#L-374">374</a></span>
+<span class="normal"><a href="#L-375">375</a></span>
+<span class="normal"><a href="#L-376">376</a></span>
+<span class="normal"><a href="#L-377">377</a></span>
+<span class="normal"><a href="#L-378">378</a></span>
+<span class="normal"><a href="#L-379">379</a></span>
+<span class="normal"><a href="#L-380">380</a></span>
+<span class="normal"><a href="#L-381">381</a></span>
+<span class="normal"><a href="#L-382">382</a></span>
+<span class="normal"><a href="#L-383">383</a></span>
+<span class="normal"><a href="#L-384">384</a></span>
+<span class="normal"><a href="#L-385">385</a></span>
+<span class="normal"><a href="#L-386">386</a></span>
+<span class="normal"><a href="#L-387">387</a></span>
+<span class="normal"><a href="#L-388">388</a></span>
+<span class="normal"><a href="#L-389">389</a></span>
+<span class="normal"><a href="#L-390">390</a></span>
+<span class="normal"><a href="#L-391">391</a></span>
+<span class="normal"><a href="#L-392">392</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="cp">%!PS</span>
+<a id="L-2" name="L-2"></a><span class="cm">% Bessel Observatory: PostScript on 64-bit Ghostscript / Linux.</span>
+<a id="L-3" name="L-3"></a><span class="cm">% All parsing, arithmetic, trigonometry and orchestration are PostScript.</span>
+<a id="L-4" name="L-4"></a><span class="cm">% Ghostscript real objects have only single precision; integer fixed-point</span>
+<a id="L-5" name="L-5"></a><span class="cm">% arithmetic preserves the shared 1e-10 tolerance without a foreign kernel.</span>
+<a id="L-6" name="L-6"></a>
+<a id="L-7" name="L-7"></a><span class="nv">/Q</span><span class="w"> </span><span class="mf">4503599627370496</span><span class="w"> </span><span class="nf">def</span><span class="w">              </span><span class="c1">% 2^52 units represent one.</span>
+<a id="L-8" name="L-8"></a><span class="nv">/Limb</span><span class="w"> </span><span class="mf">67108864</span><span class="w"> </span><span class="nf">def</span><span class="w">                   </span><span class="c1">% 2^26 splits products into exact limbs.</span>
+<a id="L-9" name="L-9"></a><span class="nv">/Pi</span><span class="w"> </span><span class="mf">14148475504056881</span><span class="w"> </span><span class="nf">def</span><span class="w">            </span><span class="c1">% Round(pi * 2^52).</span>
+<a id="L-10" name="L-10"></a><span class="nv">/HalfPi</span><span class="w"> </span><span class="mf">7074237752028440</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-11" name="L-11"></a><span class="nv">/TwoPi</span><span class="w"> </span><span class="mf">28296951008113761</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-12" name="L-12"></a><span class="nv">/Samples</span><span class="w"> </span><span class="mf">16384</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-13" name="L-13"></a>
+<a id="L-14" name="L-14"></a><span class="cm">% Multiply two fixed-point numbers without overflowing a signed 64-bit integer.</span>
+<a id="L-15" name="L-15"></a><span class="cm">% Inputs: a b, scaled by Q; callers keep |a| &lt;= 1000Q, |b| &lt;= 2.5Q,</span>
+<a id="L-16" name="L-16"></a><span class="cm">% and |a*b/Q| &lt;= 1000Q, so all partial products fit signed 64-bit integers.</span>
+<a id="L-17" name="L-17"></a><span class="cm">% Output: trunc(a*b/Q). Called by cosine and observe for polynomial terms.</span>
+<a id="L-18" name="L-18"></a><span class="cm">% A product is formed from 26-bit limbs; no operation converts to a real.</span>
+<a id="L-19" name="L-19"></a><span class="nv">/fmul</span><span class="w"> </span><span class="p">{</span>
+<a id="L-20" name="L-20"></a><span class="w">  </span><span class="mf">10</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span>
+<a id="L-21" name="L-21"></a><span class="w">  </span><span class="nv">/b</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/a</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-22" name="L-22"></a><span class="w">  </span><span class="nv">/negative</span><span class="w"> </span><span class="nf">a</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="nf">b</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="nf">xor</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/a</span><span class="w"> </span><span class="nf">a</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/b</span><span class="w"> </span><span class="nf">b</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-23" name="L-23"></a><span class="w">  </span><span class="nv">/ah</span><span class="w"> </span><span class="nf">a</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/al</span><span class="w"> </span><span class="nf">a</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-24" name="L-24"></a><span class="w">  </span><span class="nv">/bh</span><span class="w"> </span><span class="nf">b</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/bl</span><span class="w"> </span><span class="nf">b</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-25" name="L-25"></a><span class="w">  </span><span class="nf">ah</span><span class="w"> </span><span class="nf">bh</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">ah</span><span class="w"> </span><span class="nf">bl</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">al</span><span class="w"> </span><span class="nf">bh</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">al</span><span class="w"> </span><span class="nf">bl</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">Limb</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">add</span>
+<a id="L-26" name="L-26"></a><span class="w">  </span><span class="nf">negative</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">neg</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-27" name="L-27"></a><span class="w">  </span><span class="nf">end</span>
+<a id="L-28" name="L-28"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-29" name="L-29"></a>
+<a id="L-30" name="L-30"></a><span class="cm">% Concatenate two strings, allocating storage owned by the returned string.</span>
+<a id="L-31" name="L-31"></a><span class="cm">% Inputs: left right. Output: joined string. Used by CSV and command assembly.</span>
+<a id="L-32" name="L-32"></a><span class="nv">/join</span><span class="w"> </span><span class="p">{</span>
+<a id="L-33" name="L-33"></a><span class="w">  </span><span class="mf">3</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/right</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/left</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-34" name="L-34"></a><span class="w">  </span><span class="nv">/result</span><span class="w"> </span><span class="nf">left</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">right</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-35" name="L-35"></a><span class="w">  </span><span class="nf">result</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">left</span><span class="w"> </span><span class="nf">putinterval</span><span class="w"> </span><span class="nf">result</span><span class="w"> </span><span class="nf">left</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">right</span><span class="w"> </span><span class="nf">putinterval</span><span class="w"> </span><span class="nf">result</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-36" name="L-36"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-37" name="L-37"></a>
+<a id="L-38" name="L-38"></a><span class="cm">% Stop the current operation with an application diagnostic.</span>
+<a id="L-39" name="L-39"></a><span class="cm">% Input: message string. No return. Used by validation and worker checks;</span>
+<a id="L-40" name="L-40"></a><span class="cm">% the top-level stopped handler owns reporting, file cleanup and exit status.</span>
+<a id="L-41" name="L-41"></a><span class="nv">/fail</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">userdict</span><span class="w"> </span><span class="nv">/FailureMessage</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="mf">-1</span><span class="w"> </span><span class="nf">roll</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="nf">stop</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-42" name="L-42"></a>
+<a id="L-43" name="L-43"></a><span class="cm">% Remove ASCII whitespace, returning a shared slice of the original string.</span>
+<a id="L-44" name="L-44"></a><span class="cm">% Input: string. Output: slice. Called by readValues before copying each line.</span>
+<a id="L-45" name="L-45"></a><span class="cm">% getinterval aliases the same bytes: retaining it requires retaining its owner.</span>
+<a id="L-46" name="L-46"></a><span class="nv">/trim</span><span class="w"> </span><span class="p">{</span>
+<a id="L-47" name="L-47"></a><span class="w">  </span><span class="mf">3</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/first</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/last</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-48" name="L-48"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="nf">last</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-49" name="L-49"></a><span class="w">    </span><span class="nv">/first</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-50" name="L-50"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nf">last</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="nf">le</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">last</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-51" name="L-51"></a><span class="w">    </span><span class="nv">/last</span><span class="w"> </span><span class="nf">last</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-52" name="L-52"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="nf">last</span><span class="w"> </span><span class="nf">first</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">getinterval</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-53" name="L-53"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-54" name="L-54"></a>
+<a id="L-55" name="L-55"></a><span class="cm">% Recognize one decimal digit without invoking PostScript&#39;s code scanner.</span>
+<a id="L-56" name="L-56"></a><span class="cm">% Input: byte. Output: boolean. Used by number and integer argument checks.</span>
+<a id="L-57" name="L-57"></a><span class="nv">/digit</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">57</span><span class="w"> </span><span class="nf">le</span><span class="w"> </span><span class="nf">and</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-58" name="L-58"></a>
+<a id="L-59" name="L-59"></a><span class="cm">% Parse finite decimal/e-notation directly into Q-scaled integer units.</span>
+<a id="L-60" name="L-60"></a><span class="cm">% Input: trimmed string. Output: fixed integer, or stop on malformed/domain input.</span>
+<a id="L-61" name="L-61"></a><span class="cm">% Used by readValues; it never routes a decimal through a single-precision real.</span>
+<a id="L-62" name="L-62"></a><span class="cm">% The complete digits determine the domain; 18 fractional decimal digits then</span>
+<a id="L-63" name="L-63"></a><span class="cm">% supply a binary long division, with &lt; 1/Q + 1e-18 input truncation error.</span>
+<a id="L-64" name="L-64"></a><span class="nv">/number</span><span class="w"> </span><span class="p">{</span>
+<a id="L-65" name="L-65"></a><span class="w">  </span><span class="mf">20</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span>
+<a id="L-66" name="L-66"></a><span class="w">  </span><span class="nv">/s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/size</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/pos</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/sign</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-67" name="L-67"></a><span class="w">  </span><span class="nf">size</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(empty number)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-68" name="L-68"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">43</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">45</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span>
+<a id="L-69" name="L-69"></a><span class="w">    </span><span class="nf">s</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">45</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/sign</span><span class="w"> </span><span class="mf">-1</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nv">/pos</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-70" name="L-70"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-71" name="L-71"></a><span class="w">  </span><span class="nv">/digits</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/used</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/point</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/dot</span><span class="w"> </span><span class="nf">false</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-72" name="L-72"></a><span class="w">  </span><span class="p">{</span>
+<a id="L-73" name="L-73"></a><span class="w">    </span><span class="nf">pos</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nv">/ch</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-74" name="L-74"></a><span class="w">    </span><span class="nf">ch</span><span class="w"> </span><span class="nf">digit</span><span class="w"> </span><span class="p">{</span>
+<a id="L-75" name="L-75"></a><span class="w">      </span><span class="nf">digits</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">ch</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="nv">/used</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-76" name="L-76"></a><span class="w">      </span><span class="nf">dot</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/point</span><span class="w"> </span><span class="nf">point</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-77" name="L-77"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<a id="L-78" name="L-78"></a><span class="w">      </span><span class="nf">ch</span><span class="w"> </span><span class="mf">46</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">dot</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="nf">and</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/dot</span><span class="w"> </span><span class="nf">true</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+<a id="L-79" name="L-79"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+<a id="L-80" name="L-80"></a><span class="w">    </span><span class="nv">/pos</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-81" name="L-81"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-82" name="L-82"></a><span class="w">  </span><span class="nf">used</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected a decimal number)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-83" name="L-83"></a><span class="w">  </span><span class="nv">/exponent</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/esign</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-84" name="L-84"></a><span class="w">  </span><span class="nf">pos</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="p">{</span>
+<a id="L-85" name="L-85"></a><span class="w">    </span><span class="nf">s</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">101</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">69</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(invalid numeric suffix)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-86" name="L-86"></a><span class="w">    </span><span class="nv">/pos</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-87" name="L-87"></a><span class="w">    </span><span class="nf">pos</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="p">{</span>
+<a id="L-88" name="L-88"></a><span class="w">      </span><span class="nf">s</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">43</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">45</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span>
+<a id="L-89" name="L-89"></a><span class="w">        </span><span class="nf">s</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">45</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/esign</span><span class="w"> </span><span class="mf">-1</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nv">/pos</span><span class="w"> </span><span class="nf">pos</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-90" name="L-90"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-91" name="L-91"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-92" name="L-92"></a><span class="w">    </span><span class="nf">pos</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(missing exponent digits)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-93" name="L-93"></a><span class="w">    </span><span class="nf">pos</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">size</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-94" name="L-94"></a><span class="w">      </span><span class="nf">s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nv">/ch</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">ch</span><span class="w"> </span><span class="nf">digit</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(invalid exponent)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-95" name="L-95"></a><span class="w">      </span><span class="nv">/exponent</span><span class="w"> </span><span class="nf">exponent</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">ch</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="mf">10000</span><span class="w"> </span><span class="nf">min</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-96" name="L-96"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-97" name="L-97"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-98" name="L-98"></a><span class="w">  </span><span class="nv">/point</span><span class="w"> </span><span class="nf">point</span><span class="w"> </span><span class="nf">exponent</span><span class="w"> </span><span class="nf">esign</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-99" name="L-99"></a><span class="w">  </span><span class="nv">/leading</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-100" name="L-100"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-101" name="L-101"></a><span class="w">    </span><span class="nv">/leading</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-102" name="L-102"></a><span class="w">  </span><span class="nv">/digits</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">getinterval</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-103" name="L-103"></a><span class="w">  </span><span class="nv">/point</span><span class="w"> </span><span class="nf">point</span><span class="w"> </span><span class="nf">leading</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/used</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-104" name="L-104"></a><span class="w">  </span><span class="nf">used</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<a id="L-105" name="L-105"></a><span class="w">    </span><span class="nf">point</span><span class="w"> </span><span class="mf">4</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected x in [-1000,1000])</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-106" name="L-106"></a><span class="w">    </span><span class="nv">/whole</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-107" name="L-107"></a><span class="w">    </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">point</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-108" name="L-108"></a><span class="w">      </span><span class="nv">/i</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/whole</span><span class="w"> </span><span class="nf">whole</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="nf">mul</span>
+<a id="L-109" name="L-109"></a><span class="w">        </span><span class="nf">i</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-110" name="L-110"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-111" name="L-111"></a><span class="w">    </span><span class="nf">whole</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected x in [-1000,1000])</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-112" name="L-112"></a><span class="w">    </span><span class="nf">whole</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span>
+<a id="L-113" name="L-113"></a><span class="w">      </span><span class="nf">point</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-114" name="L-114"></a><span class="w">        </span><span class="nf">digits</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected x in [-1000,1000])</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-115" name="L-115"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-116" name="L-116"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-117" name="L-117"></a><span class="w">    </span><span class="nv">/fraction</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-118" name="L-118"></a><span class="w">    </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="mf">17</span><span class="w"> </span><span class="p">{</span>
+<a id="L-119" name="L-119"></a><span class="w">      </span><span class="nf">point</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nv">/i</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-120" name="L-120"></a><span class="w">      </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="nf">and</span>
+<a id="L-121" name="L-121"></a><span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-122" name="L-122"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-123" name="L-123"></a><span class="w">    </span><span class="nv">/bits</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-124" name="L-124"></a><span class="w">    </span><span class="mf">52</span><span class="w"> </span><span class="p">{</span>
+<a id="L-125" name="L-125"></a><span class="w">      </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/bits</span><span class="w"> </span><span class="nf">bits</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-126" name="L-126"></a><span class="w">      </span><span class="nf">fraction</span><span class="w"> </span><span class="mf">1000000000000000000</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="p">{</span>
+<a id="L-127" name="L-127"></a><span class="w">        </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="mf">1000000000000000000</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/bits</span><span class="w"> </span><span class="nf">bits</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-128" name="L-128"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-129" name="L-129"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">repeat</span>
+<a id="L-130" name="L-130"></a><span class="w">    </span><span class="nf">whole</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">bits</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">sign</span><span class="w"> </span><span class="nf">mul</span>
+<a id="L-131" name="L-131"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+<a id="L-132" name="L-132"></a><span class="w">  </span><span class="nf">end</span>
+<a id="L-133" name="L-133"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-134" name="L-134"></a>
+<a id="L-135" name="L-135"></a><span class="cm">% Format a fixed-point result using integer decimal long division.</span>
+<a id="L-136" name="L-136"></a><span class="cm">% Input: fixed integer. Output: decimal string with 16 fractional places.</span>
+<a id="L-137" name="L-137"></a><span class="cm">% Used by worker output; cvs is applied only to integers, never native reals.</span>
+<a id="L-138" name="L-138"></a><span class="nv">/decimal</span><span class="w"> </span><span class="p">{</span>
+<a id="L-139" name="L-139"></a><span class="w">  </span><span class="mf">6</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/value</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-140" name="L-140"></a><span class="w">  </span><span class="nv">/prefix</span><span class="w"> </span><span class="nf">value</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(-)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">()</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/value</span><span class="w"> </span><span class="nf">value</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-141" name="L-141"></a><span class="w">  </span><span class="nv">/result</span><span class="w"> </span><span class="nf">prefix</span><span class="w"> </span><span class="nf">value</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">(.)</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-142" name="L-142"></a><span class="w">  </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">value</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/digits</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-143" name="L-143"></a><span class="w">  </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="mf">15</span><span class="w"> </span><span class="p">{</span>
+<a id="L-144" name="L-144"></a><span class="w">    </span><span class="nv">/i</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="mf">10</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-145" name="L-145"></a><span class="w">    </span><span class="nf">digits</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="mf">48</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="nv">/fraction</span><span class="w"> </span><span class="nf">fraction</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-146" name="L-146"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-147" name="L-147"></a><span class="w">  </span><span class="nf">result</span><span class="w"> </span><span class="nf">digits</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-148" name="L-148"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-149" name="L-149"></a>
+<a id="L-150" name="L-150"></a><span class="cm">% Evaluate cosine with fixed-point range reduction and a Taylor recurrence.</span>
+<a id="L-151" name="L-151"></a><span class="cm">% Input: angle in Q-scaled radians, |angle| &lt;= 1000Q. Output: cosine * Q.</span>
+<a id="L-152" name="L-152"></a><span class="cm">% Called by observe for both sin(theta) = cos(pi/2-theta) and the outer cos.</span>
+<a id="L-153" name="L-153"></a><span class="cm">% Reduction to [-pi/2, pi/2] keeps terms small and the series well conditioned.</span>
+<a id="L-154" name="L-154"></a><span class="nv">/cosine</span><span class="w"> </span><span class="p">{</span>
+<a id="L-155" name="L-155"></a><span class="w">  </span><span class="mf">8</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span>
+<a id="L-156" name="L-156"></a><span class="w">  </span><span class="nv">/angle</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="nf">TwoPi</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/sign</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-157" name="L-157"></a><span class="w">  </span><span class="nf">angle</span><span class="w"> </span><span class="nf">Pi</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/angle</span><span class="w"> </span><span class="nf">TwoPi</span><span class="w"> </span><span class="nf">angle</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-158" name="L-158"></a><span class="w">  </span><span class="nf">angle</span><span class="w"> </span><span class="nf">HalfPi</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/angle</span><span class="w"> </span><span class="nf">Pi</span><span class="w"> </span><span class="nf">angle</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/sign</span><span class="w"> </span><span class="mf">-1</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-159" name="L-159"></a><span class="w">  </span><span class="nv">/square</span><span class="w"> </span><span class="nf">angle</span><span class="w"> </span><span class="nf">angle</span><span class="w"> </span><span class="nf">fmul</span><span class="w"> </span><span class="nf">neg</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/term</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/total</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-160" name="L-160"></a><span class="w">  </span><span class="mf">1</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="mf">13</span><span class="w"> </span><span class="p">{</span>
+<a id="L-161" name="L-161"></a><span class="w">    </span><span class="nv">/n</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-162" name="L-162"></a><span class="w">    </span><span class="nv">/term</span><span class="w"> </span><span class="nf">term</span><span class="w"> </span><span class="nf">square</span><span class="w"> </span><span class="nf">fmul</span><span class="w"> </span><span class="nf">n</span><span class="w"> </span><span class="nf">n</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-163" name="L-163"></a><span class="w">    </span><span class="nv">/total</span><span class="w"> </span><span class="nf">total</span><span class="w"> </span><span class="nf">term</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-164" name="L-164"></a><span class="w">    </span><span class="nf">term</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-165" name="L-165"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-166" name="L-166"></a><span class="w">  </span><span class="nf">total</span><span class="w"> </span><span class="nf">sign</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-167" name="L-167"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-168" name="L-168"></a>
+<a id="L-169" name="L-169"></a><span class="cm">% Average the shared integral&#39;s midpoint samples using exact integer sums.</span>
+<a id="L-170" name="L-170"></a><span class="cm">% Input: x * Q. Output: J0(x) * Q. Called only inside an OS worker.</span>
+<a id="L-171" name="L-171"></a><span class="cm">% Split every term into quotient and remainder before summing, so even the</span>
+<a id="L-172" name="L-172"></a><span class="cm">% constant integrand at x=0 cannot overflow. The division loses &lt; 1/Q overall.</span>
+<a id="L-173" name="L-173"></a><span class="nv">/observe</span><span class="w"> </span><span class="p">{</span>
+<a id="L-174" name="L-174"></a><span class="w">  </span><span class="mf">10</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span>
+<a id="L-175" name="L-175"></a><span class="w">  </span><span class="nv">/x</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/whole</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/remainder</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-176" name="L-176"></a><span class="w">  </span><span class="nv">/divisor</span><span class="w"> </span><span class="nf">Samples</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-177" name="L-177"></a><span class="w">  </span><span class="nv">/step</span><span class="w"> </span><span class="nf">Pi</span><span class="w"> </span><span class="nf">divisor</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/tail</span><span class="w"> </span><span class="nf">Pi</span><span class="w"> </span><span class="nf">divisor</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-178" name="L-178"></a><span class="w">  </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">Samples</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-179" name="L-179"></a><span class="w">    </span><span class="mf">2</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nv">/k</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-180" name="L-180"></a><span class="w">    </span><span class="nf">HalfPi</span><span class="w"> </span><span class="nf">step</span><span class="w"> </span><span class="nf">k</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">tail</span><span class="w"> </span><span class="nf">k</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">divisor</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">cosine</span>
+<a id="L-181" name="L-181"></a><span class="w">    </span><span class="nf">x</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">fmul</span><span class="w"> </span><span class="nf">cosine</span><span class="w"> </span><span class="nv">/term</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-182" name="L-182"></a><span class="w">    </span><span class="nv">/whole</span><span class="w"> </span><span class="nf">whole</span><span class="w"> </span><span class="nf">term</span><span class="w"> </span><span class="nf">Samples</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-183" name="L-183"></a><span class="w">    </span><span class="nv">/remainder</span><span class="w"> </span><span class="nf">remainder</span><span class="w"> </span><span class="nf">term</span><span class="w"> </span><span class="nf">Samples</span><span class="w"> </span><span class="nf">mod</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-184" name="L-184"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-185" name="L-185"></a><span class="w">  </span><span class="nf">whole</span><span class="w"> </span><span class="nf">remainder</span><span class="w"> </span><span class="nf">Samples</span><span class="w"> </span><span class="nf">idiv</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-186" name="L-186"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-187" name="L-187"></a>
+<a id="L-188" name="L-188"></a><span class="cm">% Parse an integer token without accepting a fractional or executable suffix.</span>
+<a id="L-189" name="L-189"></a><span class="cm">% Input: string, at most 19 digits plus an optional sign. Output: integer.</span>
+<a id="L-190" name="L-190"></a><span class="cm">% Called by main and collect for worker counts and the internal pipe protocol.</span>
+<a id="L-191" name="L-191"></a><span class="nv">/integer</span><span class="w"> </span><span class="p">{</span>
+<a id="L-192" name="L-192"></a><span class="w">  </span><span class="mf">4</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/start</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-193" name="L-193"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">20</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected an integer)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-194" name="L-194"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">43</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="mf">45</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/start</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-195" name="L-195"></a><span class="w">  </span><span class="nf">start</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected integer digits)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-196" name="L-196"></a><span class="w">  </span><span class="nf">start</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">s</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-197" name="L-197"></a><span class="w">    </span><span class="nf">s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">digit</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(expected an integer)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-198" name="L-198"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-199" name="L-199"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="nf">cvi</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="nf">type</span><span class="w"> </span><span class="nv">/integertype</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(integer is out of range)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-200" name="L-200"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-201" name="L-201"></a>
+<a id="L-202" name="L-202"></a><span class="cm">% Read this interpreter&#39;s real Linux process ID, not a PostScript context ID.</span>
+<a id="L-203" name="L-203"></a><span class="cm">% Inputs: none. Output: positive PID. Used by main and each numerical worker.</span>
+<a id="L-204" name="L-204"></a><span class="nv">/processId</span><span class="w"> </span><span class="p">{</span>
+<a id="L-205" name="L-205"></a><span class="w">  </span><span class="mf">3</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/statFile</span><span class="w"> </span><span class="s">(/proc/self/stat)</span><span class="w"> </span><span class="s">(r)</span><span class="w"> </span><span class="nf">file</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-206" name="L-206"></a><span class="w">  </span><span class="nf">statFile</span><span class="w"> </span><span class="mf">4096</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">readline</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="nv">/line</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">statFile</span><span class="w"> </span><span class="nf">closefile</span>
+<a id="L-207" name="L-207"></a><span class="w">  </span><span class="nf">line</span><span class="w"> </span><span class="s">( )</span><span class="w"> </span><span class="nf">search</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(cannot read Linux worker PID)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-208" name="L-208"></a><span class="w">  </span><span class="nv">/pid</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="nf">pid</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">le</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(invalid Linux PID)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-209" name="L-209"></a><span class="w">  </span><span class="nf">pid</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-210" name="L-210"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-211" name="L-211"></a>
+<a id="L-212" name="L-212"></a><span class="cm">% Write one diagnostic to stderr and flush it for interactive users.</span>
+<a id="L-213" name="L-213"></a><span class="cm">% Input: string. Output: none. Used by prompts, skipped input and fatal errors.</span>
+<a id="L-214" name="L-214"></a><span class="nv">/diagnostic</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">Stderr</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">writestring</span><span class="w"> </span><span class="nf">Stderr</span><span class="w"> </span><span class="s">(</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">writestring</span><span class="w"> </span><span class="nf">Stderr</span><span class="w"> </span><span class="nf">flushfile</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-215" name="L-215"></a>
+<a id="L-216" name="L-216"></a><span class="cm">% Read and validate observations while preserving their original decimal text.</span>
+<a id="L-217" name="L-217"></a><span class="cm">% Input: filename or &#39;-&#39;. Output: array of [text fixed-value] records.</span>
+<a id="L-218" name="L-218"></a><span class="cm">% Called by main before launching any worker or opening the output target.</span>
+<a id="L-219" name="L-219"></a><span class="nv">/readValues</span><span class="w"> </span><span class="p">{</span>
+<a id="L-220" name="L-220"></a><span class="w">  </span><span class="mf">12</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/source</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-221" name="L-221"></a><span class="w">  </span><span class="nv">/InputStream</span><span class="w"> </span><span class="nf">source</span><span class="w"> </span><span class="s">(-)</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span>
+<a id="L-222" name="L-222"></a><span class="w">    </span><span class="s">(Enter one x per line; blank line or EOF finishes:)</span><span class="w"> </span><span class="nf">diagnostic</span>
+<a id="L-223" name="L-223"></a><span class="w">    </span><span class="s">(%stdin)</span><span class="w"> </span><span class="s">(r)</span><span class="w"> </span><span class="nf">file</span>
+<a id="L-224" name="L-224"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(%os%)</span><span class="w"> </span><span class="nf">source</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">(r)</span><span class="w"> </span><span class="nf">file</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">store</span>
+<a id="L-225" name="L-225"></a><span class="w">  </span><span class="nv">/records</span><span class="w"> </span><span class="mf">4096</span><span class="w"> </span><span class="nf">array</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/used</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/lineNumber</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/buffer</span><span class="w"> </span><span class="mf">4096</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-226" name="L-226"></a><span class="w">  </span><span class="p">{</span>
+<a id="L-227" name="L-227"></a><span class="w">    </span><span class="nf">InputStream</span><span class="w"> </span><span class="nf">buffer</span><span class="w"> </span><span class="nf">readline</span><span class="w"> </span><span class="nv">/more</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">trim</span><span class="w"> </span><span class="nv">/line</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-228" name="L-228"></a><span class="w">    </span><span class="nv">/lineNumber</span><span class="w"> </span><span class="nf">lineNumber</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-229" name="L-229"></a><span class="w">    </span><span class="nf">line</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-230" name="L-230"></a><span class="w">    </span><span class="nf">line</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">35</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span>
+<a id="L-231" name="L-231"></a><span class="w">      </span><span class="c1">% stopped does not unwind dictionaries/stacks: restore both after a</span>
+<a id="L-232" name="L-232"></a><span class="w">      </span><span class="c1">% rejected token, then allow the next observation to be entered.</span>
+<a id="L-233" name="L-233"></a><span class="w">      </span><span class="nv">/depth</span><span class="w"> </span><span class="nf">countdictstack</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">count</span><span class="w"> </span><span class="nv">/operands</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-234" name="L-234"></a><span class="w">      </span><span class="p">{</span><span class="w"> </span><span class="nf">line</span><span class="w"> </span><span class="nf">number</span><span class="w"> </span><span class="nv">/value</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">stopped</span><span class="w"> </span><span class="p">{</span>
+<a id="L-235" name="L-235"></a><span class="w">        </span><span class="nf">countdictstack</span><span class="w"> </span><span class="nf">depth</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">end</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">repeat</span>
+<a id="L-236" name="L-236"></a><span class="w">        </span><span class="nf">count</span><span class="w"> </span><span class="nf">operands</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">repeat</span>
+<a id="L-237" name="L-237"></a><span class="w">        </span><span class="s">(warning: line )</span><span class="w"> </span><span class="nf">lineNumber</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">join</span>
+<a id="L-238" name="L-238"></a><span class="w">          </span><span class="s">(: invalid or out-of-domain decimal; skipped)</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">diagnostic</span>
+<a id="L-239" name="L-239"></a><span class="w">        </span><span class="nf">userdict</span><span class="w"> </span><span class="nv">/FailureMessage</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="nf">$error</span><span class="w"> </span><span class="nv">/newerror</span><span class="w"> </span><span class="nf">false</span><span class="w"> </span><span class="nf">put</span>
+<a id="L-240" name="L-240"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<a id="L-241" name="L-241"></a><span class="w">        </span><span class="nf">used</span><span class="w"> </span><span class="mf">4096</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(at most 4096 values are allowed)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-242" name="L-242"></a><span class="w">        </span><span class="c1">% Copy the shared trim view before readline reuses its backing buffer.</span>
+<a id="L-243" name="L-243"></a><span class="w">        </span><span class="nf">records</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="p">[</span><span class="nf">line</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">copy</span><span class="w"> </span><span class="nf">value</span><span class="p">]</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="nv">/used</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-244" name="L-244"></a><span class="w">      </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+<a id="L-245" name="L-245"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-246" name="L-246"></a><span class="w">    </span><span class="nf">more</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-247" name="L-247"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-248" name="L-248"></a><span class="w">  </span><span class="nf">InputStream</span><span class="w"> </span><span class="nf">closefile</span><span class="w"> </span><span class="nv">/InputStream</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">store</span>
+<a id="L-249" name="L-249"></a><span class="w">  </span><span class="nf">used</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(no valid input values)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-250" name="L-250"></a><span class="w">  </span><span class="nf">records</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">used</span><span class="w"> </span><span class="nf">getinterval</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-251" name="L-251"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-252" name="L-252"></a>
+<a id="L-253" name="L-253"></a><span class="cm">% Quote one argument for the POSIX shell used internally by Ghostscript popen.</span>
+<a id="L-254" name="L-254"></a><span class="cm">% Input: string. Output: single-quoted argument, including embedded apostrophes.</span>
+<a id="L-255" name="L-255"></a><span class="cm">% Called by launch; only executable/source paths and validated integers enter</span>
+<a id="L-256" name="L-256"></a><span class="cm">% the command. The shell&#39;s sole command is exec of another Ghostscript process.</span>
+<a id="L-257" name="L-257"></a><span class="nv">/shellQuote</span><span class="w"> </span><span class="p">{</span>
+<a id="L-258" name="L-258"></a><span class="w">  </span><span class="mf">3</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/s</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/out</span><span class="w"> </span><span class="s">(&#39;)</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-259" name="L-259"></a><span class="w">  </span><span class="nf">s</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nv">/ch</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/out</span><span class="w"> </span><span class="nf">out</span><span class="w"> </span><span class="nf">ch</span><span class="w"> </span><span class="mf">39</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(&#39;</span><span class="se">\</span><span class="s">&quot;&#39;</span><span class="se">\</span><span class="s">&quot;&#39;)</span><span class="w"> </span><span class="p">}</span>
+<a id="L-260" name="L-260"></a><span class="w">    </span><span class="p">{</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">ch</span><span class="w"> </span><span class="nf">put</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">forall</span>
+<a id="L-261" name="L-261"></a><span class="w">  </span><span class="nf">out</span><span class="w"> </span><span class="s">(&#39;)</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-262" name="L-262"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-263" name="L-263"></a>
+<a id="L-264" name="L-264"></a><span class="cm">% Launch one numeric child, returning a readable pipe immediately.</span>
+<a id="L-265" name="L-265"></a><span class="cm">% Input: x * Q. Output: file. Called by calculate to fill a bounded batch.</span>
+<a id="L-266" name="L-266"></a><span class="cm">% /proc/PID/exe selects the exact interpreter running the parent. Ghostscript&#39;s</span>
+<a id="L-267" name="L-267"></a><span class="cm">% %pipe% facility uses /bin/sh -c internally; no foreign-language helper exists.</span>
+<a id="L-268" name="L-268"></a><span class="nv">/launch</span><span class="w"> </span><span class="p">{</span>
+<a id="L-269" name="L-269"></a><span class="w">  </span><span class="mf">2</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/x</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-270" name="L-270"></a><span class="w">  </span><span class="s">(%pipe%exec )</span><span class="w"> </span><span class="nf">Executable</span><span class="w"> </span><span class="nf">shellQuote</span><span class="w"> </span><span class="nf">join</span>
+<a id="L-271" name="L-271"></a><span class="w">  </span><span class="s">( -q -dNODISPLAY -dBATCH -dNOSAFER -- )</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">SourcePath</span><span class="w"> </span><span class="nf">shellQuote</span><span class="w"> </span><span class="nf">join</span>
+<a id="L-272" name="L-272"></a><span class="w">  </span><span class="s">( --worker )</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">x</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">(r)</span><span class="w"> </span><span class="nf">file</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-273" name="L-273"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-274" name="L-274"></a>
+<a id="L-275" name="L-275"></a><span class="cm">% Read a complete protocol line; premature EOF is a worker failure.</span>
+<a id="L-276" name="L-276"></a><span class="cm">% Input: pipe. Output: line. Used by collect for the result, PID and completion.</span>
+<a id="L-277" name="L-277"></a><span class="nv">/workerLine</span><span class="w"> </span><span class="p">{</span>
+<a id="L-278" name="L-278"></a><span class="w">  </span><span class="mf">64</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">readline</span><span class="w"> </span><span class="nf">not</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(worker exited before completing its result)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-279" name="L-279"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-280" name="L-280"></a>
+<a id="L-281" name="L-281"></a><span class="cm">% Validate a worker&#39;s complete response before admitting a result to the CSV.</span>
+<a id="L-282" name="L-282"></a><span class="cm">% Input: pipe. Output: [fixed-result pid]. Called by calculate in input order.</span>
+<a id="L-283" name="L-283"></a><span class="cm">% EOF, malformed results, extra output and a missing completion marker fail.</span>
+<a id="L-284" name="L-284"></a><span class="nv">/collect</span><span class="w"> </span><span class="p">{</span>
+<a id="L-285" name="L-285"></a><span class="w">  </span><span class="mf">4</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/pipe</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-286" name="L-286"></a><span class="w">  </span><span class="nv">/value</span><span class="w"> </span><span class="nf">pipe</span><span class="w"> </span><span class="nf">workerLine</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/pid</span><span class="w"> </span><span class="nf">pipe</span><span class="w"> </span><span class="nf">workerLine</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-287" name="L-287"></a><span class="w">  </span><span class="nf">value</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="nf">pid</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">le</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="nf">pid</span><span class="w"> </span><span class="nf">ParentPID</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span>
+<a id="L-288" name="L-288"></a><span class="w">    </span><span class="s">(invalid numeric worker result or PID)</span><span class="w"> </span><span class="nf">fail</span>
+<a id="L-289" name="L-289"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-290" name="L-290"></a><span class="w">  </span><span class="nf">pipe</span><span class="w"> </span><span class="nf">workerLine</span><span class="w"> </span><span class="s">(DONE)</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(worker did not complete successfully)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-291" name="L-291"></a><span class="w">  </span><span class="nf">pipe</span><span class="w"> </span><span class="nf">read</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="s">(unexpected extra worker output)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-292" name="L-292"></a><span class="w">  </span><span class="nf">pipe</span><span class="w"> </span><span class="nf">closefile</span><span class="w"> </span><span class="p">[</span><span class="nf">value</span><span class="w"> </span><span class="nf">pid</span><span class="p">]</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-293" name="L-293"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-294" name="L-294"></a>
+<a id="L-295" name="L-295"></a><span class="cm">% Schedule genuine child interpreters in bounded batches and collect in order.</span>
+<a id="L-296" name="L-296"></a><span class="cm">% Input: records workers. Output: result array. Called by main before writing.</span>
+<a id="L-297" name="L-297"></a><span class="cm">% OpenPipes retains live handles for top-level cleanup if any child fails.</span>
+<a id="L-298" name="L-298"></a><span class="nv">/calculate</span><span class="w"> </span><span class="p">{</span>
+<a id="L-299" name="L-299"></a><span class="w">  </span><span class="mf">8</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/workers</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/records</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-300" name="L-300"></a><span class="w">  </span><span class="nv">/results</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">array</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/base</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-301" name="L-301"></a><span class="w">  </span><span class="p">{</span>
+<a id="L-302" name="L-302"></a><span class="w">    </span><span class="nf">base</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">ge</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">exit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-303" name="L-303"></a><span class="w">    </span><span class="nv">/batch</span><span class="w"> </span><span class="nf">workers</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="nf">base</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="nf">min</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-304" name="L-304"></a><span class="w">    </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">batch</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-305" name="L-305"></a><span class="w">      </span><span class="nv">/slot</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">OpenPipes</span><span class="w"> </span><span class="nf">slot</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">base</span><span class="w"> </span><span class="nf">slot</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">launch</span><span class="w"> </span><span class="nf">put</span>
+<a id="L-306" name="L-306"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-307" name="L-307"></a><span class="w">    </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">batch</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-308" name="L-308"></a><span class="w">      </span><span class="nv">/slot</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nf">results</span><span class="w"> </span><span class="nf">base</span><span class="w"> </span><span class="nf">slot</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">OpenPipes</span><span class="w"> </span><span class="nf">slot</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">collect</span><span class="w"> </span><span class="nf">put</span>
+<a id="L-309" name="L-309"></a><span class="w">      </span><span class="nf">OpenPipes</span><span class="w"> </span><span class="nf">slot</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">put</span>
+<a id="L-310" name="L-310"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-311" name="L-311"></a><span class="w">    </span><span class="nv">/base</span><span class="w"> </span><span class="nf">base</span><span class="w"> </span><span class="nf">batch</span><span class="w"> </span><span class="nf">add</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-312" name="L-312"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">loop</span>
+<a id="L-313" name="L-313"></a><span class="w">  </span><span class="nf">results</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-314" name="L-314"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-315" name="L-315"></a>
+<a id="L-316" name="L-316"></a><span class="cm">% Replace the destination only after all calculations have succeeded.</span>
+<a id="L-317" name="L-317"></a><span class="cm">% Inputs: path records results. Output: CSV file. Called by main.</span>
+<a id="L-318" name="L-318"></a><span class="nv">/writeResults</span><span class="w"> </span><span class="p">{</span>
+<a id="L-319" name="L-319"></a><span class="w">  </span><span class="mf">4</span><span class="w"> </span><span class="nf">dict</span><span class="w"> </span><span class="nf">begin</span><span class="w"> </span><span class="nv">/results</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/records</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/path</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-320" name="L-320"></a><span class="w">  </span><span class="nv">/OutputStream</span><span class="w"> </span><span class="s">(%os%)</span><span class="w"> </span><span class="nf">path</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">(w)</span><span class="w"> </span><span class="nf">file</span><span class="w"> </span><span class="nf">store</span>
+<a id="L-321" name="L-321"></a><span class="w">  </span><span class="nf">OutputStream</span><span class="w"> </span><span class="s">(x,j0,worker_pid</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">writestring</span>
+<a id="L-322" name="L-322"></a><span class="w">  </span><span class="mf">0</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span>
+<a id="L-323" name="L-323"></a><span class="w">    </span><span class="nv">/i</span><span class="w"> </span><span class="nf">exch</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-324" name="L-324"></a><span class="w">    </span><span class="nf">OutputStream</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">writestring</span><span class="w"> </span><span class="nf">OutputStream</span><span class="w"> </span><span class="s">(,)</span><span class="w"> </span><span class="nf">writestring</span>
+<a id="L-325" name="L-325"></a><span class="w">    </span><span class="nf">OutputStream</span><span class="w"> </span><span class="nf">results</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">decimal</span><span class="w"> </span><span class="nf">writestring</span><span class="w"> </span><span class="nf">OutputStream</span><span class="w"> </span><span class="s">(,)</span><span class="w"> </span><span class="nf">writestring</span>
+<a id="L-326" name="L-326"></a><span class="w">    </span><span class="nf">OutputStream</span><span class="w"> </span><span class="nf">results</span><span class="w"> </span><span class="nf">i</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">writestring</span>
+<a id="L-327" name="L-327"></a><span class="w">    </span><span class="nf">OutputStream</span><span class="w"> </span><span class="s">(</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">writestring</span>
+<a id="L-328" name="L-328"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">for</span>
+<a id="L-329" name="L-329"></a><span class="w">  </span><span class="nf">OutputStream</span><span class="w"> </span><span class="nf">closefile</span><span class="w"> </span><span class="nv">/OutputStream</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">store</span><span class="w"> </span><span class="nf">end</span>
+<a id="L-330" name="L-330"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-331" name="L-331"></a>
+<a id="L-332" name="L-332"></a><span class="cm">% Explain the public CLI and this edition&#39;s interpreter/platform boundary.</span>
+<a id="L-333" name="L-333"></a><span class="cm">% Inputs/outputs: no operands; writes usage to stdout. Called by main for --help.</span>
+<a id="L-334" name="L-334"></a><span class="nv">/usage</span><span class="w"> </span><span class="p">{</span>
+<a id="L-335" name="L-335"></a><span class="w">  </span><span class="s">(usage: gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps [INPUT|- [OUTPUT [WORKERS]]]</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span>
+<a id="L-336" name="L-336"></a><span class="w">  </span><span class="s">(Defaults: stdin, results.csv, 2 workers; workers 1..16. Run from the project directory.</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span>
+<a id="L-337" name="L-337"></a><span class="w">  </span><span class="s">(Requires 64-bit Ghostscript, Linux /proc, and permission to open %pipe% subprocesses.</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span>
+<a id="L-338" name="L-338"></a><span class="w">  </span><span class="s">(All numerical work uses PostScript fixed-point arithmetic; absolute tolerance 1e-10.</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span>
+<a id="L-339" name="L-339"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-340" name="L-340"></a>
+<a id="L-341" name="L-341"></a><span class="cm">% Dispatch arguments, perform bounded work, and report success.</span>
+<a id="L-342" name="L-342"></a><span class="cm">% Inputs: Ghostscript ARGUMENTS. Outputs: ordered CSV or internal worker reply.</span>
+<a id="L-343" name="L-343"></a><span class="cm">% Called once by the top-level stopped handler, which handles fatal failures.</span>
+<a id="L-344" name="L-344"></a><span class="nv">/main</span><span class="w"> </span><span class="p">{</span>
+<a id="L-345" name="L-345"></a><span class="w">  </span><span class="nv">/args</span><span class="w"> </span><span class="nv">/ARGUMENTS</span><span class="w"> </span><span class="nf">where</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="nf">ARGUMENTS</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">[]</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-346" name="L-346"></a><span class="w">  </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="s">(--help)</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">usage</span><span class="w"> </span><span class="nf">quit</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-347" name="L-347"></a><span class="w">  </span><span class="nf">Q</span><span class="w"> </span><span class="nf">type</span><span class="w"> </span><span class="nv">/integertype</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(this edition requires 64-bit Ghostscript integers)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-348" name="L-348"></a><span class="w">  </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span>
+<a id="L-349" name="L-349"></a><span class="w">    </span><span class="nf">args</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="s">(--worker)</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span>
+<a id="L-350" name="L-350"></a><span class="w">      </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(invalid internal worker invocation)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-351" name="L-351"></a><span class="w">      </span><span class="nf">args</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="nf">dup</span><span class="w"> </span><span class="nf">abs</span><span class="w"> </span><span class="mf">1000</span><span class="w"> </span><span class="nf">Q</span><span class="w"> </span><span class="nf">mul</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(worker x out of domain)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-352" name="L-352"></a><span class="w">      </span><span class="nf">observe</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">print</span><span class="w"> </span><span class="s">(</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span><span class="w"> </span><span class="nf">processId</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">print</span>
+<a id="L-353" name="L-353"></a><span class="w">      </span><span class="s">(</span><span class="se">\n</span><span class="s">DONE</span><span class="se">\n</span><span class="s">)</span><span class="w"> </span><span class="nf">print</span><span class="w"> </span><span class="nf">flush</span><span class="w"> </span><span class="nf">quit</span>
+<a id="L-354" name="L-354"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-355" name="L-355"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-356" name="L-356"></a><span class="w">  </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">3</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(too many arguments; use --help)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-357" name="L-357"></a><span class="w">  </span><span class="nv">/input</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="mf">0</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(-)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-358" name="L-358"></a><span class="w">  </span><span class="nv">/output</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(results.csv)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-359" name="L-359"></a><span class="w">  </span><span class="nv">/workers</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">args</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="nf">integer</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="mf">2</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-360" name="L-360"></a><span class="w">  </span><span class="nf">workers</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">lt</span><span class="w"> </span><span class="nf">workers</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="nf">gt</span><span class="w"> </span><span class="nf">or</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(workers must be an integer from 1 through 16)</span><span class="w"> </span><span class="nf">fail</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-361" name="L-361"></a><span class="w">  </span><span class="nv">/records</span><span class="w"> </span><span class="nf">input</span><span class="w"> </span><span class="nf">readValues</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-362" name="L-362"></a><span class="w">  </span><span class="nv">/ParentPID</span><span class="w"> </span><span class="nf">processId</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-363" name="L-363"></a><span class="w">  </span><span class="nv">/Executable</span><span class="w"> </span><span class="s">(/proc/)</span><span class="w"> </span><span class="nf">ParentPID</span><span class="w"> </span><span class="mf">32</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">(/exe)</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-364" name="L-364"></a><span class="w">  </span><span class="nv">/SourcePath</span><span class="w"> </span><span class="nv">/BesselSource</span><span class="w"> </span><span class="nf">where</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="nf">BesselSource</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="s">(bessel.ps)</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-365" name="L-365"></a><span class="w">  </span><span class="nv">/results</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">workers</span><span class="w"> </span><span class="nf">calculate</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-366" name="L-366"></a><span class="w">  </span><span class="nf">output</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">results</span><span class="w"> </span><span class="nf">writeResults</span>
+<a id="L-367" name="L-367"></a><span class="w">  </span><span class="s">(Wrote )</span><span class="w"> </span><span class="nf">records</span><span class="w"> </span><span class="nf">length</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="s">( observations to )</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">output</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">=</span>
+<a id="L-368" name="L-368"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-369" name="L-369"></a>
+<a id="L-370" name="L-370"></a><span class="cm">% Close outstanding resources after failure; interpreter exit also reaps pipes.</span>
+<a id="L-371" name="L-371"></a><span class="cm">% Inputs/outputs: none. Called by the top-level error handler; cleanup failures</span>
+<a id="L-372" name="L-372"></a><span class="cm">% are contained so they cannot replace the original diagnostic.</span>
+<a id="L-373" name="L-373"></a><span class="nv">/cleanup</span><span class="w"> </span><span class="p">{</span>
+<a id="L-374" name="L-374"></a><span class="w">  </span><span class="p">[</span><span class="nf">InputStream</span><span class="w"> </span><span class="nf">OutputStream</span><span class="w"> </span><span class="nf">OpenPipes</span><span class="w"> </span><span class="nf">aload</span><span class="w"> </span><span class="nf">pop</span><span class="p">]</span><span class="w"> </span><span class="p">{</span>
+<a id="L-375" name="L-375"></a><span class="w">    </span><span class="nf">dup</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">ne</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">closefile</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">stopped</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">clear</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+<a id="L-376" name="L-376"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">forall</span>
+<a id="L-377" name="L-377"></a><span class="p">}</span><span class="w"> </span><span class="nf">bind</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-378" name="L-378"></a>
+<a id="L-379" name="L-379"></a><span class="nv">/Stderr</span><span class="w"> </span><span class="s">(%stderr)</span><span class="w"> </span><span class="s">(w)</span><span class="w"> </span><span class="nf">file</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-380" name="L-380"></a><span class="nv">/InputStream</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/OutputStream</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/OpenPipes</span><span class="w"> </span><span class="mf">16</span><span class="w"> </span><span class="nf">array</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-381" name="L-381"></a><span class="nv">/FailureMessage</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">def</span><span class="w"> </span><span class="nv">/InitialDepth</span><span class="w"> </span><span class="nf">countdictstack</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-382" name="L-382"></a><span class="c1">% BesselLibrary is for the independent arithmetic tests; normal entry uses main.</span>
+<a id="L-383" name="L-383"></a><span class="nv">/BesselLibrary</span><span class="w"> </span><span class="nf">where</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">pop</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="p">{</span>
+<a id="L-384" name="L-384"></a><span class="w">  </span><span class="p">{</span><span class="w"> </span><span class="nf">main</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">stopped</span><span class="w"> </span><span class="p">{</span>
+<a id="L-385" name="L-385"></a><span class="w">    </span><span class="nf">countdictstack</span><span class="w"> </span><span class="nf">InitialDepth</span><span class="w"> </span><span class="nf">sub</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nf">end</span><span class="w"> </span><span class="p">}</span><span class="w"> </span><span class="nf">repeat</span><span class="w"> </span><span class="nf">clear</span>
+<a id="L-386" name="L-386"></a><span class="w">    </span><span class="nf">FailureMessage</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="nf">eq</span><span class="w"> </span><span class="p">{</span>
+<a id="L-387" name="L-387"></a><span class="w">      </span><span class="nv">/FailureMessage</span><span class="w"> </span><span class="nf">$error</span><span class="w"> </span><span class="nv">/errorname</span><span class="w"> </span><span class="nf">get</span><span class="w"> </span><span class="mf">64</span><span class="w"> </span><span class="nf">string</span><span class="w"> </span><span class="nf">cvs</span><span class="w"> </span><span class="nf">def</span>
+<a id="L-388" name="L-388"></a><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-389" name="L-389"></a><span class="w">    </span><span class="s">(error: )</span><span class="w"> </span><span class="nf">FailureMessage</span><span class="w"> </span><span class="nf">join</span><span class="w"> </span><span class="nf">diagnostic</span>
+<a id="L-390" name="L-390"></a><span class="w">    </span><span class="nf">cleanup</span><span class="w"> </span><span class="nf">null</span><span class="w"> </span><span class="mf">1</span><span class="w"> </span><span class="nf">.quit</span>
+<a id="L-391" name="L-391"></a><span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="nf">if</span>
+<a id="L-392" name="L-392"></a><span class="p">}</span><span class="w"> </span><span class="nf">ifelse</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>%!PS
+% Bessel Observatory: PostScript on 64-bit Ghostscript / Linux.
+% All parsing, arithmetic, trigonometry and orchestration are PostScript.
+% Ghostscript real objects have only single precision; integer fixed-point
+% arithmetic preserves the shared 1e-10 tolerance without a foreign kernel.
+
+/Q 4503599627370496 def              % 2^52 units represent one.
+/Limb 67108864 def                   % 2^26 splits products into exact limbs.
+/Pi 14148475504056881 def            % Round(pi * 2^52).
+/HalfPi 7074237752028440 def
+/TwoPi 28296951008113761 def
+/Samples 16384 def
+
+% Multiply two fixed-point numbers without overflowing a signed 64-bit integer.
+% Inputs: a b, scaled by Q; callers keep |a| &lt;= 1000Q, |b| &lt;= 2.5Q,
+% and |a*b/Q| &lt;= 1000Q, so all partial products fit signed 64-bit integers.
+% Output: trunc(a*b/Q). Called by cosine and observe for polynomial terms.
+% A product is formed from 26-bit limbs; no operation converts to a real.
+/fmul {
+  10 dict begin
+  /b exch def /a exch def
+  /negative a 0 lt b 0 lt xor def /a a abs def /b b abs def
+  /ah a Limb idiv def /al a Limb mod def
+  /bh b Limb idiv def /bl b Limb mod def
+  ah bh mul ah bl mul al bh mul add al bl mul Limb idiv add Limb idiv add
+  negative { neg } if
+  end
+} bind def
+
+% Concatenate two strings, allocating storage owned by the returned string.
+% Inputs: left right. Output: joined string. Used by CSV and command assembly.
+/join {
+  3 dict begin /right exch def /left exch def
+  /result left length right length add string def
+  result 0 left putinterval result left length right putinterval result end
+} bind def
+
+% Stop the current operation with an application diagnostic.
+% Input: message string. No return. Used by validation and worker checks;
+% the top-level stopped handler owns reporting, file cleanup and exit status.
+/fail { userdict /FailureMessage 3 -1 roll put stop } bind def
+
+% Remove ASCII whitespace, returning a shared slice of the original string.
+% Input: string. Output: slice. Called by readValues before copying each line.
+% getinterval aliases the same bytes: retaining it requires retaining its owner.
+/trim {
+  3 dict begin /s exch def /first 0 def /last s length def
+  { first last ge { exit } if s first get 32 gt { exit } if
+    /first first 1 add def } loop
+  { last first le { exit } if s last 1 sub get 32 gt { exit } if
+    /last last 1 sub def } loop
+  s first last first sub getinterval end
+} bind def
+
+% Recognize one decimal digit without invoking PostScript&#x27;s code scanner.
+% Input: byte. Output: boolean. Used by number and integer argument checks.
+/digit { dup 48 ge exch 57 le and } bind def
+
+% Parse finite decimal/e-notation directly into Q-scaled integer units.
+% Input: trimmed string. Output: fixed integer, or stop on malformed/domain input.
+% Used by readValues; it never routes a decimal through a single-precision real.
+% The complete digits determine the domain; 18 fractional decimal digits then
+% supply a binary long division, with &lt; 1/Q + 1e-18 input truncation error.
+/number {
+  20 dict begin
+  /s exch def /size s length def /pos 0 def /sign 1 def
+  size 0 eq { (empty number) fail } if
+  s 0 get dup 43 eq exch 45 eq or {
+    s 0 get 45 eq { /sign -1 def } if /pos 1 def
+  } if
+  /digits size string def /used 0 def /point 0 def /dot false def
+  {
+    pos size ge { exit } if /ch s pos get def
+    ch digit {
+      digits used ch put /used used 1 add def
+      dot not { /point point 1 add def } if
+    } {
+      ch 46 eq dot not and { /dot true def } { exit } ifelse
+    } ifelse
+    /pos pos 1 add def
+  } loop
+  used 0 eq { (expected a decimal number) fail } if
+  /exponent 0 def /esign 1 def
+  pos size lt {
+    s pos get dup 101 eq exch 69 eq or not { (invalid numeric suffix) fail } if
+    /pos pos 1 add def
+    pos size lt {
+      s pos get dup 43 eq exch 45 eq or {
+        s pos get 45 eq { /esign -1 def } if /pos pos 1 add def
+      } if
+    } if
+    pos size eq { (missing exponent digits) fail } if
+    pos 1 size 1 sub {
+      s exch get /ch exch def ch digit not { (invalid exponent) fail } if
+      /exponent exponent 10 mul ch 48 sub add 10000 min def
+    } for
+  } if
+  /point point exponent esign mul add def
+  /leading 0 def
+  { leading used ge { exit } if digits leading get 48 ne { exit } if
+    /leading leading 1 add def } loop
+  /digits digits leading used leading sub getinterval def
+  /point point leading sub def /used digits length def
+  used 0 eq { 0 } {
+    point 4 gt { (expected x in [-1000,1000]) fail } if
+    /whole 0 def
+    0 1 point 1 sub {
+      /i exch def /whole whole 10 mul
+        i used lt { digits i get 48 sub } { 0 } ifelse add def
+    } for
+    whole 1000 gt { (expected x in [-1000,1000]) fail } if
+    whole 1000 eq {
+      point 1 used 1 sub {
+        digits exch get 48 ne { (expected x in [-1000,1000]) fail } if
+      } for
+    } if
+    /fraction 0 def
+    0 1 17 {
+      point add /i exch def
+      /fraction fraction 10 mul i 0 ge i used lt and
+        { digits i get 48 sub } { 0 } ifelse add def
+    } for
+    /bits 0 def
+    52 {
+      /fraction fraction 2 mul def /bits bits 2 mul def
+      fraction 1000000000000000000 ge {
+        /fraction fraction 1000000000000000000 sub def /bits bits 1 add def
+      } if
+    } repeat
+    whole Q mul bits add sign mul
+  } ifelse
+  end
+} bind def
+
+% Format a fixed-point result using integer decimal long division.
+% Input: fixed integer. Output: decimal string with 16 fractional places.
+% Used by worker output; cvs is applied only to integers, never native reals.
+/decimal {
+  6 dict begin /value exch def
+  /prefix value 0 lt { (-) } { () } ifelse def /value value abs def
+  /result prefix value Q idiv 32 string cvs join (.) join def
+  /fraction value Q mod def /digits 16 string def
+  0 1 15 {
+    /i exch def /fraction fraction 10 mul def
+    digits i fraction Q idiv 48 add put /fraction fraction Q mod def
+  } for
+  result digits join end
+} bind def
+
+% Evaluate cosine with fixed-point range reduction and a Taylor recurrence.
+% Input: angle in Q-scaled radians, |angle| &lt;= 1000Q. Output: cosine * Q.
+% Called by observe for both sin(theta) = cos(pi/2-theta) and the outer cos.
+% Reduction to [-pi/2, pi/2] keeps terms small and the series well conditioned.
+/cosine {
+  8 dict begin
+  /angle exch abs TwoPi mod def /sign 1 def
+  angle Pi gt { /angle TwoPi angle sub def } if
+  angle HalfPi gt { /angle Pi angle sub def /sign -1 def } if
+  /square angle angle fmul neg def /term Q def /total Q def
+  1 1 13 {
+    /n exch 2 mul def
+    /term term square fmul n n 1 sub mul idiv def
+    /total total term add def
+    term 0 eq { exit } if
+  } for
+  total sign mul end
+} bind def
+
+% Average the shared integral&#x27;s midpoint samples using exact integer sums.
+% Input: x * Q. Output: J0(x) * Q. Called only inside an OS worker.
+% Split every term into quotient and remainder before summing, so even the
+% constant integrand at x=0 cannot overflow. The division loses &lt; 1/Q overall.
+/observe {
+  10 dict begin
+  /x exch def /whole 0 def /remainder 0 def
+  /divisor Samples 2 mul def
+  /step Pi divisor idiv def /tail Pi divisor mod def
+  0 1 Samples 1 sub {
+    2 mul 1 add /k exch def
+    HalfPi step k mul tail k mul divisor idiv add sub cosine
+    x exch fmul cosine /term exch def
+    /whole whole term Samples idiv add def
+    /remainder remainder term Samples mod add def
+  } for
+  whole remainder Samples idiv add end
+} bind def
+
+% Parse an integer token without accepting a fractional or executable suffix.
+% Input: string, at most 19 digits plus an optional sign. Output: integer.
+% Called by main and collect for worker counts and the internal pipe protocol.
+/integer {
+  4 dict begin /s exch def /start 0 def
+  s length 0 eq s length 20 gt or { (expected an integer) fail } if
+  s 0 get dup 43 eq exch 45 eq or { /start 1 def } if
+  start s length eq { (expected integer digits) fail } if
+  start 1 s length 1 sub {
+    s exch get digit not { (expected an integer) fail } if
+  } for
+  s cvi dup type /integertype ne { (integer is out of range) fail } if end
+} bind def
+
+% Read this interpreter&#x27;s real Linux process ID, not a PostScript context ID.
+% Inputs: none. Output: positive PID. Used by main and each numerical worker.
+/processId {
+  3 dict begin /statFile (/proc/self/stat) (r) file def
+  statFile 4096 string readline pop /line exch def statFile closefile
+  line ( ) search not { (cannot read Linux worker PID) fail } if
+  /pid exch integer def pop pop pid 0 le { (invalid Linux PID) fail } if
+  pid end
+} bind def
+
+% Write one diagnostic to stderr and flush it for interactive users.
+% Input: string. Output: none. Used by prompts, skipped input and fatal errors.
+/diagnostic { Stderr exch writestring Stderr (\n) writestring Stderr flushfile } bind def
+
+% Read and validate observations while preserving their original decimal text.
+% Input: filename or &#x27;-&#x27;. Output: array of [text fixed-value] records.
+% Called by main before launching any worker or opening the output target.
+/readValues {
+  12 dict begin /source exch def
+  /InputStream source (-) eq {
+    (Enter one x per line; blank line or EOF finishes:) diagnostic
+    (%stdin) (r) file
+  } { (%os%) source join (r) file } ifelse store
+  /records 4096 array def /used 0 def /lineNumber 0 def /buffer 4096 string def
+  {
+    InputStream buffer readline /more exch def trim /line exch def
+    /lineNumber lineNumber 1 add def
+    line length 0 eq { exit } if
+    line 0 get 35 ne {
+      % stopped does not unwind dictionaries/stacks: restore both after a
+      % rejected token, then allow the next observation to be entered.
+      /depth countdictstack def count /operands exch def
+      { line number /value exch def } stopped {
+        countdictstack depth sub { end } repeat
+        count operands sub { pop } repeat
+        (warning: line ) lineNumber 16 string cvs join
+          (: invalid or out-of-domain decimal; skipped) join diagnostic
+        userdict /FailureMessage null put $error /newerror false put
+      } {
+        used 4096 eq { (at most 4096 values are allowed) fail } if
+        % Copy the shared trim view before readline reuses its backing buffer.
+        records used [line dup length string copy value] put /used used 1 add def
+      } ifelse
+    } if
+    more not { exit } if
+  } loop
+  InputStream closefile /InputStream null store
+  used 0 eq { (no valid input values) fail } if
+  records 0 used getinterval end
+} bind def
+
+% Quote one argument for the POSIX shell used internally by Ghostscript popen.
+% Input: string. Output: single-quoted argument, including embedded apostrophes.
+% Called by launch; only executable/source paths and validated integers enter
+% the command. The shell&#x27;s sole command is exec of another Ghostscript process.
+/shellQuote {
+  3 dict begin /s exch def /out (&#x27;) def
+  s { /ch exch def /out out ch 39 eq { (&#x27;\&quot;&#x27;\&quot;&#x27;) }
+    { 1 string dup 0 ch put } ifelse join def } forall
+  out (&#x27;) join end
+} bind def
+
+% Launch one numeric child, returning a readable pipe immediately.
+% Input: x * Q. Output: file. Called by calculate to fill a bounded batch.
+% /proc/PID/exe selects the exact interpreter running the parent. Ghostscript&#x27;s
+% %pipe% facility uses /bin/sh -c internally; no foreign-language helper exists.
+/launch {
+  2 dict begin /x exch def
+  (%pipe%exec ) Executable shellQuote join
+  ( -q -dNODISPLAY -dBATCH -dNOSAFER -- ) join SourcePath shellQuote join
+  ( --worker ) join x 32 string cvs join (r) file end
+} bind def
+
+% Read a complete protocol line; premature EOF is a worker failure.
+% Input: pipe. Output: line. Used by collect for the result, PID and completion.
+/workerLine {
+  64 string readline not { (worker exited before completing its result) fail } if
+} bind def
+
+% Validate a worker&#x27;s complete response before admitting a result to the CSV.
+% Input: pipe. Output: [fixed-result pid]. Called by calculate in input order.
+% EOF, malformed results, extra output and a missing completion marker fail.
+/collect {
+  4 dict begin /pipe exch def
+  /value pipe workerLine integer def /pid pipe workerLine integer def
+  value abs Q gt pid 0 le or pid ParentPID eq or {
+    (invalid numeric worker result or PID) fail
+  } if
+  pipe workerLine (DONE) ne { (worker did not complete successfully) fail } if
+  pipe read { pop (unexpected extra worker output) fail } if
+  pipe closefile [value pid] end
+} bind def
+
+% Schedule genuine child interpreters in bounded batches and collect in order.
+% Input: records workers. Output: result array. Called by main before writing.
+% OpenPipes retains live handles for top-level cleanup if any child fails.
+/calculate {
+  8 dict begin /workers exch def /records exch def
+  /results records length array def /base 0 def
+  {
+    base records length ge { exit } if
+    /batch workers records length base sub min def
+    0 1 batch 1 sub {
+      /slot exch def OpenPipes slot records base slot add get 1 get launch put
+    } for
+    0 1 batch 1 sub {
+      /slot exch def results base slot add OpenPipes slot get collect put
+      OpenPipes slot null put
+    } for
+    /base base batch add def
+  } loop
+  results end
+} bind def
+
+% Replace the destination only after all calculations have succeeded.
+% Inputs: path records results. Output: CSV file. Called by main.
+/writeResults {
+  4 dict begin /results exch def /records exch def /path exch def
+  /OutputStream (%os%) path join (w) file store
+  OutputStream (x,j0,worker_pid\n) writestring
+  0 1 records length 1 sub {
+    /i exch def
+    OutputStream records i get 0 get writestring OutputStream (,) writestring
+    OutputStream results i get 0 get decimal writestring OutputStream (,) writestring
+    OutputStream results i get 1 get 32 string cvs writestring
+    OutputStream (\n) writestring
+  } for
+  OutputStream closefile /OutputStream null store end
+} bind def
+
+% Explain the public CLI and this edition&#x27;s interpreter/platform boundary.
+% Inputs/outputs: no operands; writes usage to stdout. Called by main for --help.
+/usage {
+  (usage: gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps [INPUT|- [OUTPUT [WORKERS]]]\n) print
+  (Defaults: stdin, results.csv, 2 workers; workers 1..16. Run from the project directory.\n) print
+  (Requires 64-bit Ghostscript, Linux /proc, and permission to open %pipe% subprocesses.\n) print
+  (All numerical work uses PostScript fixed-point arithmetic; absolute tolerance 1e-10.\n) print
+} bind def
+
+% Dispatch arguments, perform bounded work, and report success.
+% Inputs: Ghostscript ARGUMENTS. Outputs: ordered CSV or internal worker reply.
+% Called once by the top-level stopped handler, which handles fatal failures.
+/main {
+  /args /ARGUMENTS where { pop ARGUMENTS } { [] } ifelse def
+  args length 1 eq { args 0 get (--help) eq { usage quit } if } if
+  Q type /integertype ne { (this edition requires 64-bit Ghostscript integers) fail } if
+  args length 0 gt {
+    args 0 get (--worker) eq {
+      args length 2 ne { (invalid internal worker invocation) fail } if
+      args 1 get integer dup abs 1000 Q mul gt { (worker x out of domain) fail } if
+      observe 32 string cvs print (\n) print processId 32 string cvs print
+      (\nDONE\n) print flush quit
+    } if
+  } if
+  args length 3 gt { (too many arguments; use --help) fail } if
+  /input args length 0 gt { args 0 get } { (-) } ifelse def
+  /output args length 1 gt { args 1 get } { (results.csv) } ifelse def
+  /workers args length 2 gt { args 2 get integer } { 2 } ifelse def
+  workers 1 lt workers 16 gt or { (workers must be an integer from 1 through 16) fail } if
+  /records input readValues def
+  /ParentPID processId def
+  /Executable (/proc/) ParentPID 32 string cvs join (/exe) join def
+  /SourcePath /BesselSource where { pop BesselSource } { (bessel.ps) } ifelse def
+  /results records workers calculate def
+  output records results writeResults
+  (Wrote ) records length 16 string cvs join ( observations to ) join output join =
+} bind def
+
+% Close outstanding resources after failure; interpreter exit also reaps pipes.
+% Inputs/outputs: none. Called by the top-level error handler; cleanup failures
+% are contained so they cannot replace the original diagnostic.
+/cleanup {
+  [InputStream OutputStream OpenPipes aload pop] {
+    dup null ne { { closefile } stopped { clear } if } { pop } ifelse
+  } forall
+} bind def
+
+/Stderr (%stderr) (w) file def
+/InputStream null def /OutputStream null def /OpenPipes 16 array def
+/FailureMessage null def /InitialDepth countdictstack def
+% BesselLibrary is for the independent arithmetic tests; normal entry uses main.
+/BesselLibrary where { pop } {
+  { main } stopped {
+    countdictstack InitialDepth sub { end } repeat clear
+    FailureMessage null eq {
+      /FailureMessage $error /errorname get 64 string cvs def
+    } if
+    (error: ) FailureMessage join diagnostic
+    cleanup null 1 .quit
+  } if
+} ifelse
+</textarea>
+<footer>Highlighted with Pygments using the PostScript lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>9075c06dd8ec864b723d09e749f78246c174f3b126d8c49a43a90a29c52342ca</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

@@ -1,8 +1,8 @@
 {
   "title": "Bessel Observatory",
   "created": "2026-11-04",
-  "language_count": 30,
-  "description": "One numerical observatory, expressed independently and idiomatically in 30 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
+  "language_count": 31,
+  "description": "One numerical observatory, expressed independently and idiomatically in 31 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
   "goals": [
     "Make language differences visible through equivalent observable behavior.",
     "Exercise file and console I/O, interactive input, command-line arguments, graceful error handling, actual OS multiprocessing, and special-function mathematics.",
@@ -34,7 +34,7 @@
     "errors": "Invalid value lines produce diagnostics on stderr and are skipped. No valid values, excess values, bad arguments, I/O failures or worker failures terminate nonzero. Ordinary exceptions become readable diagnostics.",
     "output": "CSV columns x,j0,worker_pid; one row per accepted value in original order. Output is written after all calculations succeed, and replaces an existing target. OS PIDs and numeric formatting vary.",
     "help": "--help prints usage. Hidden --worker modes, where present, are implementation details.",
-    "portability": "Linux/POSIX is the comparison baseline. Ada/Fortran bindings assume LP64; BASIC/COBOL target Linux x86-64. Some process-launch implementations also work on macOS/Windows. Native numeric parsers may accept additional literal spellings; the common format is ordinary decimal or e-notation. RPG uses IBM i CALL parameters, DSPLY and IFS paths; its separate integration contract is rpg_setup.txt. Oberon bounds line length to 4095 bytes."
+    "portability": "Linux/POSIX is the comparison baseline. Ada/Fortran bindings assume LP64; BASIC/COBOL target Linux x86-64. Some process-launch implementations also work on macOS/Windows. Native numeric parsers may accept additional literal spellings; the common format is ordinary decimal or e-notation. RPG uses IBM i CALL parameters, DSPLY and IFS paths; its separate integration contract is rpg_setup.txt. Oberon bounds line length to 4095 bytes. PostScript requires 64-bit Ghostscript on Linux with process/file access and bounds input lines to 4096 bytes."
   },
   "mathematics": {
     "function": "Bessel function of the first kind, order zero: J0(x)",
@@ -64,14 +64,16 @@
     "Oberon-2 uses the supplied C adapter for checked OS and stdio interfaces; its quadrature and raw-address traversal are Oberon.",
     "Perligata uses BesselPerligata.pm for regex validation, unchanged line reads, temporary storage and checked POSIX/exception services. Native perlege converts Roman numerals, so it cannot preserve this input contract. Opening/writing/closing files, quadrature and scheduling remain in Latin.",
     "RPG requires IBM i setup described in rpg_setup.txt; failed or timed-out runs retain work rows, and submitted jobs may finish after parent failure.",
-    "Raw pointer arithmetic is unavailable in several listed languages; their native reference/offset models are documented instead."
+    "Raw pointer arithmetic is unavailable in several listed languages; their native reference/offset models are documented instead.",
+    "PostScript retains the 1e-10 tolerance using software fixed-point arithmetic entirely in PostScript; Ghostscript native real arithmetic is too imprecise. It requires a 64-bit integer build.",
+    "PostScript requires Linux /proc and Ghostscript %pipe% access. Its POSIX shell only execs another interpreter; there is no foreign-language helper. Restricted printer-oriented OS profiles may block execution even with -dNOSAFER. Run from the project directory, or supply -sBesselSource before --."
   ],
   "validation": {
     "report": "tests/report.json",
     "runner": "python3 tests/verify.py",
     "references": "tests/reference.json",
     "status": "See per-language report; source review is not a substitute for compilation/execution.",
-    "source_browser": "30 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
+    "source_browser": "31 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
   },
   "sources": [
     {
@@ -137,6 +139,18 @@
     {
       "title": "IBM ILE RPG reference",
       "url": "https://www.ibm.com/docs/en/i/7.4.0?topic=rpg-ile-reference"
+    },
+    {
+      "title": "Adobe PostScript Language Reference",
+      "url": "https://www.adobe.com/jp/print/postscript/pdfs/PLRM.pdf"
+    },
+    {
+      "title": "Ghostscript language limits and file extensions",
+      "url": "https://ghostscript.readthedocs.io/en/latest/Language.html"
+    },
+    {
+      "title": "Ghostscript command-line and file permissions",
+      "url": "https://ghostscript.readthedocs.io/en/latest/Use.html"
     }
   ],
   "languages": [
@@ -738,9 +752,39 @@
       "validation_dependencies": [
         "BesselPerligata.pm"
       ]
+    },
+    {
+      "id": "postscript",
+      "name": "PostScript",
+      "source": "bessel.ps",
+      "runtime": "64-bit Ghostscript on Linux; %pipe% and /proc access required",
+      "build": null,
+      "run": [
+        "gs",
+        "-q",
+        "-dNODISPLAY",
+        "-dBATCH",
+        "-dNOSAFER",
+        "--",
+        "bessel.ps"
+      ],
+      "idioms": "Operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits.",
+      "multiprocessing": "PostScript schedules bounded batches of separate Ghostscript interpreters through %pipe%; Linux /proc supplies real PIDs.",
+      "memory": "Arrays and strings are reference objects; getinterval shares a bounded view. Input slices are copied before the line buffer is reused. No raw pointer arithmetic.",
+      "strings": "ASCII trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered CSV serialization.",
+      "highlighted": "code/bessel.ps.html"
     }
   ],
   "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics.",
   "repository": "https://github.com/roeyk/bessel-observatory",
-  "license": "GPL-3.0-only"
+  "license": "GPL-3.0-only",
+  "postscript_design": {
+    "choice": "This edition keeps the existing 1e-10 absolute tolerance and implements all numerical work in PostScript, without a numerical helper or precision exception.",
+    "reason": "Ghostscript reals are single precision even in a 64-bit build. The nearest binary32 representation of J0(1) already differs by about 7.74e-9.",
+    "arithmetic": "Signed 64-bit integers store fixed-point values with 52 fractional bits. Split 26-bit products, integer range reduction, Taylor cosine, decimal parsing/formatting and quotient/remainder summation preserve precision without native real arithmetic.",
+    "method": "The same 16,384 midpoint samples are evaluated. Software arithmetic changes the representation, not the integral, domain, sample count or tolerance.",
+    "processes": "All scheduling is PostScript. Ghostscript %pipe% uses the POSIX shell only to exec the same interpreter via /proc/PID/exe; each child reads its own real PID from /proc/self/stat. No helper source in another language.",
+    "setup": "Run from the project directory with 64-bit Ghostscript, Linux /proc and -dNOSAFER for OS access. OS policies such as a printer-only AppArmor profile can still deny subprocesses or files. A different working directory requires -sBesselSource=/absolute/path/bessel.ps before --.",
+    "input_limit": "Input lines are bounded to 4096 bytes; longer lines fail with a readable diagnostic. Decimal input is parsed with less than 2^-52 + 1e-18 absolute truncation error."
+  }
 }

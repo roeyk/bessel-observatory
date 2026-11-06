@@ -3,6 +3,17 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-06 — PostScript with software numerical precision
+
+- Added the 31st edition, with decimal parsing, 52-bit fractional fixed-point
+  arithmetic, trigonometry, quadrature, formatting and scheduling in PostScript.
+- Preserved the shared `1e-10` tolerance and 16,384 midpoint samples. Separate
+  Ghostscript processes perform the numerical work and report actual Linux PIDs.
+- Documented the precision decision, 64-bit Ghostscript/Linux requirements and
+  process-access restrictions in the manifest, README and generated index.html.
+- Added the highlighted source, execution evidence and focused validation;
+  catalogue integrity checks now follow the manifest's language count.
+
 ## 2026-11-05 — Perligata Latin prose
 
 - Rewrote the Perligata listing around Latin-root vocabulary, native file

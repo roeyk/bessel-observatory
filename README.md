@@ -1,6 +1,6 @@
 # Bessel Observatory
 
-The same numerical program in **30 languages**, with an offline, syntax-highlighted
+The same numerical program in **31 languages**, with an offline, syntax-highlighted
 source catalogue. Each edition reads observations, calculates Bessel J₀ in
 separate operating-system processes, and writes ordered CSV results.
 
@@ -32,7 +32,7 @@ build/run commands. Build products belong under `build/`.
 
 Ada, Bash, BASIC, C, C++, COBOL, Erlang, Fortran, Go, Haskell, Java, JavaScript,
 Julia, Kotlin, Lingua::Romana::Perligata, Lisp, Lua, Oberon-2, Objective-C, OCaml,
-Pascal, Perl, Prolog, Python, RPG, Ruby, Rust, Smalltalk, SQL, and Swift.
+Pascal, Perl, PostScript, Prolog, Python, RPG, Ruby, Rust, Smalltalk, SQL, and Swift.
 
 The editions use their language's idioms and comment conventions. Function
 comments explain purpose, inputs, outputs, and callers. Pointer arithmetic is
@@ -51,6 +51,15 @@ buffer-offset, or relational model. All editions manipulate input/output strings
   [grammar](https://metacpan.org/dist/Lingua-Romana-Perligata/view/lib/Lingua/Romana/Perligata.pm)
   uses regularized Latin nouns and verbs within a restricted syntax.
 - SQL targets PostgreSQL, `psql`, and `dblink`; setup is in the HTML catalogue.
+- PostScript keeps the existing `1e-10` tolerance with 52-bit fractional
+  fixed-point arithmetic, trigonometry, decimal parsing and formatting written
+  entirely in PostScript. It requires 64-bit Ghostscript on Linux; scheduling
+  uses `%pipe%` to launch child interpreters, and `/proc` supplies real PIDs.
+  There is no helper source in another language. Run from this directory:
+  `gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps examples/values.txt results.csv 2`.
+  OS policies must permit these process/file operations; `-dNOSAFER` does not
+  override a restricted AppArmor profile. See the
+  [PostScript design explanation](index.html#postscript).
 - RPG targets IBM i. Read [rpg_setup.txt](rpg_setup.txt) before compiling or
   configuring its batch queue. Its CALL parameters and job-message errors are
   native IBM i interfaces.
@@ -67,7 +76,7 @@ See the [NIST DLMF Bessel integral](https://dlmf.nist.gov/10.9#E1).
 This is a special-function and language comparison, not a speed ranking or
 certified numerical library.
 
-The recorded baseline has **25 editions passing all 11 behavioral checks**.
+The recorded baseline has **26 editions passing all 11 behavioral checks**.
 Smalltalk, Julia, Swift, SQL, and RPG are explicitly untested in that baseline.
 [tests/report.json](tests/report.json) ties the evidence to source hashes
 (and the declared Perligata helper dependency);
@@ -85,7 +94,7 @@ make check
 
 `make check` verifies the catalogue, lints Python tooling, and runs the C, C++,
 Python, Bash, Perl, and Ruby editions. Install their toolchains first. It writes
-fresh evidence under `build/` and preserves the committed 30-language baseline.
+fresh evidence under `build/` and preserves the committed 31-language baseline.
 GitHub Actions runs the same checks and verifies reproducible generated HTML.
 
 ```sh
@@ -93,6 +102,8 @@ GitHub Actions runs the same checks and verifies reproducible generated HTML.
 python3 tests/verify.py --only python --require-all --report build/python-report.json
 # Rebuild the offline catalogue after source or manifest edits.
 make docs
+# Additional arithmetic, worker-limit and failure checks for PostScript.
+python3 tests/verify_postscript.py --ghostscript gs
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the development and validation workflow,

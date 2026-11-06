@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-05T16:14:21.009003+00:00",
+  "generated_utc": "2026-11-06T13:40:52.219999+00:00",
   "method": "Black-box execution against stored 80-digit reference values; process IDs checked against parent PID. No assertion of bitwise equality or relative speed.",
   "toolchains": "Some toolchains may be unpacked into /tmp through --overrides; no global installations are required.",
   "results": [
@@ -800,6 +800,37 @@
       "dependency_sha256": {
         "BesselPerligata.pm": "6b2ad61a8dc8667a56f585f2edf64738f8412f94a5df41724a480aa67200f85d"
       },
+      "observed_worker_pids": [
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    {
+      "id": "postscript",
+      "language": "PostScript",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "9075c06dd8ec864b723d09e749f78246c174f3b126d8c49a43a90a29c52342ca",
       "observed_worker_pids": [
         15,
         16,

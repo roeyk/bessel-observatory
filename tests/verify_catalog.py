@@ -63,10 +63,10 @@ def read_page(path):
 manifest = json.loads((ROOT / 'manifest.json').read_text())
 report = json.loads((ROOT / 'tests/report.json').read_text())
 entries = manifest['languages']
-assert len(entries) == manifest['language_count'] == 30
-assert len({entry['id'] for entry in entries}) == 30
+assert len(entries) == manifest['language_count']
+assert len({entry['id'] for entry in entries}) == len(entries)
 index = read_page(ROOT / 'index.html')
-assert index.rows == 30
+assert index.rows == len(entries)
 evidence = {result['id']: result for result in report['results']}
 assert set(evidence) == {entry['id'] for entry in entries}
 sources = []

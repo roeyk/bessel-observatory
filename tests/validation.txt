@@ -1,6 +1,6 @@
 VALIDATION RECORD
 
-The current tests/report.json records 25 passed editions and five untested ones.
+The current tests/report.json records 26 passed editions and five untested ones.
 Each passed edition completed all 11 behavioral checks against the sources
 identified by SHA-256 in that report. The final Perligata comment pass was
 followed by another complete run of its 11 checks.
@@ -53,7 +53,7 @@ Untested:
 These are source implementations, not runtime-verified claims.
 
 Offline HTML checks:
-  python3 tests/verify_catalog.py verifies all 30 language entries, all 34
+  python3 tests/verify_catalog.py verifies all 31 language entries, all 35
   highlighted main/support source views, embedded raw source equality,
   SHA-256 hashes, report/source correspondence, and every local link/anchor.
   Pygments supplies bundled lexers; tools/catalog_lexers.py covers Oberon-2,
@@ -71,3 +71,34 @@ Perligata revision (2026-11-05):
   Additional local probes verified execution from another working directory,
   filenames with spaces/metacharacters, directory-read errors, delayed writes
   to /dev/full, and simulated fork/child failures with process/file cleanup.
+
+PostScript addition (2026-11-06):
+  All eleven shared checks pass with 64-bit Ghostscript 10.07.1 on Linux.
+  The interpreter's 64-bit integer support is checked at startup; native reals
+  remain single precision. The program uses fixed-point arithmetic with 52
+  fractional bits, split 26-bit products, integer cosine range reduction and
+  Taylor terms, and quotient/remainder summation of all 16384 midpoint samples.
+  Decimal parsing and serialization do not pass through native real objects.
+  There is no numerical or process helper source in another language.
+  %pipe% uses the POSIX shell solely to exec the same Ghostscript interpreter;
+  /proc/self/stat supplies each worker's actual PID. OS policy must allow these
+  operations. Validation used an owner-approved isolated copy of the installed
+  interpreter because the system's printer-only AppArmor profile denies them;
+  the system profile was not modified. The executable bytes were unchanged.
+  The merged report retains unchanged source-bound evidence for all 30 earlier
+  editions; its timestamp denotes the latest update, not a full matrix rerun.
+  Reproduce focused arithmetic and process/failure probes with:
+    python3 tests/verify_postscript.py --ghostscript /path/to/gs
+  The arithmetic-only option also works without process-launch permissions.
+  Focused checks passed: 298 exact multiplication cases against Python integer
+  arithmetic, 139 decimal conversion cases against Decimal, and 97 independent
+  80-digit Bessel references (grid, boundary and seeded random observations).
+  The maximum observed J0 error was 4.782e-15, below the unchanged 1e-10 limit.
+  Failure probes covered malformed/excess-domain decimals, overlong lines,
+  directory reads, /dev/full, source/output paths with shell metacharacters,
+  literal %pipe% filenames, partial replies, invalid completion, extra output,
+  and nonzero worker exits even after a nominal completion marker. Failed runs
+  preserved an existing output file. Live /proc sampling observed peaks of 1
+  and 16 numeric workers for those requested limits and matched all 32 output
+  PIDs in each run to actual child interpreters. This sampling supplements the
+  common suite; it is not a proof of all possible scheduling/failure histories.

@@ -1,0 +1,392 @@
+%!PS
+% Bessel Observatory: PostScript on 64-bit Ghostscript / Linux.
+% All parsing, arithmetic, trigonometry and orchestration are PostScript.
+% Ghostscript real objects have only single precision; integer fixed-point
+% arithmetic preserves the shared 1e-10 tolerance without a foreign kernel.
+
+/Q 4503599627370496 def              % 2^52 units represent one.
+/Limb 67108864 def                   % 2^26 splits products into exact limbs.
+/Pi 14148475504056881 def            % Round(pi * 2^52).
+/HalfPi 7074237752028440 def
+/TwoPi 28296951008113761 def
+/Samples 16384 def
+
+% Multiply two fixed-point numbers without overflowing a signed 64-bit integer.
+% Inputs: a b, scaled by Q; callers keep |a| <= 1000Q, |b| <= 2.5Q,
+% and |a*b/Q| <= 1000Q, so all partial products fit signed 64-bit integers.
+% Output: trunc(a*b/Q). Called by cosine and observe for polynomial terms.
+% A product is formed from 26-bit limbs; no operation converts to a real.
+/fmul {
+  10 dict begin
+  /b exch def /a exch def
+  /negative a 0 lt b 0 lt xor def /a a abs def /b b abs def
+  /ah a Limb idiv def /al a Limb mod def
+  /bh b Limb idiv def /bl b Limb mod def
+  ah bh mul ah bl mul al bh mul add al bl mul Limb idiv add Limb idiv add
+  negative { neg } if
+  end
+} bind def
+
+% Concatenate two strings, allocating storage owned by the returned string.
+% Inputs: left right. Output: joined string. Used by CSV and command assembly.
+/join {
+  3 dict begin /right exch def /left exch def
+  /result left length right length add string def
+  result 0 left putinterval result left length right putinterval result end
+} bind def
+
+% Stop the current operation with an application diagnostic.
+% Input: message string. No return. Used by validation and worker checks;
+% the top-level stopped handler owns reporting, file cleanup and exit status.
+/fail { userdict /FailureMessage 3 -1 roll put stop } bind def
+
+% Remove ASCII whitespace, returning a shared slice of the original string.
+% Input: string. Output: slice. Called by readValues before copying each line.
+% getinterval aliases the same bytes: retaining it requires retaining its owner.
+/trim {
+  3 dict begin /s exch def /first 0 def /last s length def
+  { first last ge { exit } if s first get 32 gt { exit } if
+    /first first 1 add def } loop
+  { last first le { exit } if s last 1 sub get 32 gt { exit } if
+    /last last 1 sub def } loop
+  s first last first sub getinterval end
+} bind def
+
+% Recognize one decimal digit without invoking PostScript's code scanner.
+% Input: byte. Output: boolean. Used by number and integer argument checks.
+/digit { dup 48 ge exch 57 le and } bind def
+
+% Parse finite decimal/e-notation directly into Q-scaled integer units.
+% Input: trimmed string. Output: fixed integer, or stop on malformed/domain input.
+% Used by readValues; it never routes a decimal through a single-precision real.
+% The complete digits determine the domain; 18 fractional decimal digits then
+% supply a binary long division, with < 1/Q + 1e-18 input truncation error.
+/number {
+  20 dict begin
+  /s exch def /size s length def /pos 0 def /sign 1 def
+  size 0 eq { (empty number) fail } if
+  s 0 get dup 43 eq exch 45 eq or {
+    s 0 get 45 eq { /sign -1 def } if /pos 1 def
+  } if
+  /digits size string def /used 0 def /point 0 def /dot false def
+  {
+    pos size ge { exit } if /ch s pos get def
+    ch digit {
+      digits used ch put /used used 1 add def
+      dot not { /point point 1 add def } if
+    } {
+      ch 46 eq dot not and { /dot true def } { exit } ifelse
+    } ifelse
+    /pos pos 1 add def
+  } loop
+  used 0 eq { (expected a decimal number) fail } if
+  /exponent 0 def /esign 1 def
+  pos size lt {
+    s pos get dup 101 eq exch 69 eq or not { (invalid numeric suffix) fail } if
+    /pos pos 1 add def
+    pos size lt {
+      s pos get dup 43 eq exch 45 eq or {
+        s pos get 45 eq { /esign -1 def } if /pos pos 1 add def
+      } if
+    } if
+    pos size eq { (missing exponent digits) fail } if
+    pos 1 size 1 sub {
+      s exch get /ch exch def ch digit not { (invalid exponent) fail } if
+      /exponent exponent 10 mul ch 48 sub add 10000 min def
+    } for
+  } if
+  /point point exponent esign mul add def
+  /leading 0 def
+  { leading used ge { exit } if digits leading get 48 ne { exit } if
+    /leading leading 1 add def } loop
+  /digits digits leading used leading sub getinterval def
+  /point point leading sub def /used digits length def
+  used 0 eq { 0 } {
+    point 4 gt { (expected x in [-1000,1000]) fail } if
+    /whole 0 def
+    0 1 point 1 sub {
+      /i exch def /whole whole 10 mul
+        i used lt { digits i get 48 sub } { 0 } ifelse add def
+    } for
+    whole 1000 gt { (expected x in [-1000,1000]) fail } if
+    whole 1000 eq {
+      point 1 used 1 sub {
+        digits exch get 48 ne { (expected x in [-1000,1000]) fail } if
+      } for
+    } if
+    /fraction 0 def
+    0 1 17 {
+      point add /i exch def
+      /fraction fraction 10 mul i 0 ge i used lt and
+        { digits i get 48 sub } { 0 } ifelse add def
+    } for
+    /bits 0 def
+    52 {
+      /fraction fraction 2 mul def /bits bits 2 mul def
+      fraction 1000000000000000000 ge {
+        /fraction fraction 1000000000000000000 sub def /bits bits 1 add def
+      } if
+    } repeat
+    whole Q mul bits add sign mul
+  } ifelse
+  end
+} bind def
+
+% Format a fixed-point result using integer decimal long division.
+% Input: fixed integer. Output: decimal string with 16 fractional places.
+% Used by worker output; cvs is applied only to integers, never native reals.
+/decimal {
+  6 dict begin /value exch def
+  /prefix value 0 lt { (-) } { () } ifelse def /value value abs def
+  /result prefix value Q idiv 32 string cvs join (.) join def
+  /fraction value Q mod def /digits 16 string def
+  0 1 15 {
+    /i exch def /fraction fraction 10 mul def
+    digits i fraction Q idiv 48 add put /fraction fraction Q mod def
+  } for
+  result digits join end
+} bind def
+
+% Evaluate cosine with fixed-point range reduction and a Taylor recurrence.
+% Input: angle in Q-scaled radians, |angle| <= 1000Q. Output: cosine * Q.
+% Called by observe for both sin(theta) = cos(pi/2-theta) and the outer cos.
+% Reduction to [-pi/2, pi/2] keeps terms small and the series well conditioned.
+/cosine {
+  8 dict begin
+  /angle exch abs TwoPi mod def /sign 1 def
+  angle Pi gt { /angle TwoPi angle sub def } if
+  angle HalfPi gt { /angle Pi angle sub def /sign -1 def } if
+  /square angle angle fmul neg def /term Q def /total Q def
+  1 1 13 {
+    /n exch 2 mul def
+    /term term square fmul n n 1 sub mul idiv def
+    /total total term add def
+    term 0 eq { exit } if
+  } for
+  total sign mul end
+} bind def
+
+% Average the shared integral's midpoint samples using exact integer sums.
+% Input: x * Q. Output: J0(x) * Q. Called only inside an OS worker.
+% Split every term into quotient and remainder before summing, so even the
+% constant integrand at x=0 cannot overflow. The division loses < 1/Q overall.
+/observe {
+  10 dict begin
+  /x exch def /whole 0 def /remainder 0 def
+  /divisor Samples 2 mul def
+  /step Pi divisor idiv def /tail Pi divisor mod def
+  0 1 Samples 1 sub {
+    2 mul 1 add /k exch def
+    HalfPi step k mul tail k mul divisor idiv add sub cosine
+    x exch fmul cosine /term exch def
+    /whole whole term Samples idiv add def
+    /remainder remainder term Samples mod add def
+  } for
+  whole remainder Samples idiv add end
+} bind def
+
+% Parse an integer token without accepting a fractional or executable suffix.
+% Input: string, at most 19 digits plus an optional sign. Output: integer.
+% Called by main and collect for worker counts and the internal pipe protocol.
+/integer {
+  4 dict begin /s exch def /start 0 def
+  s length 0 eq s length 20 gt or { (expected an integer) fail } if
+  s 0 get dup 43 eq exch 45 eq or { /start 1 def } if
+  start s length eq { (expected integer digits) fail } if
+  start 1 s length 1 sub {
+    s exch get digit not { (expected an integer) fail } if
+  } for
+  s cvi dup type /integertype ne { (integer is out of range) fail } if end
+} bind def
+
+% Read this interpreter's real Linux process ID, not a PostScript context ID.
+% Inputs: none. Output: positive PID. Used by main and each numerical worker.
+/processId {
+  3 dict begin /statFile (/proc/self/stat) (r) file def
+  statFile 4096 string readline pop /line exch def statFile closefile
+  line ( ) search not { (cannot read Linux worker PID) fail } if
+  /pid exch integer def pop pop pid 0 le { (invalid Linux PID) fail } if
+  pid end
+} bind def
+
+% Write one diagnostic to stderr and flush it for interactive users.
+% Input: string. Output: none. Used by prompts, skipped input and fatal errors.
+/diagnostic { Stderr exch writestring Stderr (\n) writestring Stderr flushfile } bind def
+
+% Read and validate observations while preserving their original decimal text.
+% Input: filename or '-'. Output: array of [text fixed-value] records.
+% Called by main before launching any worker or opening the output target.
+/readValues {
+  12 dict begin /source exch def
+  /InputStream source (-) eq {
+    (Enter one x per line; blank line or EOF finishes:) diagnostic
+    (%stdin) (r) file
+  } { (%os%) source join (r) file } ifelse store
+  /records 4096 array def /used 0 def /lineNumber 0 def /buffer 4096 string def
+  {
+    InputStream buffer readline /more exch def trim /line exch def
+    /lineNumber lineNumber 1 add def
+    line length 0 eq { exit } if
+    line 0 get 35 ne {
+      % stopped does not unwind dictionaries/stacks: restore both after a
+      % rejected token, then allow the next observation to be entered.
+      /depth countdictstack def count /operands exch def
+      { line number /value exch def } stopped {
+        countdictstack depth sub { end } repeat
+        count operands sub { pop } repeat
+        (warning: line ) lineNumber 16 string cvs join
+          (: invalid or out-of-domain decimal; skipped) join diagnostic
+        userdict /FailureMessage null put $error /newerror false put
+      } {
+        used 4096 eq { (at most 4096 values are allowed) fail } if
+        % Copy the shared trim view before readline reuses its backing buffer.
+        records used [line dup length string copy value] put /used used 1 add def
+      } ifelse
+    } if
+    more not { exit } if
+  } loop
+  InputStream closefile /InputStream null store
+  used 0 eq { (no valid input values) fail } if
+  records 0 used getinterval end
+} bind def
+
+% Quote one argument for the POSIX shell used internally by Ghostscript popen.
+% Input: string. Output: single-quoted argument, including embedded apostrophes.
+% Called by launch; only executable/source paths and validated integers enter
+% the command. The shell's sole command is exec of another Ghostscript process.
+/shellQuote {
+  3 dict begin /s exch def /out (') def
+  s { /ch exch def /out out ch 39 eq { ('\"'\"') }
+    { 1 string dup 0 ch put } ifelse join def } forall
+  out (') join end
+} bind def
+
+% Launch one numeric child, returning a readable pipe immediately.
+% Input: x * Q. Output: file. Called by calculate to fill a bounded batch.
+% /proc/PID/exe selects the exact interpreter running the parent. Ghostscript's
+% %pipe% facility uses /bin/sh -c internally; no foreign-language helper exists.
+/launch {
+  2 dict begin /x exch def
+  (%pipe%exec ) Executable shellQuote join
+  ( -q -dNODISPLAY -dBATCH -dNOSAFER -- ) join SourcePath shellQuote join
+  ( --worker ) join x 32 string cvs join (r) file end
+} bind def
+
+% Read a complete protocol line; premature EOF is a worker failure.
+% Input: pipe. Output: line. Used by collect for the result, PID and completion.
+/workerLine {
+  64 string readline not { (worker exited before completing its result) fail } if
+} bind def
+
+% Validate a worker's complete response before admitting a result to the CSV.
+% Input: pipe. Output: [fixed-result pid]. Called by calculate in input order.
+% EOF, malformed results, extra output and a missing completion marker fail.
+/collect {
+  4 dict begin /pipe exch def
+  /value pipe workerLine integer def /pid pipe workerLine integer def
+  value abs Q gt pid 0 le or pid ParentPID eq or {
+    (invalid numeric worker result or PID) fail
+  } if
+  pipe workerLine (DONE) ne { (worker did not complete successfully) fail } if
+  pipe read { pop (unexpected extra worker output) fail } if
+  pipe closefile [value pid] end
+} bind def
+
+% Schedule genuine child interpreters in bounded batches and collect in order.
+% Input: records workers. Output: result array. Called by main before writing.
+% OpenPipes retains live handles for top-level cleanup if any child fails.
+/calculate {
+  8 dict begin /workers exch def /records exch def
+  /results records length array def /base 0 def
+  {
+    base records length ge { exit } if
+    /batch workers records length base sub min def
+    0 1 batch 1 sub {
+      /slot exch def OpenPipes slot records base slot add get 1 get launch put
+    } for
+    0 1 batch 1 sub {
+      /slot exch def results base slot add OpenPipes slot get collect put
+      OpenPipes slot null put
+    } for
+    /base base batch add def
+  } loop
+  results end
+} bind def
+
+% Replace the destination only after all calculations have succeeded.
+% Inputs: path records results. Output: CSV file. Called by main.
+/writeResults {
+  4 dict begin /results exch def /records exch def /path exch def
+  /OutputStream (%os%) path join (w) file store
+  OutputStream (x,j0,worker_pid\n) writestring
+  0 1 records length 1 sub {
+    /i exch def
+    OutputStream records i get 0 get writestring OutputStream (,) writestring
+    OutputStream results i get 0 get decimal writestring OutputStream (,) writestring
+    OutputStream results i get 1 get 32 string cvs writestring
+    OutputStream (\n) writestring
+  } for
+  OutputStream closefile /OutputStream null store end
+} bind def
+
+% Explain the public CLI and this edition's interpreter/platform boundary.
+% Inputs/outputs: no operands; writes usage to stdout. Called by main for --help.
+/usage {
+  (usage: gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps [INPUT|- [OUTPUT [WORKERS]]]\n) print
+  (Defaults: stdin, results.csv, 2 workers; workers 1..16. Run from the project directory.\n) print
+  (Requires 64-bit Ghostscript, Linux /proc, and permission to open %pipe% subprocesses.\n) print
+  (All numerical work uses PostScript fixed-point arithmetic; absolute tolerance 1e-10.\n) print
+} bind def
+
+% Dispatch arguments, perform bounded work, and report success.
+% Inputs: Ghostscript ARGUMENTS. Outputs: ordered CSV or internal worker reply.
+% Called once by the top-level stopped handler, which handles fatal failures.
+/main {
+  /args /ARGUMENTS where { pop ARGUMENTS } { [] } ifelse def
+  args length 1 eq { args 0 get (--help) eq { usage quit } if } if
+  Q type /integertype ne { (this edition requires 64-bit Ghostscript integers) fail } if
+  args length 0 gt {
+    args 0 get (--worker) eq {
+      args length 2 ne { (invalid internal worker invocation) fail } if
+      args 1 get integer dup abs 1000 Q mul gt { (worker x out of domain) fail } if
+      observe 32 string cvs print (\n) print processId 32 string cvs print
+      (\nDONE\n) print flush quit
+    } if
+  } if
+  args length 3 gt { (too many arguments; use --help) fail } if
+  /input args length 0 gt { args 0 get } { (-) } ifelse def
+  /output args length 1 gt { args 1 get } { (results.csv) } ifelse def
+  /workers args length 2 gt { args 2 get integer } { 2 } ifelse def
+  workers 1 lt workers 16 gt or { (workers must be an integer from 1 through 16) fail } if
+  /records input readValues def
+  /ParentPID processId def
+  /Executable (/proc/) ParentPID 32 string cvs join (/exe) join def
+  /SourcePath /BesselSource where { pop BesselSource } { (bessel.ps) } ifelse def
+  /results records workers calculate def
+  output records results writeResults
+  (Wrote ) records length 16 string cvs join ( observations to ) join output join =
+} bind def
+
+% Close outstanding resources after failure; interpreter exit also reaps pipes.
+% Inputs/outputs: none. Called by the top-level error handler; cleanup failures
+% are contained so they cannot replace the original diagnostic.
+/cleanup {
+  [InputStream OutputStream OpenPipes aload pop] {
+    dup null ne { { closefile } stopped { clear } if } { pop } ifelse
+  } forall
+} bind def
+
+/Stderr (%stderr) (w) file def
+/InputStream null def /OutputStream null def /OpenPipes 16 array def
+/FailureMessage null def /InitialDepth countdictstack def
+% BesselLibrary is for the independent arithmetic tests; normal entry uses main.
+/BesselLibrary where { pop } {
+  { main } stopped {
+    countdictstack InitialDepth sub { end } repeat clear
+    FailureMessage null eq {
+      /FailureMessage $error /errorname get 64 string cvs def
+    } if
+    (error: ) FailureMessage join diagnostic
+    cleanup null 1 .quit
+  } if
+} ifelse
