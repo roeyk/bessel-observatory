@@ -2,6 +2,7 @@
 # Render an offline catalogue from the manifest and recorded test results.
 import html
 import json
+from functools import lru_cache
 from pathlib import Path
 import shlex
 
@@ -11,6 +12,61 @@ report_file = ROOT / "tests/report.json"
 report = json.loads(report_file.read_text()) if report_file.exists() else {"results": []}
 results = {row["id"]: row for row in report["results"]}
 escape = html.escape
+KINDS = {"workaround": "Workaround", "platform": "Platform dependency", "native": "Native approach"}
+
+
+# Read source lines once while resolving the catalogue's procedure references.
+# Input: a declared source path. Output: lines. Used by adaptation_reference.
+@lru_cache(maxsize=None)
+def source_lines(source):
+    return (ROOT / source).read_text().splitlines()
+
+
+# Link to a unique source passage, deriving its line number on every rebuild.
+# Inputs: a reference and its edition. Output: escaped HTML link, or ValueError
+# for stale/ambiguous references. Used by render_adaptations for each code link.
+def adaptation_reference(reference, item):
+    source = reference["source"]
+    if source not in [item["source"], *item.get("support", [])]:
+        raise ValueError(f"Undeclared adaptation source: {item['id']}: {source}")
+    needle = reference["match"]
+    matches = [line for line, text in enumerate(source_lines(source), 1) if needle and needle in text]
+    if len(matches) != 1:
+        raise ValueError(f"Adaptation reference must match one line: {source}: {needle!r}: {matches}")
+    href = source if source.endswith(".txt") else f"code/{source.replace('/', '_')}.html#L-{matches[0]}"
+    return f'<a href="{escape(href, quote=True)}">{escape(reference["label"])}</a>'
+
+
+# Explain actual implementation choices without inventing missing features.
+# Inputs: edition notes and recorded execution status. Output: expandable HTML.
+# Used by the row loop; status comes from the existing report, not note prose.
+def render_adaptations(item, status):
+    notes = item["adaptations"]
+    if not notes:
+        raise ValueError(f"Missing objective notes: {item['id']}")
+    evidence = ("Edition evidence: passed the recorded shared behavior checks."
+                if status == "passed" else
+                "Edition evidence: untested. These notes describe the source." if status == "untested" else
+                "Edition evidence: failed shared behavior checks. These notes describe the source.")
+    parts = []
+    for note in notes:
+        for field in ("objective", "constraint", "approach", "tradeoff"):
+            if not isinstance(note[field], str) or not note[field].strip():
+                raise ValueError(f"Empty adaptation {field}: {item['id']}")
+        if not note["references"]:
+            raise ValueError(f"Missing adaptation references: {item['id']}")
+        links = ' · '.join(adaptation_reference(ref, item) for ref in note["references"])
+        parts.append(f'''<div class="adaptation-note">
+<h4>{escape(note['objective'])}</h4><span class="adaptation-kind">{KINDS[note['kind']]}</span>
+<p><strong>Constraint:</strong> {escape(note['constraint'])}</p>
+<p><strong>Implementation:</strong> {escape(note['approach'])}</p>
+<p><strong>Tradeoff / dependency:</strong> {escape(note['tradeoff'])}</p>
+<p class="adaptation-links"><strong>Code:</strong> {links}</p></div>''')
+    return f'''<details class="adaptations" id="adaptations-{item['id']}" data-edition="{item['id']}" data-evidence="{status}">
+<summary>Objectives &amp; adaptations ({len(notes)})</summary>
+<p class="adaptation-evidence">{evidence}</p>{''.join(parts)}</details>'''
+
+
 rows = []
 # Keep the displayed language list alphabetical across catalogue rebuilds.
 for item in sorted(manifest["languages"], key=lambda entry: entry["name"].casefold()):
@@ -34,12 +90,17 @@ for item in sorted(manifest["languages"], key=lambda entry: entry["name"].casefo
     for file in item.get("support", []):
         view = "" if file.endswith(".txt") else f' · <a href="code/{file.replace(chr(47), chr(95))}.html">highlighted</a>'
         support += f'<small><a href="{file}">{file}</a>{view}</small>'
-    rows.append(f'''<tr data-search="{escape(' '.join([item['name'],item['runtime'],item['idioms'],item['multiprocessing']]).lower(), quote=True)}">
+    adaptations = render_adaptations(item, status)
+    search = [item[key] for key in ('name', 'runtime', 'idioms', 'multiprocessing', 'memory', 'strings')]
+    for note in item['adaptations']:
+        search.extend(note[key] for key in ('objective', 'constraint', 'approach', 'tradeoff'))
+        search.append(KINDS[note['kind']])
+    rows.append(f'''<tr id="language-{item['id']}" data-search="{escape(' '.join(search).lower(), quote=True)}">
 <th scope="row">{escape(item['name'])}<small>{escape(item['runtime'])}</small></th>
 <td><a class="source" href="code/{item['source']}.html">View highlighted code →</a></td>
 <td><a class="source" href="{item['source']}">{item['source']} ↗</a>{support}
 <details><summary>Build &amp; run</summary><pre>{escape(chr(10).join(commands))}</pre></details></td>
-<td>{escape(item['idioms'])}<small class="process">{escape(item['multiprocessing'])}</small><details><summary>Memory &amp; string features</summary><small>{escape(item.get('memory', ''))}</small><small>{escape(item.get('strings', ''))}</small></details></td>
+<td>{escape(item['idioms'])}<small class="process">{escape(item['multiprocessing'])}</small>{adaptations}<details><summary>Memory &amp; string features</summary><small>{escape(item.get('memory', ''))}</small><small>{escape(item.get('strings', ''))}</small></details></td>
 <td><span class="badge {status}" title="{escape(detail, quote=True)}">{escape(status)}</span>
 <small>{escape(detail)}</small></td></tr>''')
 passed = sum(result.get("status") == "passed" for result in results.values())
@@ -75,6 +136,11 @@ thead th{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(
 small{display:block;font-size:12px;line-height:1.6;font-weight:400;margin-top:7px}.process{border-left:2px solid #55746a;padding-left:10px;margin-top:12px}
 .source{font-family:monospace;font-size:14px}summary{cursor:pointer;color:var(--muted);font-size:12px;margin-top:12px}.badge{display:inline-block;border:1px solid var(--line);border-radius:30px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px}
 .passed{background:#1b3e31;color:#a3ebc4}.untested{background:#3b3220;color:#e7c584}.failed{background:#4d2525;color:#ffbbbb}
+.adaptations{margin-top:16px}.adaptations summary{color:var(--accent);font-size:13px;font-weight:600}
+.adaptation-note{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;font-size:13px;overflow-wrap:anywhere}
+.adaptation-note h4{font-size:14px;line-height:1.4;margin:0 0 6px}.adaptation-note p{margin:9px 0}
+.adaptation-kind{color:var(--accent);font-size:11px;letter-spacing:.04em}.adaptation-evidence{font-size:12px;color:var(--muted);margin:12px 0}
+.adaptation-links{line-height:1.8}.adaptation-guide{font-size:14px}
 li{margin-bottom:8px}footer{margin-top:50px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}
 @media print{body{background:white;color:black}nav,.filter,.plot input{display:none}small{color:#555}a{color:#173f32}details{display:block}main{padding:0}.badge{background:white;color:black}}
@@ -96,7 +162,8 @@ python3 bessel.py - results.csv 4</pre><p>Run commands from this project directo
 <div class="card"><h3>The mathematical contract</h3><p><strong>J₀(x) = (1/π) ∫₀ᵖⁱ cos(x sin θ) dθ</strong></p><p>Every implementation approximates this integral at 16,384 equally spaced midpoints. Inputs are restricted to −1000 ≤ x ≤ 1000.</p><p><a href="https://dlmf.nist.gov/10.9#E1">NIST’s Bessel integral</a> supplies the common definition. This is a numerical demonstration, not a certified special-function library.</p></div></div>
 <h2 id="languages">Explore the implementations</h2>
 <p class="muted">Open a syntax-highlighted HTML view or the adjacent raw source file, and expand its build instructions. “Untested” means execution has not been verified here; it does not mean a stub. Each edition contains its numerical kernel and process orchestration. Bash embeds an awk kernel; Oberon and Perligata disclose their OS/syntax adapters. RPG uses native IBM i jobs.</p>
-<label for="filter">Filter by language, runtime, idiom, or process model</label><br><input id="filter" class="filter" type="search" placeholder="Try: pattern matching, POSIX, JVM…" autocomplete="off">
+<p class="adaptation-guide">Expand <strong>Objectives &amp; adaptations</strong> in any row for the requirement, constraint, implementation, tradeoff and code links. <strong>Workaround</strong> identifies a feature gap or mismatch; <strong>Platform dependency</strong> names a required runtime or OS facility; <strong>Native approach</strong> explains how the language already meets the objective. Graceful error handling does not require try/catch syntax, and the memory comparison uses each language’s actual model. Notes describe the source; validation badges report the recorded shared behavior checks.</p>
+<label for="filter">Filter by language, runtime, objective, or adaptation</label><br><input id="filter" class="filter" type="search" placeholder="Try: error handling, pointer, fixed-point…" autocomplete="off">
 <div class="table-wrap"><table><thead><tr><th>Language / dialect</th><th>Highlighted code</th><th>Raw source &amp; commands</th><th>Language character / processes</th><th>Validation</th></tr></thead><tbody>__ROWS__</tbody></table></div>
 <p id="empty" hidden>No languages match this filter.</p>
 <h2 id="contract">Shared behavior</h2><div class="grid"><div class="card"><h3>Inputs &amp; arguments</h3><pre>PROGRAM [INPUT|- [OUTPUT [WORKERS]]]</pre><p>Defaults: standard input, <code>results.csv</code>, two workers. Workers must be an integer from 1 to 16. Files and interactive input accept one decimal real per line, ignore <code>#</code> comment lines, and end at the first blank line or EOF. At most 4,096 valid values are accepted.</p><p>Native numeric parsers may accept additional literal forms. Decimal and scientific <code>e</code> notation are the common interchange format.</p></div>

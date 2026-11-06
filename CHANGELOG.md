@@ -3,6 +3,15 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-06 — Objectives and adaptations
+
+- Added 61 expandable notes across all 31 languages, explaining objectives,
+  constraints, implementation choices, tradeoffs and dependencies with code links.
+- Distinguished workarounds, platform dependencies and native approaches,
+  including error handling, OS processes, numerical precision and memory models.
+- Made the notes searchable and resolved procedure links from source on rebuild.
+  Kept the existing 26 passed / 5 untested execution baseline unchanged.
+
 ## 2026-11-06 — Online catalogue
 
 - Published the existing static catalogue with GitHub Pages, with a prominent

@@ -23,6 +23,11 @@ thead th{text-transform:uppercase;letter-spacing:.12em;font-size:11px;color:var(
 small{display:block;font-size:12px;line-height:1.6;font-weight:400;margin-top:7px}.process{border-left:2px solid #55746a;padding-left:10px;margin-top:12px}
 .source{font-family:monospace;font-size:14px}summary{cursor:pointer;color:var(--muted);font-size:12px;margin-top:12px}.badge{display:inline-block;border:1px solid var(--line);border-radius:30px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;padding:3px 10px}
 .passed{background:#1b3e31;color:#a3ebc4}.untested{background:#3b3220;color:#e7c584}.failed{background:#4d2525;color:#ffbbbb}
+.adaptations{margin-top:16px}.adaptations summary{color:var(--accent);font-size:13px;font-weight:600}
+.adaptation-note{border-top:1px solid var(--line);padding-top:12px;margin-top:16px;font-size:13px;overflow-wrap:anywhere}
+.adaptation-note h4{font-size:14px;line-height:1.4;margin:0 0 6px}.adaptation-note p{margin:9px 0}
+.adaptation-kind{color:var(--accent);font-size:11px;letter-spacing:.04em}.adaptation-evidence{font-size:12px;color:var(--muted);margin:12px 0}
+.adaptation-links{line-height:1.8}.adaptation-guide{font-size:14px}
 li{margin-bottom:8px}footer{margin-top:50px;border-top:1px solid var(--line);padding-top:20px;font-size:12px;color:var(--muted)}
 :focus-visible{outline:2px solid var(--accent);outline-offset:5px}[hidden]{display:none!important}
 @media print{body{background:white;color:black}nav,.filter,.plot input{display:none}small{color:#555}a{color:#173f32}details{display:block}main{padding:0}.badge{background:white;color:black}}
@@ -44,181 +49,398 @@ python3 bessel.py - results.csv 4</pre><p>Run commands from this project directo
 <div class="card"><h3>The mathematical contract</h3><p><strong>J₀(x) = (1/π) ∫₀ᵖⁱ cos(x sin θ) dθ</strong></p><p>Every implementation approximates this integral at 16,384 equally spaced midpoints. Inputs are restricted to −1000 ≤ x ≤ 1000.</p><p><a href="https://dlmf.nist.gov/10.9#E1">NIST’s Bessel integral</a> supplies the common definition. This is a numerical demonstration, not a certified special-function library.</p></div></div>
 <h2 id="languages">Explore the implementations</h2>
 <p class="muted">Open a syntax-highlighted HTML view or the adjacent raw source file, and expand its build instructions. “Untested” means execution has not been verified here; it does not mean a stub. Each edition contains its numerical kernel and process orchestration. Bash embeds an awk kernel; Oberon and Perligata disclose their OS/syntax adapters. RPG uses native IBM i jobs.</p>
-<label for="filter">Filter by language, runtime, idiom, or process model</label><br><input id="filter" class="filter" type="search" placeholder="Try: pattern matching, POSIX, JVM…" autocomplete="off">
-<div class="table-wrap"><table><thead><tr><th>Language / dialect</th><th>Highlighted code</th><th>Raw source &amp; commands</th><th>Language character / processes</th><th>Validation</th></tr></thead><tbody><tr data-search="ada gnat / ada 2012 on posix lp64 strong types, range checks, generic float_io, exception handlers, explicit c imports. posix fork, pipe and waitpid">
+<p class="adaptation-guide">Expand <strong>Objectives &amp; adaptations</strong> in any row for the requirement, constraint, implementation, tradeoff and code links. <strong>Workaround</strong> identifies a feature gap or mismatch; <strong>Platform dependency</strong> names a required runtime or OS facility; <strong>Native approach</strong> explains how the language already meets the objective. Graceful error handling does not require try/catch syntax, and the memory comparison uses each language’s actual model. Notes describe the source; validation badges report the recorded shared behavior checks.</p>
+<label for="filter">Filter by language, runtime, objective, or adaptation</label><br><input id="filter" class="filter" type="search" placeholder="Try: error handling, pointer, fixed-point…" autocomplete="off">
+<div class="table-wrap"><table><thead><tr><th>Language / dialect</th><th>Highlighted code</th><th>Raw source &amp; commands</th><th>Language character / processes</th><th>Validation</th></tr></thead><tbody><tr id="language-ada" data-search="ada gnat / ada 2012 on posix lp64 strong types, range checks, generic float_io, exception handlers, explicit c imports. posix fork, pipe and waitpid borrowed in-out scalar reference, system.address and storage_offset byte arithmetic in complete pipe transfers. trim, string slices, argument strings, image conversion and diagnostic concatenation. real os worker processes ada tasks do not by themselves provide the separate os processes required here. import posix fork, pipe, read/write and waitpid through interfaces.c; batch runs the ada kernel in each child. the c abi declarations assume a posix lp64 system; tasking alone cannot replace this process boundary. platform dependency graceful error handling ada already has exceptions; imported c functions still return status codes. check transfer and child statuses explicitly, raise descriptive exceptions, and catch invalid numbers locally so reading continues. the foreign-call boundary needs explicit checks even though the surrounding control flow uses native exception handling. native approach">
 <th scope="row">Ada<small>GNAT / Ada 2012 on POSIX LP64</small></th>
 <td><a class="source" href="code/bessel.adb.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.adb">bessel.adb ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 gnatmake -gnat2012 -O2 -D build/ada bessel.adb -o build/bessel-ada
 build/bessel-ada examples/values.txt ada-results.csv 2</pre></details></td>
-<td>Strong types, range checks, generic Float_IO, exception handlers, explicit C imports.<small class="process">POSIX fork, pipe and waitpid</small><details><summary>Memory &amp; string features</summary><small>Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.</small><small>Trim, string slices, argument strings, image conversion and diagnostic concatenation.</small></details></td>
+<td>Strong types, range checks, generic Float_IO, exception handlers, explicit C imports.<small class="process">POSIX fork, pipe and waitpid</small><details class="adaptations" id="adaptations-ada" data-edition="ada" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> Ada tasks do not by themselves provide the separate OS processes required here.</p>
+<p><strong>Implementation:</strong> Import POSIX fork, pipe, read/write and waitpid through Interfaces.C; Batch runs the Ada kernel in each child.</p>
+<p><strong>Tradeoff / dependency:</strong> The C ABI declarations assume a POSIX LP64 system; tasking alone cannot replace this process boundary.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.adb.html#L-33">POSIX imports</a> · <a href="code/bessel.adb.html#L-148">Batch</a></p></div><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Ada already has exceptions; imported C functions still return status codes.</p>
+<p><strong>Implementation:</strong> Check transfer and child statuses explicitly, raise descriptive exceptions, and catch invalid numbers locally so reading continues.</p>
+<p><strong>Tradeoff / dependency:</strong> The foreign-call boundary needs explicit checks even though the surrounding control flow uses native exception handling.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.adb.html#L-78">Number</a> · <a href="code/bessel.adb.html#L-148">Batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.</small><small>Trim, string slices, argument strings, image conversion and diagnostic concatenation.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="bash bash 4.3+ with awk and posix utilities arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec. background bash workers exec awk; bashpid remains the os pid performing the numerical calculation.">
+<tr id="language-bash" data-search="bash bash 4.3+ with awk and posix utilities arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec. background bash workers exec awk; bashpid remains the os pid performing the numerical calculation. bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic. whitespace parameter expansion, substring offsets, regex validation and printf. floating-point bessel computation bash arithmetic is integer-only and supplies no floating-point trigonometric kernel. each background worker execs the embedded awk quadrature. bashpid is passed before exec, which preserves the pid of the process doing the math. requires awk. this edition explicitly delegates its numerical kernel; it is not an entirely bash implementation. workaround graceful errors and resource cleanup shell exit statuses and traps provide no structured try/catch/finally scope. check commands and wait results, route fatal errors through fail, and use an exit trap to kill/reap outstanding workers and remove private row files. every fallible operation needs an explicit check; cleanup uses tracked pids and temporary storage. workaround">
 <th scope="row">Bash<small>Bash 4.3+ with awk and POSIX utilities</small></th>
 <td><a class="source" href="code/bessel.sh.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.sh">bessel.sh ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 bash bessel.sh examples/values.txt bash-results.csv 2</pre></details></td>
-<td>Arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec.<small class="process">Background Bash workers exec awk; BASHPID remains the OS PID performing the numerical calculation.</small><details><summary>Memory &amp; string features</summary><small>Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.</small><small>Whitespace parameter expansion, substring offsets, regex validation and printf.</small></details></td>
+<td>Arrays, nameref, parameter expansion, background jobs, wait, traps, quoted paths, exec.<small class="process">Background Bash workers exec awk; BASHPID remains the OS PID performing the numerical calculation.</small><details class="adaptations" id="adaptations-bash" data-edition="bash" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Floating-point Bessel computation</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Bash arithmetic is integer-only and supplies no floating-point trigonometric kernel.</p>
+<p><strong>Implementation:</strong> Each background worker execs the embedded awk quadrature. BASHPID is passed before exec, which preserves the PID of the process doing the math.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires awk. This edition explicitly delegates its numerical kernel; it is not an entirely Bash implementation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sh.html#L-40">observe</a></p></div><div class="adaptation-note">
+<h4>Graceful errors and resource cleanup</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Shell exit statuses and traps provide no structured try/catch/finally scope.</p>
+<p><strong>Implementation:</strong> Check commands and wait results, route fatal errors through fail, and use an EXIT trap to kill/reap outstanding workers and remove private row files.</p>
+<p><strong>Tradeoff / dependency:</strong> Every fallible operation needs an explicit check; cleanup uses tracked PIDs and temporary storage.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sh.html#L-18">cleanup and traps</a> · <a href="code/bessel.sh.html#L-54">join_batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.</small><small>Whitespace parameter expansion, substring offsets, regex validation and printf.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="basic freebasic 1.10 on linux x86-64 structured basic, typed arrays, line input and explicit return-code checks. posix fork and binary pipes via c abi">
+<tr id="language-basic" data-search="basic freebasic 1.10 on linux x86-64 structured basic, typed arrays, line input and explicit return-code checks. posix fork and binary pipes via c abi byref parameters, double ptr, dereference and cursor += 1 across a locally owned numeric array. trim, left, strptr, c-string end-pointer validation and csv concatenation. real os worker processes this freebasic edition needs posix process and pipe services through its foreign-function interface. extern c declarations bind fork, pipe, read/write and waitpid. the child computes j0 with basic double arithmetic. targets linux x86-64 and its abi. use the supplied build helper to keep generated c intermediates away from bessel.c. platform dependency graceful error handling this edition uses explicit success/failure results at parsing, file and os boundaries. number returns boolean acceptance; invalid values are skipped. fatal checks call fail to print a diagnostic and end 1. there is no automatic exception unwinding in this implementation; the checked control paths own resource handling. native approach">
 <th scope="row">BASIC<small>FreeBASIC 1.10 on Linux x86-64</small></th>
 <td><a class="source" href="code/bessel.bas.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.bas">bessel.bas ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 sh tools/build_basic.sh
 build/bessel-basic examples/values.txt basic-results.csv 2</pre></details></td>
-<td>Structured BASIC, typed arrays, line input and explicit return-code checks.<small class="process">POSIX fork and binary pipes via C ABI</small><details><summary>Memory &amp; string features</summary><small>ByRef parameters, Double Ptr, dereference and cursor += 1 across a locally owned numeric array.</small><small>Trim, Left, StrPtr, C-string end-pointer validation and CSV concatenation.</small></details></td>
+<td>Structured BASIC, typed arrays, line input and explicit return-code checks.<small class="process">POSIX fork and binary pipes via C ABI</small><details class="adaptations" id="adaptations-basic" data-edition="basic" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This FreeBASIC edition needs POSIX process and pipe services through its foreign-function interface.</p>
+<p><strong>Implementation:</strong> Extern C declarations bind fork, pipe, read/write and waitpid. The child computes J0 with BASIC Double arithmetic.</p>
+<p><strong>Tradeoff / dependency:</strong> Targets Linux x86-64 and its ABI. Use the supplied build helper to keep generated C intermediates away from bessel.c.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.bas.html#L-9">OS bindings</a></p></div><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> This edition uses explicit success/failure results at parsing, file and OS boundaries.</p>
+<p><strong>Implementation:</strong> Number returns Boolean acceptance; invalid values are skipped. Fatal checks call Fail to print a diagnostic and End 1.</p>
+<p><strong>Tradeoff / dependency:</strong> There is no automatic exception unwinding in this implementation; the checked control paths own resource handling.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.bas.html#L-67">Fail</a> · <a href="code/bessel.bas.html#L-77">Number</a></p></div></details><details><summary>Memory &amp; string features</summary><small>ByRef parameters, Double Ptr, dereference and cursor += 1 across a locally owned numeric array.</small><small>Trim, Left, StrPtr, C-string end-pointer validation and CSV concatenation.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="c c17 + posix structs, explicit ownership, checked return codes, complete pipe transfers. posix fork, pipe and waitpid">
+<tr id="language-c" data-search="c c17 + posix structs, explicit ownership, checked return codes, complete pipe transfers. posix fork, pipe and waitpid pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked ipc transfers. strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted csv. graceful error handling c has no built-in throw/catch exception mechanism. parse, transfer and batch return success flags. callers inspect errno and child exit status, print diagnostics, and explicitly close/reap resources before returning failure. error propagation and cleanup must be written at each call boundary; no automatic stack unwinding is supplied. workaround complete worker-result transfers a posix pipe read or write can transfer fewer bytes than requested or be interrupted. transfer advances a byte pointer until the whole payload moves, retries eintr, and reports eof or other errors. the binary payload is suitable for forked copies of this executable, not a portable network wire format. platform dependency">
 <th scope="row">C<small>C17 + POSIX</small></th>
 <td><a class="source" href="code/bessel.c.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.c">bessel.c ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 cc -std=c17 -O2 -Wall -Wextra bessel.c -lm -o build/bessel-c
 build/bessel-c examples/values.txt c-results.csv 2</pre></details></td>
-<td>Structs, explicit ownership, checked return codes, complete pipe transfers.<small class="process">POSIX fork, pipe and waitpid</small><details><summary>Memory &amp; string features</summary><small>Pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked IPC transfers.</small><small>strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted CSV.</small></details></td>
+<td>Structs, explicit ownership, checked return codes, complete pipe transfers.<small class="process">POSIX fork, pipe and waitpid</small><details class="adaptations" id="adaptations-c" data-edition="c" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> C has no built-in throw/catch exception mechanism.</p>
+<p><strong>Implementation:</strong> parse, transfer and batch return success flags. Callers inspect errno and child exit status, print diagnostics, and explicitly close/reap resources before returning failure.</p>
+<p><strong>Tradeoff / dependency:</strong> Error propagation and cleanup must be written at each call boundary; no automatic stack unwinding is supplied.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.c.html#L-27">parse</a> · <a href="code/bessel.c.html#L-76">batch</a></p></div><div class="adaptation-note">
+<h4>Complete worker-result transfers</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> A POSIX pipe read or write can transfer fewer bytes than requested or be interrupted.</p>
+<p><strong>Implementation:</strong> transfer advances a byte pointer until the whole payload moves, retries EINTR, and reports EOF or other errors.</p>
+<p><strong>Tradeoff / dependency:</strong> The binary payload is suitable for forked copies of this executable, not a portable network wire format.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.c.html#L-57">transfer</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked IPC transfers.</small><small>strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted CSV.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="c++ c++20 + posix raii, unique_ptr, structured bindings, standard exceptions and std::numbers. raii-managed posix fork workers">
+<tr id="language-cpp" data-search="c++ c++20 + posix raii, unique_ptr, structured bindings, standard exceptions and std::numbers. raii-managed posix fork workers c++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references. std::string searches, substring position validation, stoi/stod and stream formatting. real os workers with exception cleanup the c++20 standard library has no subprocess-launch api; threads would share the parent os process. worker wraps posix fork and pipes. unique_ptr ownership and the worker destructor close descriptors and reap children during normal exit or exception unwinding. requires posix. exceptions and raii are native c++ features; the os binding is the portability dependency. platform dependency">
 <th scope="row">C++<small>C++20 + POSIX</small></th>
 <td><a class="source" href="code/bessel.cpp.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.cpp">bessel.cpp ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 c++ -std=c++20 -O2 -Wall -Wextra bessel.cpp -o build/bessel-cpp
 build/bessel-cpp examples/values.txt cpp-results.csv 2</pre></details></td>
-<td>RAII, unique_ptr, structured bindings, standard exceptions and std::numbers.<small class="process">RAII-managed POSIX fork workers</small><details><summary>Memory &amp; string features</summary><small>C++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references.</small><small>std::string searches, substring position validation, stoi/stod and stream formatting.</small></details></td>
+<td>RAII, unique_ptr, structured bindings, standard exceptions and std::numbers.<small class="process">RAII-managed POSIX fork workers</small><details class="adaptations" id="adaptations-cpp" data-edition="cpp" data-evidence="passed">
+<summary>Objectives &amp; adaptations (1)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS workers with exception cleanup</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> The C++20 standard library has no subprocess-launch API; threads would share the parent OS process.</p>
+<p><strong>Implementation:</strong> Worker wraps POSIX fork and pipes. unique_ptr ownership and the Worker destructor close descriptors and reap children during normal exit or exception unwinding.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires POSIX. Exceptions and RAII are native C++ features; the OS binding is the portability dependency.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.cpp.html#L-57">Worker constructor</a> · <a href="code/bessel.cpp.html#L-79">Worker destructor</a></p></div></details><details><summary>Memory &amp; string features</summary><small>C++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references.</small><small>std::string searches, substring position validation, stoi/stod and stream formatting.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="cobol gnucobol 3.2 on linux x86-64 divisions, paragraphs, picture fields, evaluate, file status and on size error. cbl_gc_fork with posix pipes and waitpid">
+<tr id="language-cobol" data-search="cobol gnucobol 3.2 on linux x86-64 divisions, paragraphs, picture fields, evaluate, file status and on size error. cbl_gc_fork with posix pipes and waitpid usage pointer, address of, a linkage reference, and set pointer up by length of current-sample. function trim, reference modification, test-numval-f, string and edited picture output. graceful error handling this gnucobol edition uses operation-specific status handling rather than a general try/catch block. file status and check-file detect i/o errors; test-numval-f and on size error reject malformed or overflowing input. fatal paths stop run returning 1. file, numeric and worker statuses must each be checked explicitly. native approach real os worker processes process creation is supplied by the selected gnucobol runtime and posix services. cbl_gc_fork creates children; binary posix pipes carry the cobol-computed results and waitpid verifies completion. the foreign calls and numeric layouts target gnucobol on linux x86-64, not arbitrary cobol runtimes. platform dependency">
 <th scope="row">COBOL<small>GnuCOBOL 3.2 on Linux x86-64</small></th>
 <td><a class="source" href="code/bessel.cob.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.cob">bessel.cob ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 cobc -A -std=gnu17 -x -free bessel.cob -o build/bessel-cobol
 build/bessel-cobol examples/values.txt cobol-results.csv 2</pre></details></td>
-<td>Divisions, paragraphs, PICTURE fields, EVALUATE, file status and ON SIZE ERROR.<small class="process">CBL_GC_FORK with POSIX pipes and waitpid</small><details><summary>Memory &amp; string features</summary><small>USAGE POINTER, ADDRESS OF, a LINKAGE reference, and SET pointer UP BY LENGTH OF current-sample.</small><small>FUNCTION TRIM, reference modification, TEST-NUMVAL-F, STRING and edited PICTURE output.</small></details></td>
+<td>Divisions, paragraphs, PICTURE fields, EVALUATE, file status and ON SIZE ERROR.<small class="process">CBL_GC_FORK with POSIX pipes and waitpid</small><details class="adaptations" id="adaptations-cobol" data-edition="cobol" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> This GnuCOBOL edition uses operation-specific status handling rather than a general try/catch block.</p>
+<p><strong>Implementation:</strong> FILE STATUS and check-file detect I/O errors; TEST-NUMVAL-F and ON SIZE ERROR reject malformed or overflowing input. Fatal paths STOP RUN RETURNING 1.</p>
+<p><strong>Tradeoff / dependency:</strong> File, numeric and worker statuses must each be checked explicitly.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.cob.html#L-192">accept-line</a> · <a href="code/bessel.cob.html#L-239">check-file</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> Process creation is supplied by the selected GnuCOBOL runtime and POSIX services.</p>
+<p><strong>Implementation:</strong> CBL_GC_FORK creates children; binary POSIX pipes carry the COBOL-computed results and waitpid verifies completion.</p>
+<p><strong>Tradeoff / dependency:</strong> The foreign calls and numeric layouts target GnuCOBOL on Linux x86-64, not arbitrary COBOL runtimes.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.cob.html#L-127">Worker launch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>USAGE POINTER, ADDRESS OF, a LINKAGE reference, and SET pointer UP BY LENGTH OF current-sample.</small><small>FUNCTION TRIM, reference modification, TEST-NUMVAL-F, STRING and edited PICTURE output.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="erlang erlang/otp 25+ pattern matching, tail recursion, mailbox receive, ports and try/after. ports start separate escript os vms; not just beam processes">
+<tr id="language-erlang" data-search="erlang erlang/otp 25+ pattern matching, tail recursion, mailbox receive, ports and try/after. ports start separate escript os vms; not just beam processes immutable values and opaque port handles. beam terms do not expose raw memory pointers or pointer arithmetic. string:trim, string:to_float/to_integer, float_to_list and io:format. real os worker processes erlang spawn creates a beam process, which does not satisfy the separate os-process requirement. open_port starts another escript vm per observation. port messages carry output and exit status; each worker reports os:getpid(). starting a vm per value is expensive. batches bound concurrency and collect imposes a 30-second receive timeout. workaround memory-model comparison beam terms do not expose raw addresses or pointer arithmetic. use immutable lists for values, explicit recursion state for the sum, and opaque port handles for worker resources. this demonstrates erlang value and handle semantics; it makes no raw-pointer claim. native approach">
 <th scope="row">Erlang<small>Erlang/OTP 25+</small></th>
 <td><a class="source" href="code/bessel.erl.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.erl">bessel.erl ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 escript bessel.erl examples/values.txt erlang-results.csv 2</pre></details></td>
-<td>Pattern matching, tail recursion, mailbox receive, ports and try/after.<small class="process">Ports start separate escript OS VMs; not just BEAM processes</small><details><summary>Memory &amp; string features</summary><small>Immutable values and opaque port handles. BEAM terms do not expose raw memory pointers or pointer arithmetic.</small><small>string:trim, string:to_float/to_integer, float_to_list and io:format.</small></details></td>
+<td>Pattern matching, tail recursion, mailbox receive, ports and try/after.<small class="process">Ports start separate escript OS VMs; not just BEAM processes</small><details class="adaptations" id="adaptations-erlang" data-edition="erlang" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Erlang spawn creates a BEAM process, which does not satisfy the separate OS-process requirement.</p>
+<p><strong>Implementation:</strong> open_port starts another escript VM per observation. Port messages carry output and exit status; each worker reports os:getpid().</p>
+<p><strong>Tradeoff / dependency:</strong> Starting a VM per value is expensive. Batches bound concurrency and collect imposes a 30-second receive timeout.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.erl.html#L-96">launch</a> · <a href="code/bessel.erl.html#L-77">collect</a></p></div><div class="adaptation-note">
+<h4>Memory-model comparison</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> BEAM terms do not expose raw addresses or pointer arithmetic.</p>
+<p><strong>Implementation:</strong> Use immutable lists for values, explicit recursion state for the sum, and opaque port handles for worker resources.</p>
+<p><strong>Tradeoff / dependency:</strong> This demonstrates Erlang value and handle semantics; it makes no raw-pointer claim.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.erl.html#L-43">Recursive accumulation</a> · <a href="code/bessel.erl.html#L-90">Port ownership</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Immutable values and opaque port handles. BEAM terms do not expose raw memory pointers or pointer arithmetic.</small><small>string:trim, string:to_float/to_integer, float_to_list and io:format.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="fortran fortran 2008 / gfortran on posix lp64 modules, numeric kinds, typed array pointers, ieee checks, iostat and iso_c_binding. posix fork and pipes through iso_c_binding">
+<tr id="language-fortran" data-search="fortran fortran 2008 / gfortran on posix lp64 modules, numeric kinds, typed array pointers, ieee checks, iostat and iso_c_binding. posix fork and pipes through iso_c_binding c_loc / c_f_pointer produce typed array pointers; pointer sections shift the view using array descriptors. raw address addition is not portable standard fortran. trim, adjustl, verify, character slices, concatenation, internal numeric read and formatted write. real os worker processes this edition needs fork/pipe services outside the fortran language interface. iso_c_binding declarations expose posix calls with c-compatible kinds. each child evaluates the fortran kernel and sends its result back. assumes posix lp64 and compatible c double storage; it is not a portable coarray implementation. platform dependency graceful error handling fortran i/o exposes iostat/iomsg rather than structured catchable exceptions. check numeric read, file operations, transfers and worker statuses. fail prints to error_unit and calls the bound _exit with status 1. explicit checks provide readable failures; _exit avoids a compiler-specific error stop backtrace and uses the posix binding. native approach pointer and offset demonstration portable fortran does not provide raw c-style address addition. c_loc/c_f_pointer expose the owned sample array as a typed pointer; tail points at successive two-element array sections. offsets are array-descriptor views, not fabricated addresses. the target allocation remains alive throughout the reduction. native approach">
 <th scope="row">Fortran<small>Fortran 2008 / gfortran on POSIX LP64</small></th>
 <td><a class="source" href="code/bessel.f90.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.f90">bessel.f90 ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 gfortran -std=f2008 -O2 -Jbuild/fortran bessel.f90 -o build/bessel-fortran
 build/bessel-fortran examples/values.txt fortran-results.csv 2</pre></details></td>
-<td>Modules, numeric kinds, typed array pointers, IEEE checks, IOSTAT and ISO_C_BINDING.<small class="process">POSIX fork and pipes through ISO_C_BINDING</small><details><summary>Memory &amp; string features</summary><small>C_LOC / C_F_POINTER produce typed array pointers; pointer sections shift the view using array descriptors. Raw address addition is not portable standard Fortran.</small><small>TRIM, ADJUSTL, VERIFY, character slices, concatenation, internal numeric READ and formatted WRITE.</small></details></td>
+<td>Modules, numeric kinds, typed array pointers, IEEE checks, IOSTAT and ISO_C_BINDING.<small class="process">POSIX fork and pipes through ISO_C_BINDING</small><details class="adaptations" id="adaptations-fortran" data-edition="fortran" data-evidence="passed">
+<summary>Objectives &amp; adaptations (3)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This edition needs fork/pipe services outside the Fortran language interface.</p>
+<p><strong>Implementation:</strong> ISO_C_BINDING declarations expose POSIX calls with C-compatible kinds. Each child evaluates the Fortran kernel and sends its result back.</p>
+<p><strong>Tradeoff / dependency:</strong> Assumes POSIX LP64 and compatible C double storage; it is not a portable coarray implementation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.f90.html#L-24">C process interface</a></p></div><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Fortran I/O exposes IOSTAT/IOMSG rather than structured catchable exceptions.</p>
+<p><strong>Implementation:</strong> Check numeric READ, file operations, transfers and worker statuses. fail prints to error_unit and calls the bound _exit with status 1.</p>
+<p><strong>Tradeoff / dependency:</strong> Explicit checks provide readable failures; _exit avoids a compiler-specific ERROR STOP backtrace and uses the POSIX binding.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.f90.html#L-82">fail</a> · <a href="code/bessel.f90.html#L-163">Numeric status check</a></p></div><div class="adaptation-note">
+<h4>Pointer and offset demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Portable Fortran does not provide raw C-style address addition.</p>
+<p><strong>Implementation:</strong> C_LOC/C_F_POINTER expose the owned sample array as a typed pointer; tail points at successive two-element array sections.</p>
+<p><strong>Tradeoff / dependency:</strong> Offsets are array-descriptor views, not fabricated addresses. The target allocation remains alive throughout the reduction.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.f90.html#L-91">j0 pointer sections</a></p></div></details><details><summary>Memory &amp; string features</summary><small>C_LOC / C_F_POINTER produce typed array pointers; pointer sections shift the view using array descriptors. Raw address addition is not portable standard Fortran.</small><small>TRIM, ADJUSTL, VERIFY, character slices, concatenation, internal numeric READ and formatted WRITE.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="go go 1.22+ explicit errors, defer, small structs, interfaces and standard-library process apis. os/exec child executables; goroutines only support pipe i/o">
+<tr id="language-go" data-search="go go 1.22+ explicit errors, defer, small structs, interfaces and standard-library process apis. os/exec child executables; goroutines only support pipe i/o a slice owns samples; unsafe.slicedata, unsafe.add and typed dereference show byte arithmetic, with runtime.keepalive. trimspace, hasprefix, parsefloat, formatfloat, bytes.buffer and formatted csv. graceful errors and resource cleanup go uses explicit error values for ordinary failures; try/catch is not needed for this objective. number, batch and run return errors. callers propagate them, main prints a diagnostic, and deferred batch cleanup kills and waits for remaining children. errors must be checked at each call; panic/recover is not used as the normal failure path. native approach real os worker processes goroutines execute within the go runtime and are not separate numerical worker processes. os/exec launches this executable in --worker mode. child pids identify numerical work; internal output-copying goroutines only support pipe i/o. uses the standard library, with executable startup and buffering overhead for each observation. native approach">
 <th scope="row">Go<small>Go 1.22+</small></th>
 <td><a class="source" href="code/bessel.go.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.go">bessel.go ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 go build -o build/bessel-go bessel.go
 build/bessel-go examples/values.txt go-results.csv 2</pre></details></td>
-<td>Explicit errors, defer, small structs, interfaces and standard-library process APIs.<small class="process">os/exec child executables; goroutines only support pipe I/O</small><details><summary>Memory &amp; string features</summary><small>A slice owns samples; unsafe.SliceData, unsafe.Add and typed dereference show byte arithmetic, with runtime.KeepAlive.</small><small>TrimSpace, HasPrefix, ParseFloat, FormatFloat, bytes.Buffer and formatted CSV.</small></details></td>
+<td>Explicit errors, defer, small structs, interfaces and standard-library process APIs.<small class="process">os/exec child executables; goroutines only support pipe I/O</small><details class="adaptations" id="adaptations-go" data-edition="go" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Graceful errors and resource cleanup</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Go uses explicit error values for ordinary failures; try/catch is not needed for this objective.</p>
+<p><strong>Implementation:</strong> number, batch and run return errors. Callers propagate them, main prints a diagnostic, and deferred batch cleanup kills and waits for remaining children.</p>
+<p><strong>Tradeoff / dependency:</strong> Errors must be checked at each call; panic/recover is not used as the normal failure path.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.go.html#L-102">batch and defer</a> · <a href="code/bessel.go.html#L-229">Final error boundary</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Goroutines execute within the Go runtime and are not separate numerical worker processes.</p>
+<p><strong>Implementation:</strong> os/exec launches this executable in --worker mode. Child PIDs identify numerical work; internal output-copying goroutines only support pipe I/O.</p>
+<p><strong>Tradeoff / dependency:</strong> Uses the standard library, with executable startup and buffering overhead for each observation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.go.html#L-102">os/exec batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>A slice owns samples; unsafe.SliceData, unsafe.Add and typed dereference show byte arithmetic, with runtime.KeepAlive.</small><small>TrimSpace, HasPrefix, ParseFloat, FormatFloat, bytes.Buffer and formatted CSV.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="haskell ghc 9.x + process and unix packages pure sample generation, either, pattern matching, scoped foreign memory, explicit io and bracketed child lifetimes. system.process child executables">
+<tr id="language-haskell" data-search="haskell ghc 9.x + process and unix packages pure sample generation, either, pattern matching, scoped foreign memory, explicit io and bracketed child lifetimes. system.process child executables witharray brackets a foreign allocation; plusptr byte offsets and peek occur explicitly in io. numeric sample generation remains pure. whitespace/prefix pattern matching, readmaybe, string concatenation, show and line streams. pointer demonstration with scoped effects dereferencing foreign memory is an io effect, while the sample sequence can remain pure. witharray owns a temporary allocation; plusptr advances by double-sized byte offsets and peek reads within that scope. j0 returns io double and copies samples into foreign storage for the memory example; the sample-generation function remains pure. native approach reliable collection of process output lazy hgetcontents output must be consumed while its pipe is still open. nested withcreateprocess scopes retain workers; evaluate (length row) forces each result before waiting and leaving its resource scope. requires process and unix packages. bracketed lifetimes and exceptions are native library facilities, not an emulated exception system. native approach">
 <th scope="row">Haskell<small>GHC 9.x + process and unix packages</small></th>
 <td><a class="source" href="code/bessel.hs.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.hs">bessel.hs ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 ghc -O2 -outputdir build/haskell bessel.hs -o build/bessel-haskell
 build/bessel-haskell examples/values.txt haskell-results.csv 2</pre></details></td>
-<td>Pure sample generation, Either, pattern matching, scoped foreign memory, explicit IO and bracketed child lifetimes.<small class="process">System.Process child executables</small><details><summary>Memory &amp; string features</summary><small>withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.</small><small>Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.</small></details></td>
+<td>Pure sample generation, Either, pattern matching, scoped foreign memory, explicit IO and bracketed child lifetimes.<small class="process">System.Process child executables</small><details class="adaptations" id="adaptations-haskell" data-edition="haskell" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Pointer demonstration with scoped effects</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Dereferencing foreign memory is an IO effect, while the sample sequence can remain pure.</p>
+<p><strong>Implementation:</strong> withArray owns a temporary allocation; plusPtr advances by Double-sized byte offsets and peek reads within that scope.</p>
+<p><strong>Tradeoff / dependency:</strong> j0 returns IO Double and copies samples into foreign storage for the memory example; the sample-generation function remains pure.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.hs.html#L-47">j0</a></p></div><div class="adaptation-note">
+<h4>Reliable collection of process output</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Lazy hGetContents output must be consumed while its pipe is still open.</p>
+<p><strong>Implementation:</strong> Nested withCreateProcess scopes retain workers; evaluate (length row) forces each result before waiting and leaving its resource scope.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires process and unix packages. Bracketed lifetimes and exceptions are native library facilities, not an emulated exception system.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.hs.html#L-91">batch and collect</a></p></div></details><details><summary>Memory &amp; string features</summary><small>withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.</small><small>Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="java jdk 17+ records, streams, try-with-resources and processbuilder. separate jvm worker processes">
+<tr id="language-java" data-search="java jdk 17+ records, streams, try-with-resources and processbuilder. separate jvm worker processes object references and a bytebuffer with checked byte-offset reads. java does not expose raw pointer arithmetic. strip, startswith, numeric parsing, stringbuilder and locale.root csv formatting. pointer and offset demonstration java does not expose c-style raw pointer arithmetic. observe stores samples in a bytebuffer and reads them at checked k * double.bytes offsets through a shared object reference. demonstrates byte offsets within managed storage, not addresses. the buffer is an educational alternative to a simple double array. native approach real os worker processes java threads alone would not provide independent worker os pids. processbuilder starts a separate jvm in --worker mode with the current classpath. finally terminates and waits for outstanding children. standard apis suffice; a jvm starts for each observation, so startup can dominate the calculation. native approach">
 <th scope="row">Java<small>JDK 17+</small></th>
 <td><a class="source" href="code/Bessel.java.html">View highlighted code →</a></td>
 <td><a class="source" href="Bessel.java">Bessel.java ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 javac -d build Bessel.java
 java -cp build Bessel examples/values.txt java-results.csv 2</pre></details></td>
-<td>Records, streams, try-with-resources and ProcessBuilder.<small class="process">Separate JVM worker processes</small><details><summary>Memory &amp; string features</summary><small>Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.</small><small>strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.</small></details></td>
+<td>Records, streams, try-with-resources and ProcessBuilder.<small class="process">Separate JVM worker processes</small><details class="adaptations" id="adaptations-java" data-edition="java" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Pointer and offset demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Java does not expose C-style raw pointer arithmetic.</p>
+<p><strong>Implementation:</strong> observe stores samples in a ByteBuffer and reads them at checked k * Double.BYTES offsets through a shared object reference.</p>
+<p><strong>Tradeoff / dependency:</strong> Demonstrates byte offsets within managed storage, not addresses. The buffer is an educational alternative to a simple double array.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.java.html#L-43">observe</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Java threads alone would not provide independent worker OS PIDs.</p>
+<p><strong>Implementation:</strong> ProcessBuilder starts a separate JVM in --worker mode with the current classpath. finally terminates and waits for outstanding children.</p>
+<p><strong>Tradeoff / dependency:</strong> Standard APIs suffice; a JVM starts for each observation, so startup can dominate the calculation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.java.html#L-89">ProcessBuilder batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.</small><small>strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="javascript node.js 20+ es modules, async iteration, promises, promise.all, try/finally. child_process.fork with ipc messages, not worker threads">
+<tr id="language-javascript" data-search="javascript node.js 20+ es modules, async iteration, promises, promise.all, try/finally. child_process.fork with ipc messages, not worker threads arraybuffer/dataview references and checked byte-offset arithmetic. these are not raw addresses. trim, startswith, regex validation, template strings and array joining. real os worker processes the browser javascript execution model does not provide the required command-line os workers. target node.js and use child_process.fork with ipc. worker resolves its promise only after receiving a result and a successful child close event. requires node.js, not a browser. promise.all coordinates ordering; child processes perform the numerical work. platform dependency pointer and offset demonstration javascript references do not expose raw memory addresses. an arraybuffer owns sample storage; dataview reads and writes float64 values at explicit checked byte offsets. shows shared-buffer views and offsets, with no raw-pointer arithmetic or foreign helper. native approach">
 <th scope="row">JavaScript<small>Node.js 20+</small></th>
 <td><a class="source" href="code/bessel.mjs.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.mjs">bessel.mjs ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 node bessel.mjs examples/values.txt javascript-results.csv 2</pre></details></td>
-<td>ES modules, async iteration, promises, Promise.all, try/finally.<small class="process">child_process.fork with IPC messages, not worker threads</small><details><summary>Memory &amp; string features</summary><small>ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.</small><small>trim, startsWith, regex validation, template strings and array joining.</small></details></td>
+<td>ES modules, async iteration, promises, Promise.all, try/finally.<small class="process">child_process.fork with IPC messages, not worker threads</small><details class="adaptations" id="adaptations-javascript" data-edition="javascript" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> The browser JavaScript execution model does not provide the required command-line OS workers.</p>
+<p><strong>Implementation:</strong> Target Node.js and use child_process.fork with IPC. worker resolves its Promise only after receiving a result and a successful child close event.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Node.js, not a browser. Promise.all coordinates ordering; child processes perform the numerical work.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.mjs.html#L-51">worker</a></p></div><div class="adaptation-note">
+<h4>Pointer and offset demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> JavaScript references do not expose raw memory addresses.</p>
+<p><strong>Implementation:</strong> An ArrayBuffer owns sample storage; DataView reads and writes Float64 values at explicit checked byte offsets.</p>
+<p><strong>Tradeoff / dependency:</strong> Shows shared-buffer views and offsets, with no raw-pointer arithmetic or foreign helper.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.mjs.html#L-32">observe</a></p></div></details><details><summary>Memory &amp; string features</summary><small>ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.</small><small>trim, startsWith, regex validation, template strings and array joining.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="julia julia 1.10+ / distributed standard library multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap. distributed.addprocs / pmap on os workers">
+<tr id="language-julia" data-search="julia julia 1.10+ / distributed standard library multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap. distributed.addprocs / pmap on os workers ptr byte arithmetic and unsafe_load within gc.@preserve; the owning float64 array stays alive and unmodified. strip, startswith, parse, interpolation and printf output. real os workers with definitions available separate julia processes need the observe definition loaded before they can execute it. distributed.addprocs creates workers; @everywhere includes the source there. the program_file guard prevents recursive cli execution, pmap preserves ordering, and finally removes workers. uses the distributed standard library and pays process/loading overhead. this design is source-reviewed; execution remains untested. native approach raw-pointer lifetime a raw ptr alone does not keep its owning array alive. gc.@preserve retains samples while pointer arithmetic and unsafe_load read aligned float64 elements. bounds and lifetime are the programmer’s responsibility in this demonstration; ordinary array iteration avoids these unsafe reads. native approach">
 <th scope="row">Julia<small>Julia 1.10+ / Distributed standard library</small></th>
 <td><a class="source" href="code/bessel.jl.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.jl">bessel.jl ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 julia --startup-file=no bessel.jl examples/values.txt julia-results.csv 2</pre></details></td>
-<td>Multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap.<small class="process">Distributed.addprocs / pmap on OS workers</small><details><summary>Memory &amp; string features</summary><small>Ptr byte arithmetic and unsafe_load within GC.@preserve; the owning Float64 array stays alive and unmodified.</small><small>strip, startswith, parse, interpolation and Printf output.</small></details></td>
+<td>Multiple dispatch, generators, named tuples, do-blocks, sinpi, pmap.<small class="process">Distributed.addprocs / pmap on OS workers</small><details class="adaptations" id="adaptations-julia" data-edition="julia" data-evidence="untested">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: untested. These notes describe the source.</p><div class="adaptation-note">
+<h4>Real OS workers with definitions available</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Separate Julia processes need the observe definition loaded before they can execute it.</p>
+<p><strong>Implementation:</strong> Distributed.addprocs creates workers; @everywhere includes the source there. The PROGRAM_FILE guard prevents recursive CLI execution, pmap preserves ordering, and finally removes workers.</p>
+<p><strong>Tradeoff / dependency:</strong> Uses the Distributed standard library and pays process/loading overhead. This design is source-reviewed; execution remains untested.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.jl.html#L-90">Worker setup</a> · <a href="code/bessel.jl.html#L-114">Entry guard</a></p></div><div class="adaptation-note">
+<h4>Raw-pointer lifetime</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> A raw Ptr alone does not keep its owning array alive.</p>
+<p><strong>Implementation:</strong> GC.@preserve retains samples while pointer arithmetic and unsafe_load read aligned Float64 elements.</p>
+<p><strong>Tradeoff / dependency:</strong> Bounds and lifetime are the programmer’s responsibility in this demonstration; ordinary array iteration avoids these unsafe reads.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.jl.html#L-17">observe</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Ptr byte arithmetic and unsafe_load within GC.@preserve; the owning Float64 array stays alive and unmodified.</small><small>strip, startswith, parse, interpolation and Printf output.</small></details></td>
 <td><span class="badge untested" title="Tool or executable unavailable: julia">untested</span>
 <small>Tool or executable unavailable: julia</small></td></tr>
-<tr data-search="kotlin kotlin 1.9+ + jvm 17 data classes, when, collection pipelines, use, require and finally. processbuilder starts separate jvms">
+<tr id="language-kotlin" data-search="kotlin kotlin 1.9+ + jvm 17 data classes, when, collection pipelines, use, require and finally. processbuilder starts separate jvms jvm object references and bytebuffer getdouble at checked byte offsets; raw pointers are not available on this target. trim, startswith, conversions, string interpolation and locale.root formatting. pointer and offset demonstration this kotlin/jvm target has managed references, not kotlin/native raw pointers. use java bytebuffer and checked getdouble byte offsets to traverse the shared sample allocation. the memory example describes jvm buffer semantics, not raw address arithmetic. native approach real os worker processes threads or coroutines within the jvm would not satisfy the os-process objective. processbuilder launches besselkt in separate jvms using the current classpath. bounded batches collect rows in order and finally reaps children. uses jvm interoperability; each observation pays jvm startup cost. use and finally provide native resource/error handling. native approach">
 <th scope="row">Kotlin<small>Kotlin 1.9+ + JVM 17</small></th>
 <td><a class="source" href="code/Bessel.kt.html">View highlighted code →</a></td>
 <td><a class="source" href="Bessel.kt">Bessel.kt ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 kotlinc Bessel.kt -include-runtime -d build/bessel-kotlin.jar
 java -jar build/bessel-kotlin.jar examples/values.txt kotlin-results.csv 2</pre></details></td>
-<td>Data classes, when, collection pipelines, use, require and finally.<small class="process">ProcessBuilder starts separate JVMs</small><details><summary>Memory &amp; string features</summary><small>JVM object references and ByteBuffer getDouble at checked byte offsets; raw pointers are not available on this target.</small><small>trim, startsWith, conversions, string interpolation and Locale.ROOT formatting.</small></details></td>
+<td>Data classes, when, collection pipelines, use, require and finally.<small class="process">ProcessBuilder starts separate JVMs</small><details class="adaptations" id="adaptations-kotlin" data-edition="kotlin" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Pointer and offset demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> This Kotlin/JVM target has managed references, not Kotlin/Native raw pointers.</p>
+<p><strong>Implementation:</strong> Use Java ByteBuffer and checked getDouble byte offsets to traverse the shared sample allocation.</p>
+<p><strong>Tradeoff / dependency:</strong> The memory example describes JVM buffer semantics, not raw address arithmetic.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.kt.html#L-37">observe</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Threads or coroutines within the JVM would not satisfy the OS-process objective.</p>
+<p><strong>Implementation:</strong> ProcessBuilder launches BesselKt in separate JVMs using the current classpath. Bounded batches collect rows in order and finally reaps children.</p>
+<p><strong>Tradeoff / dependency:</strong> Uses JVM interoperability; each observation pays JVM startup cost. use and finally provide native resource/error handling.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.kt.html#L-51">batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>JVM object references and ByteBuffer getDouble at checked byte offsets; raw pointers are not available on this target.</small><small>trim, startsWith, conversions, string interpolation and Locale.ROOT formatting.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="lingua::romana::perligata posix perl + cpan lingua::romana::perligata 0.605 latin-root vocabulary, inflected nouns and verbs, roman numerals, sic/cis blocks, native evolute/scribe/claude i/o, adnota and ecce comments; separately browsable perl compatibility module. latin scheduling loop uses registered perl fork calls, bounded pid batches, checked waitpid and private per-observation files with parent-owned cleanup.">
+<tr id="language-perligata" data-search="lingua::romana::perligata posix perl + cpan lingua::romana::perligata 0.605 latin-root vocabulary, inflected nouns and verbs, roman numerals, sic/cis blocks, native evolute/scribe/claude i/o, adnota and ecce comments; separately browsable perl compatibility module. latin scheduling loop uses registered perl fork calls, bounded pid batches, checked waitpid and private per-observation files with parent-owned cleanup. latin ad creates a scalar reference for in-place trim; agtorem supplies a code reference to the exception boundary. perl references retain their owners. no raw pointer arithmetic. latin excerpementum (substr), serementum (concatenation), chr punctuation and a regex validation bridge; raw reads preserve decimal input instead of converting roman numerals. unchanged decimal input and validation perligata 0.605 perlege converts roman numerals, and its regex syntax is unimplemented. besselperligata.pm exports accip for unchanged line reads and prob for complete finite-decimal validation. a line containing i stays invalid instead of becoming 1. requires the disclosed perl compatibility module. native latin file opening, writing and closing remain in the main listing. workaround checked workers and error cleanup the restricted latin syntax needs access to checked perl os services and an exception boundary. gign registers forked children, collig checks waitpid, and teg wraps the latin action in eval and parent-owned cleanup. private per-observation files carry ordered rows. the adapter handles os/error mechanics; the latin listing retains quadrature and scheduling. the helper is included in validation hashes. workaround">
 <th scope="row">Lingua::Romana::Perligata<small>POSIX Perl + CPAN Lingua::Romana::Perligata 0.605</small></th>
 <td><a class="source" href="code/bessel-perligata.pl.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel-perligata.pl">bessel-perligata.pl ↗</a><small><a href="BesselPerligata.pm">BesselPerligata.pm</a> · <a href="code/BesselPerligata.pm.html">highlighted</a></small>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 perl bessel-perligata.pl examples/values.txt perligata-results.csv 2</pre></details></td>
-<td>Latin-root vocabulary, inflected nouns and verbs, Roman numerals, sic/cis blocks, native evolute/scribe/claude I/O, adnota and ecce comments; separately browsable Perl compatibility module.<small class="process">Latin scheduling loop uses registered Perl fork calls, bounded PID batches, checked waitpid and private per-observation files with parent-owned cleanup.</small><details><summary>Memory &amp; string features</summary><small>Latin ad creates a scalar reference for in-place trim; agtorem supplies a code reference to the exception boundary. Perl references retain their owners. No raw pointer arithmetic.</small><small>Latin excerpementum (substr), serementum (concatenation), chr punctuation and a regex validation bridge; raw reads preserve decimal input instead of converting Roman numerals.</small></details></td>
+<td>Latin-root vocabulary, inflected nouns and verbs, Roman numerals, sic/cis blocks, native evolute/scribe/claude I/O, adnota and ecce comments; separately browsable Perl compatibility module.<small class="process">Latin scheduling loop uses registered Perl fork calls, bounded PID batches, checked waitpid and private per-observation files with parent-owned cleanup.</small><details class="adaptations" id="adaptations-perligata" data-edition="perligata" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Unchanged decimal input and validation</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Perligata 0.605 perlege converts Roman numerals, and its regex syntax is unimplemented.</p>
+<p><strong>Implementation:</strong> BesselPerligata.pm exports accip for unchanged line reads and prob for complete finite-decimal validation. A line containing I stays invalid instead of becoming 1.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires the disclosed Perl compatibility module. Native Latin file opening, writing and closing remain in the main listing.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/BesselPerligata.pm.html#L-74">accip</a> · <a href="code/BesselPerligata.pm.html#L-44">prob</a></p></div><div class="adaptation-note">
+<h4>Checked workers and error cleanup</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> The restricted Latin syntax needs access to checked Perl OS services and an exception boundary.</p>
+<p><strong>Implementation:</strong> gign registers forked children, collig checks waitpid, and teg wraps the Latin action in eval and parent-owned cleanup. Private per-observation files carry ordered rows.</p>
+<p><strong>Tradeoff / dependency:</strong> The adapter handles OS/error mechanics; the Latin listing retains quadrature and scheduling. The helper is included in validation hashes.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/BesselPerligata.pm.html#L-105">gign</a> · <a href="code/BesselPerligata.pm.html#L-160">teg</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Latin ad creates a scalar reference for in-place trim; agtorem supplies a code reference to the exception boundary. Perl references retain their owners. No raw pointer arithmetic.</small><small>Latin excerpementum (substr), serementum (concatenation), chr punctuation and a regex validation bridge; raw reads preserve decimal input instead of converting Roman numerals.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="lisp common lisp / sbcl 2.x conditions, a skip-value restart, loop, with-open-file and unwind-protect. sbcl run-program with asynchronous os processes">
+<tr id="language-lisp" data-search="lisp common lisp / sbcl 2.x conditions, a skip-value restart, loop, with-open-file and unwind-protect. sbcl run-program with asynchronous os processes sbcl vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. this is an explicitly implementation-specific pointer example. string-trim, read-from-string with reader evaluation disabled, subseq and format. os workers and raw-pointer access these process and memory facilities are implementation-specific in this common lisp edition. sbcl run-program starts asynchronous worker interpreters. vector-sap and sap+ traverse the sample vector while with-pinned-objects prevents gc relocation. requires sbcl; the explicit pointer example and os interfaces are not portable ansi common lisp. platform dependency recoverable input errors common lisp already supplies conditions and restarts, allowing recovery without abandoning the input session. read-values installs a handler that invokes skip-value; restart-case discards the malformed observation. fatal conditions reach the outer handler-case. no exception workaround is needed. recovery is deliberately limited to the numeric-input operation. native approach">
 <th scope="row">Lisp<small>Common Lisp / SBCL 2.x</small></th>
 <td><a class="source" href="code/bessel.lisp.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.lisp">bessel.lisp ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 sbcl --script bessel.lisp examples/values.txt lisp-results.csv 2</pre></details></td>
-<td>Conditions, a skip-value restart, LOOP, WITH-OPEN-FILE and UNWIND-PROTECT.<small class="process">SBCL run-program with asynchronous OS processes</small><details><summary>Memory &amp; string features</summary><small>SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.</small><small>STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.</small></details></td>
+<td>Conditions, a skip-value restart, LOOP, WITH-OPEN-FILE and UNWIND-PROTECT.<small class="process">SBCL run-program with asynchronous OS processes</small><details class="adaptations" id="adaptations-lisp" data-edition="lisp" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>OS workers and raw-pointer access</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> These process and memory facilities are implementation-specific in this Common Lisp edition.</p>
+<p><strong>Implementation:</strong> SBCL run-program starts asynchronous worker interpreters. vector-sap and sap+ traverse the sample vector while with-pinned-objects prevents GC relocation.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires SBCL; the explicit pointer example and OS interfaces are not portable ANSI Common Lisp.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.lisp.html#L-89">batch</a> · <a href="code/bessel.lisp.html#L-44">Pinned sample storage</a></p></div><div class="adaptation-note">
+<h4>Recoverable input errors</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Common Lisp already supplies conditions and restarts, allowing recovery without abandoning the input session.</p>
+<p><strong>Implementation:</strong> read-values installs a handler that invokes skip-value; restart-case discards the malformed observation. Fatal conditions reach the outer handler-case.</p>
+<p><strong>Tradeoff / dependency:</strong> No exception workaround is needed. Recovery is deliberately limited to the numeric-input operation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.lisp.html#L-66">read-values</a></p></div></details><details><summary>Memory &amp; string features</summary><small>SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.</small><small>STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="lua lua 5.4 + luaposix tables, closures, protected calls, to-be-closed local, small explicit modules. luaposix fork, pipes and wait">
+<tr id="language-lua" data-search="lua lua 5.4 + luaposix tables, closures, protected calls, to-be-closed local, small explicit modules. luaposix fork, pipes and wait tables are passed by reference and process pipes are handles. standard lua 5.4 has no raw-pointer arithmetic; no luajit ffi is assumed. lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct csv. real os worker processes lua’s standard library does not provide the fork/pipe/wait interfaces used here. load luaposix modules for process creation, pipe transfers, child pids and wait status; keep the numerical kernel in lua. requires lua 5.4 plus luaposix on posix. missing-module errors are caught by the protected entry call. platform dependency graceful errors and cleanup lua provides protected calls rather than try/catch syntax. pcall catches numeric, batch and top-level errors. batch cleanup closes descriptors and waits before rethrowing; a to-be-closed local scopes the output file. protected calls are native error handling. child-resource cleanup is explicit, and the output scope requires lua 5.4. native approach">
 <th scope="row">Lua<small>Lua 5.4 + luaposix</small></th>
 <td><a class="source" href="code/bessel.lua.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.lua">bessel.lua ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 lua bessel.lua examples/values.txt lua-results.csv 2</pre></details></td>
-<td>Tables, closures, protected calls, to-be-closed local, small explicit modules.<small class="process">luaposix fork, pipes and wait</small><details><summary>Memory &amp; string features</summary><small>Tables are passed by reference and process pipes are handles. Standard Lua 5.4 has no raw-pointer arithmetic; no LuaJIT FFI is assumed.</small><small>Lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct CSV.</small></details></td>
+<td>Tables, closures, protected calls, to-be-closed local, small explicit modules.<small class="process">luaposix fork, pipes and wait</small><details class="adaptations" id="adaptations-lua" data-edition="lua" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> Lua’s standard library does not provide the fork/pipe/wait interfaces used here.</p>
+<p><strong>Implementation:</strong> Load luaposix modules for process creation, pipe transfers, child PIDs and wait status; keep the numerical kernel in Lua.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Lua 5.4 plus luaposix on POSIX. Missing-module errors are caught by the protected entry call.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.lua.html#L-18">luaposix imports</a></p></div><div class="adaptation-note">
+<h4>Graceful errors and cleanup</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Lua provides protected calls rather than try/catch syntax.</p>
+<p><strong>Implementation:</strong> pcall catches numeric, batch and top-level errors. Batch cleanup closes descriptors and waits before rethrowing; a to-be-closed local scopes the output file.</p>
+<p><strong>Tradeoff / dependency:</strong> Protected calls are native error handling. Child-resource cleanup is explicit, and the output scope requires Lua 5.4.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.lua.html#L-69">Batch protection</a> · <a href="code/bessel.lua.html#L-105">Output lifetime</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Tables are passed by reference and process pipes are handles. Standard Lua 5.4 has no raw-pointer arithmetic; no LuaJIT FFI is assumed.</small><small>Lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct CSV.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="oberon-2 oxford oberon-2 obc 3 + posix c toolchain modules, typed record pointers, var parameters, explicit error checks, longreal quadrature. bounded fork/pipe batches through the supplied checked posix adapter.">
+<tr id="language-oberon" data-search="oberon-2 oxford oberon-2 obc 3 + posix c toolchain modules, typed record pointers, var parameters, explicit error checks, longreal quadrature. bounded fork/pipe batches through the supplied checked posix adapter. typed pointer owns a sample record; system.adr/get and byte offsets traverse it without intervening allocations. var-based in-place whitespace trimming, char scanning, nul-terminated cli strings, checked numeric conversion. checked os processes and i/o the core oberon-2 language does not supply the posix/stdio services required by this executable. bessel.mod imports the supplied c adapter for checked fork, pipes, complete transfers, waiting and file i/o. scheduling, longreal quadrature and address traversal stay in oberon. requires oxford obc, a c toolchain and posix. the adapter contains no bessel kernel; input lines are bounded to 4095 bytes. workaround graceful error handling this oberon-2 implementation uses explicit status checks rather than catchable exception unwinding. the adapter returns checked statuses; fail emits a diagnostic, calls cleanup, and halts with status 1. failure paths must call the cleanup procedure explicitly; the adapter tracks owned streams, descriptors and child pids. workaround">
 <th scope="row">Oberon-2<small>Oxford Oberon-2 OBC 3 + POSIX C toolchain</small></th>
 <td><a class="source" href="code/Bessel.Mod.html">View highlighted code →</a></td>
 <td><a class="source" href="Bessel.Mod">Bessel.Mod ↗</a><small><a href="bessel-oberon-posix.c">bessel-oberon-posix.c</a> · <a href="code/bessel-oberon-posix.c.html">highlighted</a></small><small><a href="tools/build_oberon.sh">tools/build_oberon.sh</a> · <a href="code/tools_build_oberon.sh.html">highlighted</a></small>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 sh tools/build_oberon.sh
 build/bessel-oberon examples/values.txt oberon-results.csv 2</pre></details></td>
-<td>Modules, typed record pointers, VAR parameters, explicit error checks, LONGREAL quadrature.<small class="process">Bounded fork/pipe batches through the supplied checked POSIX adapter.</small><details><summary>Memory &amp; string features</summary><small>Typed pointer owns a sample record; SYSTEM.ADR/GET and byte offsets traverse it without intervening allocations.</small><small>VAR-based in-place whitespace trimming, CHAR scanning, NUL-terminated CLI strings, checked numeric conversion.</small></details></td>
+<td>Modules, typed record pointers, VAR parameters, explicit error checks, LONGREAL quadrature.<small class="process">Bounded fork/pipe batches through the supplied checked POSIX adapter.</small><details class="adaptations" id="adaptations-oberon" data-edition="oberon" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Checked OS processes and I/O</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> The core Oberon-2 language does not supply the POSIX/stdio services required by this executable.</p>
+<p><strong>Implementation:</strong> Bessel.Mod imports the supplied C adapter for checked fork, pipes, complete transfers, waiting and file I/O. Scheduling, LONGREAL quadrature and address traversal stay in Oberon.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Oxford OBC, a C toolchain and POSIX. The adapter contains no Bessel kernel; input lines are bounded to 4095 bytes.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.Mod.html#L-35">Oberon imports</a> · <a href="code/bessel-oberon-posix.c.html#L-56">C adapter</a></p></div><div class="adaptation-note">
+<h4>Graceful error handling</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> This Oberon-2 implementation uses explicit status checks rather than catchable exception unwinding.</p>
+<p><strong>Implementation:</strong> The adapter returns checked statuses; Fail emits a diagnostic, calls Cleanup, and HALTs with status 1.</p>
+<p><strong>Tradeoff / dependency:</strong> Failure paths must call the cleanup procedure explicitly; the adapter tracks owned streams, descriptors and child PIDs.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/Bessel.Mod.html#L-58">Fail</a> · <a href="code/bessel-oberon-posix.c.html#L-115">Adapter cleanup</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Typed pointer owns a sample record; SYSTEM.ADR/GET and byte offsets traverse it without intervening allocations.</small><small>VAR-based in-place whitespace trimming, CHAR scanning, NUL-terminated CLI strings, checked numeric conversion.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="objective-c foundation: macos or gnustep objective-c class messages, foundation collections, nstask, nserror and @try/@finally. nstask child executables">
+<tr id="language-objc" data-search="objective-c foundation: macos or gnustep objective-c class messages, foundation collections, nstask, nserror and @try/@finally. nstask child executables objective-c object references coexist with c double pointers, one-past array bounds and ++cursor element arithmetic. nsstring trimming/prefix checks, nsscanner parsing, utf-8 conversion and string formatting. unifying different error conventions foundation and c calls report failures through a mixture of nserror, return values and exceptions. check c i/o and foundation write results, translate failures through fail into nsexception, and use @finally for file/buffer and child cleanup. exceptions are already supported. this edition chooses a common reporting boundary but must still check nonthrowing apis explicitly. native approach real os worker processes this edition uses foundation’s process facilities in addition to the objective-c language. nstask relaunches the executable with --worker; nspipe carries the row, and the parent checks terminationstatus before accepting it. requires macos foundation or gnustep and an objective-c runtime; the build commands differ by platform. platform dependency">
 <th scope="row">Objective-C<small>Foundation: macOS or GNUstep</small></th>
 <td><a class="source" href="code/bessel.m.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.m">bessel.m ↗</a>
@@ -228,118 +450,269 @@ clang -fobjc-exceptions bessel.m -framework Foundation -o build/bessel-objc
 # GNUstep (GNUstep development headers and Objective-C runtime required):
 clang $(gnustep-config --objc-flags) bessel.m -o build/bessel-objc $(gnustep-config --base-libs)
 build/bessel-objc examples/values.txt objc-results.csv 2</pre></details></td>
-<td>Objective-C class messages, Foundation collections, NSTask, NSError and @try/@finally.<small class="process">NSTask child executables</small><details><summary>Memory &amp; string features</summary><small>Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.</small><small>NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.</small></details></td>
+<td>Objective-C class messages, Foundation collections, NSTask, NSError and @try/@finally.<small class="process">NSTask child executables</small><details class="adaptations" id="adaptations-objc" data-edition="objc" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Unifying different error conventions</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Foundation and C calls report failures through a mixture of NSError, return values and exceptions.</p>
+<p><strong>Implementation:</strong> Check C I/O and Foundation write results, translate failures through Fail into NSException, and use @finally for file/buffer and child cleanup.</p>
+<p><strong>Tradeoff / dependency:</strong> Exceptions are already supported. This edition chooses a common reporting boundary but must still check nonthrowing APIs explicitly.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.m.html#L-17">Fail</a> · <a href="code/bessel.m.html#L-127">NSError conversion</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This edition uses Foundation’s process facilities in addition to the Objective-C language.</p>
+<p><strong>Implementation:</strong> NSTask relaunches the executable with --worker; NSPipe carries the row, and the parent checks terminationStatus before accepting it.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires macOS Foundation or GNUstep and an Objective-C runtime; the build commands differ by platform.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.m.html#L-105">NSTask launch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.</small><small>NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="ocaml ocaml 4.14+ + unix algebraic variants, pattern matching, recursive list processing, fun.protect. unix.fork and pipes">
+<tr id="language-ocaml" data-search="ocaml ocaml 4.14+ + unix algebraic variants, pattern matching, recursive list processing, fun.protect. unix.fork and pipes ref cells, shared values and mutable array/channel handles. portable ocaml does not expose raw address arithmetic. string.trim, prefix indexing, float_of_string, concatenation and printf. real os worker processes the selected process interface comes from the unix library. unix.fork creates numeric children, pipes carry results, and waitpid is matched against wexited 0. fun.protect closes channels and reaps children. requires unix library linkage and posix fork support. exceptions and cleanup combinators are native ocaml facilities. platform dependency memory-model comparison portable ocaml does not expose raw pointer arithmetic. a ref cell holds the mutable sum; lists retain input values and referenced child records hold pids/channel handles. the comparison uses managed references and handles rather than claiming they are raw addresses. native approach">
 <th scope="row">OCaml<small>OCaml 4.14+ + Unix</small></th>
 <td><a class="source" href="code/bessel.ml.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.ml">bessel.ml ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 ocamlopt -I +unix unix.cmxa bessel.ml -o build/bessel-ocaml
 build/bessel-ocaml examples/values.txt ocaml-results.csv 2</pre></details></td>
-<td>Algebraic variants, pattern matching, recursive list processing, Fun.protect.<small class="process">Unix.fork and pipes</small><details><summary>Memory &amp; string features</summary><small>ref cells, shared values and mutable array/channel handles. Portable OCaml does not expose raw address arithmetic.</small><small>String.trim, prefix indexing, float_of_string, concatenation and Printf.</small></details></td>
+<td>Algebraic variants, pattern matching, recursive list processing, Fun.protect.<small class="process">Unix.fork and pipes</small><details class="adaptations" id="adaptations-ocaml" data-edition="ocaml" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> The selected process interface comes from the Unix library.</p>
+<p><strong>Implementation:</strong> Unix.fork creates numeric children, pipes carry results, and waitpid is matched against WEXITED 0. Fun.protect closes channels and reaps children.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Unix library linkage and POSIX fork support. Exceptions and cleanup combinators are native OCaml facilities.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.ml.html#L-54">batch</a></p></div><div class="adaptation-note">
+<h4>Memory-model comparison</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Portable OCaml does not expose raw pointer arithmetic.</p>
+<p><strong>Implementation:</strong> A ref cell holds the mutable sum; lists retain input values and referenced child records hold PIDs/channel handles.</p>
+<p><strong>Tradeoff / dependency:</strong> The comparison uses managed references and handles rather than claiming they are raw addresses.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.ml.html#L-20">Accumulator reference</a> · <a href="code/bessel.ml.html#L-54">Child references</a></p></div></details><details><summary>Memory &amp; string features</summary><small>ref cells, shared values and mutable array/channel handles. Portable OCaml does not expose raw address arithmetic.</small><small>String.trim, prefix indexing, float_of_string, concatenation and Printf.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="pascal free pascal 3.2+ procedures, dynamic arrays, try/except and try/finally, tprocess ownership. tprocess child executables in bounded batches">
+<tr id="language-pascal" data-search="pascal free pascal 3.2+ procedures, dynamic arrays, try/except and try/finally, tprocess ownership. tprocess child executables in bounded batches pdouble dereference and inc(cursor) traverse a live double array in element-sized steps. trim, comment-prefix detection, numeric conversion, string concatenation, csv formatting. real os workers and graceful errors this edition targets free pascal’s object pascal libraries rather than minimal standard pascal. tprocess launches separate copies of the executable with pipes. native try/except reports failures, and try/finally terminates/reaps children and frees objects. requires free pascal with sysutils and process. exception support is native to the chosen dialect, not an emulated feature. platform dependency">
 <th scope="row">Pascal<small>Free Pascal 3.2+</small></th>
 <td><a class="source" href="code/bessel.pas.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.pas">bessel.pas ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 fpc -O2 -FUbuild/pascal -obuild/bessel-pascal bessel.pas
 build/bessel-pascal examples/values.txt pascal-results.csv 2</pre></details></td>
-<td>Procedures, dynamic arrays, try/except and try/finally, TProcess ownership.<small class="process">TProcess child executables in bounded batches</small><details><summary>Memory &amp; string features</summary><small>PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.</small><small>Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.</small></details></td>
+<td>Procedures, dynamic arrays, try/except and try/finally, TProcess ownership.<small class="process">TProcess child executables in bounded batches</small><details class="adaptations" id="adaptations-pascal" data-edition="pascal" data-evidence="passed">
+<summary>Objectives &amp; adaptations (1)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS workers and graceful errors</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This edition targets Free Pascal’s Object Pascal libraries rather than minimal standard Pascal.</p>
+<p><strong>Implementation:</strong> TProcess launches separate copies of the executable with pipes. Native try/except reports failures, and try/finally terminates/reaps children and frees objects.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Free Pascal with SysUtils and Process. Exception support is native to the chosen dialect, not an emulated feature.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.pas.html#L-55">Run and TProcess</a></p></div></details><details><summary>Memory &amp; string features</summary><small>PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.</small><small>Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="perl perl 5.20+ / posix lexical filehandles, regexes, eval/die, list processing and posix module. fork with pipe handles">
+<tr id="language-perl" data-search="perl perl 5.20+ / posix lexical filehandles, regexes, eval/die, list processing and posix module. fork with pipe handles scalar, array and filehandle references, including referenced child records. this edition uses portable perl references, not fabricated raw addresses. regex trimming, numeric-token recognition, interpolation, printf and string-length checks. exception-safe worker cleanup perl 5.20 already supplies eval/die, but cleanup here is implemented explicitly around eval. batch saves $@ immediately after eval, closes pipe handles and waits for tracked children, then rethrows the original error. the entry boundary prints it and exits nonzero. cleanup must preserve the original exception; references to child records provide ownership without raw pointers. native approach">
 <th scope="row">Perl<small>Perl 5.20+ / POSIX</small></th>
 <td><a class="source" href="code/bessel.pl.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.pl">bessel.pl ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 perl bessel.pl examples/values.txt perl-results.csv 2</pre></details></td>
-<td>Lexical filehandles, regexes, eval/die, list processing and POSIX module.<small class="process">fork with pipe handles</small><details><summary>Memory &amp; string features</summary><small>Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.</small><small>Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.</small></details></td>
+<td>Lexical filehandles, regexes, eval/die, list processing and POSIX module.<small class="process">fork with pipe handles</small><details class="adaptations" id="adaptations-perl" data-edition="perl" data-evidence="passed">
+<summary>Objectives &amp; adaptations (1)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Exception-safe worker cleanup</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Perl 5.20 already supplies eval/die, but cleanup here is implemented explicitly around eval.</p>
+<p><strong>Implementation:</strong> batch saves $@ immediately after eval, closes pipe handles and waits for tracked children, then rethrows the original error. The entry boundary prints it and exits nonzero.</p>
+<p><strong>Tradeoff / dependency:</strong> Cleanup must preserve the original exception; references to child records provide ownership without raw pointers.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.pl.html#L-44">batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.</small><small>Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="postscript 64-bit ghostscript on linux; %pipe% and /proc access required operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits. postscript schedules bounded batches of separate ghostscript interpreters through %pipe%; linux /proc supplies real pids.">
+<tr id="language-postscript" data-search="postscript 64-bit ghostscript on linux; %pipe% and /proc access required operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits. postscript schedules bounded batches of separate ghostscript interpreters through %pipe%; linux /proc supplies real pids. arrays and strings are reference objects; getinterval shares a bounded view. input slices are copied before the line buffer is reused. no raw pointer arithmetic. ascii trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered csv serialization. the shared 1e-10 numerical tolerance ghostscript native real arithmetic has insufficient precision for the existing tolerance. implement decimal parsing, 52-bit fractional fixed-point multiplication, range-reduced trigonometry, accumulation and formatting entirely in postscript using 64-bit integers. requires a 64-bit integer ghostscript build and more arithmetic code. the tolerance and 16,384-sample quadrature are preserved; no foreign numerical helper is used. workaround real os worker processes portable postscript does not specify the linux process-launch and pid facilities used here. ghostscript %pipe% launches child interpreters and /proc supplies real pids. the internal posix shell only execs the interpreter; scheduling and result checks are postscript. requires linux /proc and permitted %pipe% access. -dnosafer does not override os restrictions such as apparmor. platform dependency recovering after errors native stop/stopped catches control transfer but does not restore operand and dictionary stacks automatically. record stack depths before parsing, restore them after a rejected token, and continue input. the top-level stopped boundary reports fatal errors and closes tracked files/pipes. error handling is native; explicit stack restoration and resource cleanup are still required. native approach">
 <th scope="row">PostScript<small>64-bit Ghostscript on Linux; %pipe% and /proc access required</small></th>
 <td><a class="source" href="code/bessel.ps.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.ps">bessel.ps ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 gs -q -dNODISPLAY -dBATCH -dNOSAFER -- bessel.ps examples/values.txt postscript-results.csv 2</pre></details></td>
-<td>Operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits.<small class="process">PostScript schedules bounded batches of separate Ghostscript interpreters through %pipe%; Linux /proc supplies real PIDs.</small><details><summary>Memory &amp; string features</summary><small>Arrays and strings are reference objects; getinterval shares a bounded view. Input slices are copied before the line buffer is reused. No raw pointer arithmetic.</small><small>ASCII trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered CSV serialization.</small></details></td>
+<td>Operand stacks, dictionaries, procedures, stopped error handling, and integer fixed-point arithmetic with 52 fractional bits.<small class="process">PostScript schedules bounded batches of separate Ghostscript interpreters through %pipe%; Linux /proc supplies real PIDs.</small><details class="adaptations" id="adaptations-postscript" data-edition="postscript" data-evidence="passed">
+<summary>Objectives &amp; adaptations (3)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>The shared 1e-10 numerical tolerance</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Ghostscript native real arithmetic has insufficient precision for the existing tolerance.</p>
+<p><strong>Implementation:</strong> Implement decimal parsing, 52-bit fractional fixed-point multiplication, range-reduced trigonometry, accumulation and formatting entirely in PostScript using 64-bit integers.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires a 64-bit integer Ghostscript build and more arithmetic code. The tolerance and 16,384-sample quadrature are preserved; no foreign numerical helper is used.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.ps.html#L-19">fmul</a> · <a href="code/bessel.ps.html#L-154">cosine and observe</a></p></div><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> Portable PostScript does not specify the Linux process-launch and PID facilities used here.</p>
+<p><strong>Implementation:</strong> Ghostscript %pipe% launches child interpreters and /proc supplies real PIDs. The internal POSIX shell only execs the interpreter; scheduling and result checks are PostScript.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Linux /proc and permitted %pipe% access. -dNOSAFER does not override OS restrictions such as AppArmor.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.ps.html#L-204">processId</a> · <a href="code/bessel.ps.html#L-268">launch and collect</a></p></div><div class="adaptation-note">
+<h4>Recovering after errors</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Native stop/stopped catches control transfer but does not restore operand and dictionary stacks automatically.</p>
+<p><strong>Implementation:</strong> Record stack depths before parsing, restore them after a rejected token, and continue input. The top-level stopped boundary reports fatal errors and closes tracked files/pipes.</p>
+<p><strong>Tradeoff / dependency:</strong> Error handling is native; explicit stack restoration and resource cleanup are still required.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.ps.html#L-219">readValues</a> · <a href="code/bessel.ps.html#L-373">cleanup and error boundary</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Arrays and strings are reference objects; getinterval shares a bounded view. Input slices are copied before the line buffer is reused. No raw pointer arithmetic.</small><small>ASCII trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered CSV serialization.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="prolog swi-prolog 9.x relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3. library(process) creates separate swi-prolog os workers">
+<tr id="language-prolog" data-search="prolog swi-prolog 9.x relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3. library(process) creates separate swi-prolog os workers logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic. normalize_space, sub_string, number_string, atom/string conversion and format. real os worker processes this edition needs swi-prolog’s process library in addition to logical evaluation. process_create starts a separate swi executable per value; nested setup_call_cleanup scopes keep streams and pids available until collection or failure. depends on swi-prolog library(process); each observation starts an interpreter. catch and cleanup are supplied facilities. platform dependency graceful failure and memory semantics a predicate may fail logically as well as throw an exception; logical variables are not raw memory pointers. main converts unsuccessful run goals into a program_failed exception and catches it for a diagnostic/status 1. results travel through unification and stream/worker terms. the interface accounts for both failure modes. memory examples remain logical bindings and opaque handles. native approach">
 <th scope="row">Prolog<small>SWI-Prolog 9.x</small></th>
 <td><a class="source" href="code/bessel.pro.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.pro">bessel.pro ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 swipl -q -s bessel.pro -- examples/values.txt prolog-results.csv 2</pre></details></td>
-<td>Relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3.<small class="process">library(process) creates separate SWI-Prolog OS workers</small><details><summary>Memory &amp; string features</summary><small>Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.</small><small>normalize_space, sub_string, number_string, atom/string conversion and format.</small></details></td>
+<td>Relations, unification, recursive accumulation, catch/3, setup_call_cleanup/3.<small class="process">library(process) creates separate SWI-Prolog OS workers</small><details class="adaptations" id="adaptations-prolog" data-edition="prolog" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This edition needs SWI-Prolog’s process library in addition to logical evaluation.</p>
+<p><strong>Implementation:</strong> process_create starts a separate SWI executable per value; nested setup_call_cleanup scopes keep streams and PIDs available until collection or failure.</p>
+<p><strong>Tradeoff / dependency:</strong> Depends on SWI-Prolog library(process); each observation starts an interpreter. catch and cleanup are supplied facilities.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.pro.html#L-78">start_worker</a> · <a href="code/bessel.pro.html#L-108">Scoped launch</a></p></div><div class="adaptation-note">
+<h4>Graceful failure and memory semantics</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> A predicate may fail logically as well as throw an exception; logical variables are not raw memory pointers.</p>
+<p><strong>Implementation:</strong> main converts unsuccessful run goals into a program_failed exception and catches it for a diagnostic/status 1. Results travel through unification and stream/worker terms.</p>
+<p><strong>Tradeoff / dependency:</strong> The interface accounts for both failure modes. Memory examples remain logical bindings and opaque handles.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.pro.html#L-176">main</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.</small><small>normalize_space, sub_string, number_string, atom/string conversion and format.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="python python 3.10+ structural match/case, type hints, generators, context managers, argparse, fsum. a small ctypes example demonstrates pointer offsets. processpoolexecutor with spawn context">
+<tr id="language-python" data-search="python python 3.10+ structural match/case, type hints, generators, context managers, argparse, fsum. a small ctypes example demonstrates pointer offsets. processpoolexecutor with spawn context ctypes array ownership, byref(array, byte_offset), pointer(c_double) casts and contents dereference. math.fsum remains the reducer. strip, startswith, float parsing, f-strings and csv.writer serialization. real os workers with safe startup spawned python processes import the module, so an unguarded cli would start recursively. processpoolexecutor uses an explicit spawn context and ordered map. the __main__ guard separates importable worker definitions from the command-line entry point. standard-library facilities suffice. spawn incurs interpreter/import overhead and requires an importable worker function. native approach pointer and offset demonstration ordinary python objects provide references, not c-style pointer arithmetic. a ctypes double array owns the samples. byref supplies byte offsets, cast provides typed pointers, and contents reads them while the array stays alive. this is an explicit ctypes example with manual bounds/lifetime reasoning; math.fsum remains the numerical reducer. native approach">
 <th scope="row">Python<small>Python 3.10+</small></th>
 <td><a class="source" href="code/bessel.py.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.py">bessel.py ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 python3 bessel.py examples/values.txt python-results.csv 2</pre></details></td>
-<td>Structural match/case, type hints, generators, context managers, argparse, fsum. A small ctypes example demonstrates pointer offsets.<small class="process">ProcessPoolExecutor with spawn context</small><details><summary>Memory &amp; string features</summary><small>ctypes array ownership, byref(array, byte_offset), POINTER(c_double) casts and contents dereference. math.fsum remains the reducer.</small><small>strip, startswith, float parsing, f-strings and csv.writer serialization.</small></details></td>
+<td>Structural match/case, type hints, generators, context managers, argparse, fsum. A small ctypes example demonstrates pointer offsets.<small class="process">ProcessPoolExecutor with spawn context</small><details class="adaptations" id="adaptations-python" data-edition="python" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Real OS workers with safe startup</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Spawned Python processes import the module, so an unguarded CLI would start recursively.</p>
+<p><strong>Implementation:</strong> ProcessPoolExecutor uses an explicit spawn context and ordered map. The __main__ guard separates importable worker definitions from the command-line entry point.</p>
+<p><strong>Tradeoff / dependency:</strong> Standard-library facilities suffice. Spawn incurs interpreter/import overhead and requires an importable worker function.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.py.html#L-95">Process pool</a> · <a href="code/bessel.py.html#L-116">Entry guard</a></p></div><div class="adaptation-note">
+<h4>Pointer and offset demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Ordinary Python objects provide references, not C-style pointer arithmetic.</p>
+<p><strong>Implementation:</strong> A ctypes double array owns the samples. byref supplies byte offsets, cast provides typed pointers, and contents reads them while the array stays alive.</p>
+<p><strong>Tradeoff / dependency:</strong> This is an explicit ctypes example with manual bounds/lifetime reasoning; math.fsum remains the numerical reducer.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.py.html#L-38">observe</a></p></div></details><details><summary>Memory &amp; string features</summary><small>ctypes array ownership, byref(array, byte_offset), POINTER(c_double) casts and contents dereference. math.fsum remains the reducer.</small><small>strip, startswith, float parsing, f-strings and csv.writer serialization.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="rpg ibm i 7.5, ile rpg + db2 sql + qc2le; see rpg_setup.txt fully free rpg, monitor/on-error, prototyped calls, embedded sql, native job messages. sbmjob creates bounded ibm i batch jobs; dedicated queue must permit concurrent execution.">
+<tr id="language-rpg" data-search="rpg ibm i 7.5, ile rpg + db2 sql + qc2le; see rpg_setup.txt fully free rpg, monitor/on-error, prototyped calls, embedded sql, native job messages. sbmjob creates bounded ibm i batch jobs; dedicated queue must permit concurrent execution. pointer, %addr, based aliases, by-reference parameters, and byte-wise pointer advancement by %size. %trim, %check, %subst, %scanrpl, %char, concatenation and ccsid-aware ifs services. real os workers and result exchange ibm i uses submitted jobs and job queues rather than this project’s posix fork/pipe interface. sbmjob starts numeric batch jobs; db2 work_items rows carry input, results and state. bounded batches poll for completion and workers record getpid(). requires ibm i, configured queue/subsystem concurrency and database setup. timeout is 600 seconds; failed rows remain and submitted jobs may finish after parent failure. platform dependency input/output and graceful errors the ibm i call/5250 interface differs from unix argv, stdin and stderr. use padded call parameters, dsply input, db2 ifs services and monitor/on-error. checksql translates sql status into escape messages through die. paths are limited to 32 characters and interactive input needs a 5250 job. errors use native job messages; compilation and execution remain untested. platform dependency">
 <th scope="row">RPG<small>IBM i 7.5, ILE RPG + Db2 SQL + QC2LE; see rpg_setup.txt</small></th>
 <td><a class="source" href="code/bessel.sqlrpgle.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.sqlrpgle">bessel.sqlrpgle ↗</a><small><a href="rpg_setup.txt">rpg_setup.txt</a></small><small><a href="rpg_setup.sql">rpg_setup.sql</a> · <a href="code/rpg_setup.sql.html">highlighted</a></small>
 <details><summary>Build &amp; run</summary><pre>See rpg_setup.txt for compilation and queue setup.
 CALL PGM(BESSELAB/BESSEL) PARM(&#x27;/tmp/values.txt&#x27; &#x27;/tmp/results.csv&#x27; &#x27;2&#x27;)</pre></details></td>
-<td>Fully free RPG, MONITOR/ON-ERROR, prototyped calls, embedded SQL, native job messages.<small class="process">SBMJOB creates bounded IBM i batch jobs; dedicated queue must permit concurrent execution.</small><details><summary>Memory &amp; string features</summary><small>POINTER, %ADDR, BASED aliases, by-reference parameters, and byte-wise pointer advancement by %SIZE.</small><small>%TRIM, %CHECK, %SUBST, %SCANRPL, %CHAR, concatenation and CCSID-aware IFS services.</small></details></td>
+<td>Fully free RPG, MONITOR/ON-ERROR, prototyped calls, embedded SQL, native job messages.<small class="process">SBMJOB creates bounded IBM i batch jobs; dedicated queue must permit concurrent execution.</small><details class="adaptations" id="adaptations-rpg" data-edition="rpg" data-evidence="untested">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: untested. These notes describe the source.</p><div class="adaptation-note">
+<h4>Real OS workers and result exchange</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> IBM i uses submitted jobs and job queues rather than this project’s POSIX fork/pipe interface.</p>
+<p><strong>Implementation:</strong> SBMJOB starts numeric batch jobs; Db2 WORK_ITEMS rows carry input, results and state. Bounded batches poll for completion and workers record getpid().</p>
+<p><strong>Tradeoff / dependency:</strong> Requires IBM i, configured queue/subsystem concurrency and database setup. Timeout is 600 seconds; failed rows remain and submitted jobs may finish after parent failure.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sqlrpgle.html#L-133">Job submission</a> · <a href="rpg_setup.txt">IBM i setup</a></p></div><div class="adaptation-note">
+<h4>Input/output and graceful errors</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> The IBM i CALL/5250 interface differs from Unix argv, stdin and stderr.</p>
+<p><strong>Implementation:</strong> Use padded CALL parameters, DSPLY input, Db2 IFS services and MONITOR/ON-ERROR. CheckSql translates SQL status into escape messages through Die.</p>
+<p><strong>Tradeoff / dependency:</strong> Paths are limited to 32 characters and interactive input needs a 5250 job. Errors use native job messages; compilation and execution remain untested.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sqlrpgle.html#L-257">CheckSql and Die</a> · <a href="rpg_setup.txt">Interface contract</a></p></div></details><details><summary>Memory &amp; string features</summary><small>POINTER, %ADDR, BASED aliases, by-reference parameters, and byte-wise pointer advancement by %SIZE.</small><small>%TRIM, %CHECK, %SUBST, %SCANRPL, %CHAR, concatenation and CCSID-aware IFS services.</small></details></td>
 <td><span class="badge untested" title="Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.">untested</span>
 <small>Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.</small></td></tr>
-<tr data-search="ruby ruby 3.x / posix blocks, enumerable sum and each_slice, rescue/ensure, csv library. fork with io.pipe">
+<tr id="language-ruby" data-search="ruby ruby 3.x / posix blocks, enumerable sum and each_slice, rescue/ensure, csv library. fork with io.pipe object references plus fiddle::pointer over a retained packed string; pointer + byte offset and native-double reads. strip, start_with?, pack/unpack, interpolation, numeric conversion and csv serialization. raw-pointer demonstration ordinary ruby arrays and object references do not provide raw pointer arithmetic. pack samples into a retained native-double string and use fiddle::pointer plus byte offsets to read each value. requires the fiddle standard library. the packed storage must stay alive and unchanged; normal ruby would simply sum the array. native approach real os workers with cleanup this edition relies on posix fork support. fork and io.pipe create numeric children; process.wait2 checks status. rescue handles errors and ensure closes pipes and reaps outstanding children. requires a fork-capable platform. exceptions and ensure are native ruby, so no exception emulation is needed. platform dependency">
 <th scope="row">Ruby<small>Ruby 3.x / POSIX</small></th>
 <td><a class="source" href="code/bessel.rb.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.rb">bessel.rb ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 ruby bessel.rb examples/values.txt ruby-results.csv 2</pre></details></td>
-<td>Blocks, Enumerable sum and each_slice, rescue/ensure, CSV library.<small class="process">fork with IO.pipe</small><details><summary>Memory &amp; string features</summary><small>Object references plus Fiddle::Pointer over a retained packed string; pointer + byte offset and native-double reads.</small><small>strip, start_with?, pack/unpack, interpolation, numeric conversion and CSV serialization.</small></details></td>
+<td>Blocks, Enumerable sum and each_slice, rescue/ensure, CSV library.<small class="process">fork with IO.pipe</small><details class="adaptations" id="adaptations-ruby" data-edition="ruby" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Raw-pointer demonstration</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Ordinary Ruby arrays and object references do not provide raw pointer arithmetic.</p>
+<p><strong>Implementation:</strong> Pack samples into a retained native-double string and use Fiddle::Pointer plus byte offsets to read each value.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires the Fiddle standard library. The packed storage must stay alive and unchanged; normal Ruby would simply sum the array.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.rb.html#L-42">observe</a></p></div><div class="adaptation-note">
+<h4>Real OS workers with cleanup</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> This edition relies on POSIX fork support.</p>
+<p><strong>Implementation:</strong> fork and IO.pipe create numeric children; Process.wait2 checks status. rescue handles errors and ensure closes pipes and reaps outstanding children.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires a fork-capable platform. Exceptions and ensure are native Ruby, so no exception emulation is needed.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.rb.html#L-69">parallel_batch</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Object references plus Fiddle::Pointer over a retained packed string; pointer + byte offset and native-double reads.</small><small>strip, start_with?, pack/unpack, interpolation, numeric conversion and CSV serialization.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="rust rust 2021 / standard library result and ?, exhaustive match, iterators, ownership and drop cleanup. std::process::command child executables">
+<tr id="language-rust" data-search="rust rust 2021 / standard library result and ?, exhaustive match, iterators, ownership and drop cleanup. std::process::command child executables borrowed &amp;[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper. trim, starts_with, parse, string accumulation and utf-8 validation. graceful errors and resource cleanup rust represents ordinary recoverable failures with result rather than throw/catch exceptions. use result and ? to propagate errors, match to skip invalid lines, and main to emit a diagnostic/status 1. a worker drop implementation cleans up children it still owns. errors remain explicit in signatures. the cleanup wrapper is needed because merely dropping a child-process handle does not reap it. native approach raw-pointer traversal with ownership dereferencing raw pointers is outside rust’s safe subset. sum_buffer borrows an immutable slice and contains the educational as_ptr().add(i) dereference in one documented unsafe block. the caller retains live storage; each offset is bounded by the slice. ordinary rust would use safe iterator summation. native approach">
 <th scope="row">Rust<small>Rust 2021 / standard library</small></th>
 <td><a class="source" href="code/bessel.rs.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.rs">bessel.rs ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 rustc --edition=2021 -O bessel.rs -o build/bessel-rust
 build/bessel-rust examples/values.txt rust-results.csv 2</pre></details></td>
-<td>Result and ?, exhaustive match, iterators, ownership and Drop cleanup.<small class="process">std::process::Command child executables</small><details><summary>Memory &amp; string features</summary><small>Borrowed &amp;[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.</small><small>trim, starts_with, parse, String accumulation and UTF-8 validation.</small></details></td>
+<td>Result and ?, exhaustive match, iterators, ownership and Drop cleanup.<small class="process">std::process::Command child executables</small><details class="adaptations" id="adaptations-rust" data-edition="rust" data-evidence="passed">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: passed the recorded shared behavior checks.</p><div class="adaptation-note">
+<h4>Graceful errors and resource cleanup</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Rust represents ordinary recoverable failures with Result rather than throw/catch exceptions.</p>
+<p><strong>Implementation:</strong> Use Result and ? to propagate errors, match to skip invalid lines, and main to emit a diagnostic/status 1. A Worker Drop implementation cleans up children it still owns.</p>
+<p><strong>Tradeoff / dependency:</strong> Errors remain explicit in signatures. The cleanup wrapper is needed because merely dropping a child-process handle does not reap it.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.rs.html#L-53">Worker Drop</a> · <a href="code/bessel.rs.html#L-70">run</a></p></div><div class="adaptation-note">
+<h4>Raw-pointer traversal with ownership</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Dereferencing raw pointers is outside Rust’s safe subset.</p>
+<p><strong>Implementation:</strong> sum_buffer borrows an immutable slice and contains the educational as_ptr().add(i) dereference in one documented unsafe block.</p>
+<p><strong>Tradeoff / dependency:</strong> The caller retains live storage; each offset is bounded by the slice. Ordinary Rust would use safe iterator summation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.rs.html#L-39">sum_buffer</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Borrowed &amp;[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.</small><small>trim, starts_with, parse, String accumulation and UTF-8 validation.</small></details></td>
 <td><span class="badge passed" title="11 behavior checks passed.">passed</span>
 <small>11 behavior checks passed.</small></td></tr>
-<tr data-search="smalltalk gnu smalltalk 3.2+ / posix message sends, blocks, inject:into:, orderedcollection, on:do: and ensure:. external gnu smalltalk vms via filestream popen:">
+<tr id="language-smalltalk" data-search="smalltalk gnu smalltalk 3.2+ / posix message sends, blocks, inject:into:, orderedcollection, on:do: and ensure:. external gnu smalltalk vms via filestream popen: object references and indexed collection access. this edition does not expose raw pointers or pretend block fork creates os processes. trimseparators, stream-based parsing, character tests, copyreplaceall: and comma-delimited output. real os worker processes smalltalk block fork is a language-level process, not the separate os worker required here. filestream popen: starts external gnu smalltalk vms, and a getpid c binding reports their os identity. ensure: closes the process pipes. requires gnu smalltalk/posix and launch from the project directory because bessel.st is a relative worker path. execution remains untested. workaround portable numeric text gnu smalltalk floatd printing uses a d exponent marker instead of the shared e notation. decimal: replaces d with e when serializing values for csv and worker arguments. this adapts textual representation only; calculations still use floatd. runtime behavior awaits validation. workaround">
 <th scope="row">Smalltalk<small>GNU Smalltalk 3.2+ / POSIX</small></th>
 <td><a class="source" href="code/bessel.st.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.st">bessel.st ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 gst -f bessel.st examples/values.txt smalltalk-results.csv 2</pre></details></td>
-<td>Message sends, blocks, inject:into:, OrderedCollection, on:do: and ensure:.<small class="process">External GNU Smalltalk VMs via FileStream popen:</small><details><summary>Memory &amp; string features</summary><small>Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.</small><small>trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.</small></details></td>
+<td>Message sends, blocks, inject:into:, OrderedCollection, on:do: and ensure:.<small class="process">External GNU Smalltalk VMs via FileStream popen:</small><details class="adaptations" id="adaptations-smalltalk" data-edition="smalltalk" data-evidence="untested">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: untested. These notes describe the source.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> Smalltalk block fork is a language-level process, not the separate OS worker required here.</p>
+<p><strong>Implementation:</strong> FileStream popen: starts external GNU Smalltalk VMs, and a getpid C binding reports their OS identity. ensure: closes the process pipes.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires GNU Smalltalk/POSIX and launch from the project directory because bessel.st is a relative worker path. Execution remains untested.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.st.html#L-69">batch:</a> · <a href="code/bessel.st.html#L-13">processId</a></p></div><div class="adaptation-note">
+<h4>Portable numeric text</h4><span class="adaptation-kind">Workaround</span>
+<p><strong>Constraint:</strong> GNU Smalltalk FloatD printing uses a d exponent marker instead of the shared e notation.</p>
+<p><strong>Implementation:</strong> decimal: replaces d with e when serializing values for CSV and worker arguments.</p>
+<p><strong>Tradeoff / dependency:</strong> This adapts textual representation only; calculations still use FloatD. Runtime behavior awaits validation.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.st.html#L-37">decimal:</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.</small><small>trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.</small></details></td>
 <td><span class="badge untested" title="Tool or executable unavailable: gst">untested</span>
 <small>Tool or executable unavailable: gst</small></td></tr>
-<tr data-search="sql postgresql 14+ + psql + dblink set-based numeric aggregation, temporary relations, pl/pgsql exceptions, psql variables. dblink_send_query dispatches to separate postgresql backend os processes">
+<tr id="language-sql" data-search="sql postgresql 14+ + psql + dblink set-based numeric aggregation, temporary relations, pl/pgsql exceptions, psql variables. dblink_send_query dispatches to separate postgresql backend os processes relational row keys and ordinal offsets are the native analogue. sql has no raw pointers, object references or pointer arithmetic. btrim, regexp validation, replace, string_to_array, format and array operations. real os worker processes portable sql provides no standalone fork/exec interface for these workers. postgresql dblink_send_query dispatches asynchronous sql aggregates on separate backend connections; pg_backend_pid supplies the worker pid. requires postgresql, dblink setup and authenticated connections. pl/pgsql exception handles failures natively; this edition remains untested. platform dependency file/console input and csv output a database script has a client/server boundary rather than a single executable’s positional argv and local files. psql variables supply options and a comma-separated prompt supplies interactive values. pg_read_file reads on the server; psql redirects ordered csv output to a client-side file. server input needs file-read privileges. the documented interface differs from line-at-a-time stdin and uses relational ordinals instead of pointers. platform dependency">
 <th scope="row">SQL<small>PostgreSQL 14+ + psql + dblink</small></th>
 <td><a class="source" href="code/bessel.sql.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.sql">bessel.sql ↗</a>
 <details><summary>Build &amp; run</summary><pre>psql -X -d observatory -v values=&#x27;0,1,5,10&#x27; -v workers=2 -v output=results.csv -f bessel.sql</pre></details></td>
-<td>Set-based numeric aggregation, temporary relations, PL/pgSQL exceptions, psql variables.<small class="process">dblink_send_query dispatches to separate PostgreSQL backend OS processes</small><details><summary>Memory &amp; string features</summary><small>Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.</small><small>btrim, regexp validation, replace, string_to_array, format and array operations.</small></details></td>
+<td>Set-based numeric aggregation, temporary relations, PL/pgSQL exceptions, psql variables.<small class="process">dblink_send_query dispatches to separate PostgreSQL backend OS processes</small><details class="adaptations" id="adaptations-sql" data-edition="sql" data-evidence="untested">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: untested. These notes describe the source.</p><div class="adaptation-note">
+<h4>Real OS worker processes</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> Portable SQL provides no standalone fork/exec interface for these workers.</p>
+<p><strong>Implementation:</strong> PostgreSQL dblink_send_query dispatches asynchronous SQL aggregates on separate backend connections; pg_backend_pid supplies the worker PID.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires PostgreSQL, dblink setup and authenticated connections. PL/pgSQL EXCEPTION handles failures natively; this edition remains untested.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sql.html#L-112">Asynchronous dispatch</a> · <a href="code/bessel.sql.html#L-132">Failure cleanup</a></p></div><div class="adaptation-note">
+<h4>File/console input and CSV output</h4><span class="adaptation-kind">Platform dependency</span>
+<p><strong>Constraint:</strong> A database script has a client/server boundary rather than a single executable’s positional argv and local files.</p>
+<p><strong>Implementation:</strong> psql variables supply options and a comma-separated prompt supplies interactive values. pg_read_file reads on the server; psql redirects ordered CSV output to a client-side file.</p>
+<p><strong>Tradeoff / dependency:</strong> Server input needs file-read privileges. The documented interface differs from line-at-a-time stdin and uses relational ordinals instead of pointers.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.sql.html#L-73">Server input</a> · <a href="code/bessel.sql.html#L-148">Client output</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.</small><small>btrim, regexp validation, replace, string_to_array, format and array operations.</small></details></td>
 <td><span class="badge untested" title="A local PostgreSQL 18 cluster was initialized, but the sandbox denies creating the server socket. No SQL integration execution is claimed.">untested</span>
 <small>A local PostgreSQL 18 cluster was initialized, but the sandbox denies creating the server socket. No SQL integration execution is claimed.</small></td></tr>
-<tr data-search="swift swift 5.9+ / foundation value types, typed error enum, guard, defer and foundation process. foundation process child executables">
+<tr id="language-swift" data-search="swift swift 5.9+ / foundation value types, typed error enum, guard, defer and foundation process. foundation process child executables foundation class references plus withunsafebufferpointer, advanced(by:) and pointee inside the buffer lifetime. trimming, hasprefix, utf-8 conversion, splitting lines and interpolation. real os workers and graceful errors swift concurrency tasks alone do not provide independent os workers. foundation process launches this executable in --worker mode. typed thrown errors reach do/catch, while defer terminates and waits for outstanding children. requires foundation process on the target platform; process startup occurs per observation. no exception emulation is needed; execution remains untested. native approach scoped raw-pointer access an array’s unsafe buffer pointer is only valid within its borrowing scope. withunsafebufferpointer contains every advanced(by:) and pointee read, with offsets bounded by buffer.count. the example relies on manual bounds reasoning but does not let the pointer escape; ordinary reduction could avoid unsafe access. native approach">
 <th scope="row">Swift<small>Swift 5.9+ / Foundation</small></th>
 <td><a class="source" href="code/bessel.swift.html">View highlighted code →</a></td>
 <td><a class="source" href="bessel.swift">bessel.swift ↗</a>
 <details><summary>Build &amp; run</summary><pre>mkdir -p build build/pascal build/ada build/fortran build/haskell
 swiftc bessel.swift -o build/bessel-swift
 build/bessel-swift examples/values.txt swift-results.csv 2</pre></details></td>
-<td>Value types, typed error enum, guard, defer and Foundation Process.<small class="process">Foundation Process child executables</small><details><summary>Memory &amp; string features</summary><small>Foundation class references plus withUnsafeBufferPointer, advanced(by:) and pointee inside the buffer lifetime.</small><small>Trimming, hasPrefix, UTF-8 conversion, splitting lines and interpolation.</small></details></td>
+<td>Value types, typed error enum, guard, defer and Foundation Process.<small class="process">Foundation Process child executables</small><details class="adaptations" id="adaptations-swift" data-edition="swift" data-evidence="untested">
+<summary>Objectives &amp; adaptations (2)</summary>
+<p class="adaptation-evidence">Edition evidence: untested. These notes describe the source.</p><div class="adaptation-note">
+<h4>Real OS workers and graceful errors</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> Swift concurrency tasks alone do not provide independent OS workers.</p>
+<p><strong>Implementation:</strong> Foundation Process launches this executable in --worker mode. Typed thrown errors reach do/catch, while defer terminates and waits for outstanding children.</p>
+<p><strong>Tradeoff / dependency:</strong> Requires Foundation Process on the target platform; process startup occurs per observation. No exception emulation is needed; execution remains untested.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.swift.html#L-112">Process batch and defer</a></p></div><div class="adaptation-note">
+<h4>Scoped raw-pointer access</h4><span class="adaptation-kind">Native approach</span>
+<p><strong>Constraint:</strong> An Array’s unsafe buffer pointer is only valid within its borrowing scope.</p>
+<p><strong>Implementation:</strong> withUnsafeBufferPointer contains every advanced(by:) and pointee read, with offsets bounded by buffer.count.</p>
+<p><strong>Tradeoff / dependency:</strong> The example relies on manual bounds reasoning but does not let the pointer escape; ordinary reduction could avoid unsafe access.</p>
+<p class="adaptation-links"><strong>Code:</strong> <a href="code/bessel.swift.html#L-56">Borrowed sample buffer</a></p></div></details><details><summary>Memory &amp; string features</summary><small>Foundation class references plus withUnsafeBufferPointer, advanced(by:) and pointee inside the buffer lifetime.</small><small>Trimming, hasPrefix, UTF-8 conversion, splitting lines and interpolation.</small></details></td>
 <td><span class="badge untested" title="Tool or executable unavailable: swiftc">untested</span>
 <small>Tool or executable unavailable: swiftc</small></td></tr></tbody></table></div>
 <p id="empty" hidden>No languages match this filter.</p>

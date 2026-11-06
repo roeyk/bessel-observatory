@@ -173,7 +173,23 @@
       "multiprocessing": "TProcess child executables in bounded batches",
       "memory": "PDouble dereference and Inc(Cursor) traverse a live Double array in element-sized steps.",
       "strings": "Trim, comment-prefix detection, numeric conversion, string concatenation, CSV formatting.",
-      "highlighted": "code/bessel.pas.html"
+      "highlighted": "code/bessel.pas.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers and graceful errors",
+          "kind": "platform",
+          "constraint": "This edition targets Free Pascal\u2019s Object Pascal libraries rather than minimal standard Pascal.",
+          "approach": "TProcess launches separate copies of the executable with pipes. Native try/except reports failures, and try/finally terminates/reaps children and frees objects.",
+          "tradeoff": "Requires Free Pascal with SysUtils and Process. Exception support is native to the chosen dialect, not an emulated feature.",
+          "references": [
+            {
+              "source": "bessel.pas",
+              "match": "procedure Run;",
+              "label": "Run and TProcess"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "ada",
@@ -197,7 +213,47 @@
       "multiprocessing": "POSIX fork, pipe and waitpid",
       "memory": "Borrowed in-out scalar reference, System.Address and Storage_Offset byte arithmetic in complete pipe transfers.",
       "strings": "Trim, string slices, argument strings, image conversion and diagnostic concatenation.",
-      "highlighted": "code/bessel.adb.html"
+      "highlighted": "code/bessel.adb.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "Ada tasks do not by themselves provide the separate OS processes required here.",
+          "approach": "Import POSIX fork, pipe, read/write and waitpid through Interfaces.C; Batch runs the Ada kernel in each child.",
+          "tradeoff": "The C ABI declarations assume a POSIX LP64 system; tasking alone cannot replace this process boundary.",
+          "references": [
+            {
+              "source": "bessel.adb",
+              "match": "function Fork return",
+              "label": "POSIX imports"
+            },
+            {
+              "source": "bessel.adb",
+              "match": "procedure Batch",
+              "label": "Batch"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful error handling",
+          "kind": "native",
+          "constraint": "Ada already has exceptions; imported C functions still return status codes.",
+          "approach": "Check transfer and child statuses explicitly, raise descriptive exceptions, and catch invalid numbers locally so reading continues.",
+          "tradeoff": "The foreign-call boundary needs explicit checks even though the surrounding control flow uses native exception handling.",
+          "references": [
+            {
+              "source": "bessel.adb",
+              "match": "function Number (",
+              "label": "Number"
+            },
+            {
+              "source": "bessel.adb",
+              "match": "procedure Batch",
+              "label": "Batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "basic",
@@ -218,6 +274,41 @@
       "highlighted": "code/bessel.bas.html",
       "build_prerequisites": [
         "fbc"
+      ],
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "This FreeBASIC edition needs POSIX process and pipe services through its foreign-function interface.",
+          "approach": "Extern C declarations bind fork, pipe, read/write and waitpid. The child computes J0 with BASIC Double arithmetic.",
+          "tradeoff": "Targets Linux x86-64 and its ABI. Use the supplied build helper to keep generated C intermediates away from bessel.c.",
+          "references": [
+            {
+              "source": "bessel.bas",
+              "match": "Extern \"C\"",
+              "label": "OS bindings"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful error handling",
+          "kind": "native",
+          "constraint": "This edition uses explicit success/failure results at parsing, file and OS boundaries.",
+          "approach": "Number returns Boolean acceptance; invalid values are skipped. Fatal checks call Fail to print a diagnostic and End 1.",
+          "tradeoff": "There is no automatic exception unwinding in this implementation; the checked control paths own resource handling.",
+          "references": [
+            {
+              "source": "bessel.bas",
+              "match": "Sub Fail(",
+              "label": "Fail"
+            },
+            {
+              "source": "bessel.bas",
+              "match": "Function Number(",
+              "label": "Number"
+            }
+          ]
+        }
       ]
     },
     {
@@ -242,7 +333,42 @@
       "multiprocessing": "CBL_GC_FORK with POSIX pipes and waitpid",
       "memory": "USAGE POINTER, ADDRESS OF, a LINKAGE reference, and SET pointer UP BY LENGTH OF current-sample.",
       "strings": "FUNCTION TRIM, reference modification, TEST-NUMVAL-F, STRING and edited PICTURE output.",
-      "highlighted": "code/bessel.cob.html"
+      "highlighted": "code/bessel.cob.html",
+      "adaptations": [
+        {
+          "objective": "Graceful error handling",
+          "kind": "native",
+          "constraint": "This GnuCOBOL edition uses operation-specific status handling rather than a general try/catch block.",
+          "approach": "FILE STATUS and check-file detect I/O errors; TEST-NUMVAL-F and ON SIZE ERROR reject malformed or overflowing input. Fatal paths STOP RUN RETURNING 1.",
+          "tradeoff": "File, numeric and worker statuses must each be checked explicitly.",
+          "references": [
+            {
+              "source": "bessel.cob",
+              "match": "accept-line.",
+              "label": "accept-line"
+            },
+            {
+              "source": "bessel.cob",
+              "match": "check-file.",
+              "label": "check-file"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "Process creation is supplied by the selected GnuCOBOL runtime and POSIX services.",
+          "approach": "CBL_GC_FORK creates children; binary POSIX pipes carry the COBOL-computed results and waitpid verifies completion.",
+          "tradeoff": "The foreign calls and numeric layouts target GnuCOBOL on Linux x86-64, not arbitrary COBOL runtimes.",
+          "references": [
+            {
+              "source": "bessel.cob",
+              "match": "call \"CBL_GC_FORK\"",
+              "label": "Worker launch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "fortran",
@@ -265,7 +391,56 @@
       "multiprocessing": "POSIX fork and pipes through ISO_C_BINDING",
       "memory": "C_LOC / C_F_POINTER produce typed array pointers; pointer sections shift the view using array descriptors. Raw address addition is not portable standard Fortran.",
       "strings": "TRIM, ADJUSTL, VERIFY, character slices, concatenation, internal numeric READ and formatted WRITE.",
-      "highlighted": "code/bessel.f90.html"
+      "highlighted": "code/bessel.f90.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "This edition needs fork/pipe services outside the Fortran language interface.",
+          "approach": "ISO_C_BINDING declarations expose POSIX calls with C-compatible kinds. Each child evaluates the Fortran kernel and sends its result back.",
+          "tradeoff": "Assumes POSIX LP64 and compatible C double storage; it is not a portable coarray implementation.",
+          "references": [
+            {
+              "source": "bessel.f90",
+              "match": "function c_fork() bind",
+              "label": "C process interface"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful error handling",
+          "kind": "native",
+          "constraint": "Fortran I/O exposes IOSTAT/IOMSG rather than structured catchable exceptions.",
+          "approach": "Check numeric READ, file operations, transfers and worker statuses. fail prints to error_unit and calls the bound _exit with status 1.",
+          "tradeoff": "Explicit checks provide readable failures; _exit avoids a compiler-specific ERROR STOP backtrace and uses the POSIX binding.",
+          "references": [
+            {
+              "source": "bessel.f90",
+              "match": "subroutine fail(message)",
+              "label": "fail"
+            },
+            {
+              "source": "bessel.f90",
+              "match": "read(text, *, iostat=ios)",
+              "label": "Numeric status check"
+            }
+          ]
+        },
+        {
+          "objective": "Pointer and offset demonstration",
+          "kind": "native",
+          "constraint": "Portable Fortran does not provide raw C-style address addition.",
+          "approach": "C_LOC/C_F_POINTER expose the owned sample array as a typed pointer; tail points at successive two-element array sections.",
+          "tradeoff": "Offsets are array-descriptor views, not fabricated addresses. The target allocation remains alive throughout the reduction.",
+          "references": [
+            {
+              "source": "bessel.f90",
+              "match": "function j0(x)",
+              "label": "j0 pointer sections"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "c",
@@ -290,7 +465,42 @@
       "multiprocessing": "POSIX fork, pipe and waitpid",
       "memory": "Pointer parameters, array offsets, address-of, dereferences and byte-pointer advancement in checked IPC transfers.",
       "strings": "strtod with end-pointer checking, whitespace scanning, strcmp, getline and formatted CSV.",
-      "highlighted": "code/bessel.c.html"
+      "highlighted": "code/bessel.c.html",
+      "adaptations": [
+        {
+          "objective": "Graceful error handling",
+          "kind": "workaround",
+          "constraint": "C has no built-in throw/catch exception mechanism.",
+          "approach": "parse, transfer and batch return success flags. Callers inspect errno and child exit status, print diagnostics, and explicitly close/reap resources before returning failure.",
+          "tradeoff": "Error propagation and cleanup must be written at each call boundary; no automatic stack unwinding is supplied.",
+          "references": [
+            {
+              "source": "bessel.c",
+              "match": "static int parse(",
+              "label": "parse"
+            },
+            {
+              "source": "bessel.c",
+              "match": "static int batch(",
+              "label": "batch"
+            }
+          ]
+        },
+        {
+          "objective": "Complete worker-result transfers",
+          "kind": "platform",
+          "constraint": "A POSIX pipe read or write can transfer fewer bytes than requested or be interrupted.",
+          "approach": "transfer advances a byte pointer until the whole payload moves, retries EINTR, and reports EOF or other errors.",
+          "tradeoff": "The binary payload is suitable for forked copies of this executable, not a portable network wire format.",
+          "references": [
+            {
+              "source": "bessel.c",
+              "match": "static int transfer(",
+              "label": "transfer"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "objc",
@@ -305,7 +515,42 @@
       "multiprocessing": "NSTask child executables",
       "memory": "Objective-C object references coexist with C double pointers, one-past array bounds and ++cursor element arithmetic.",
       "strings": "NSString trimming/prefix checks, NSScanner parsing, UTF-8 conversion and string formatting.",
-      "highlighted": "code/bessel.m.html"
+      "highlighted": "code/bessel.m.html",
+      "adaptations": [
+        {
+          "objective": "Unifying different error conventions",
+          "kind": "native",
+          "constraint": "Foundation and C calls report failures through a mixture of NSError, return values and exceptions.",
+          "approach": "Check C I/O and Foundation write results, translate failures through Fail into NSException, and use @finally for file/buffer and child cleanup.",
+          "tradeoff": "Exceptions are already supported. This edition chooses a common reporting boundary but must still check nonthrowing APIs explicitly.",
+          "references": [
+            {
+              "source": "bessel.m",
+              "match": "static void Fail(",
+              "label": "Fail"
+            },
+            {
+              "source": "bessel.m",
+              "match": "NSError *error = nil;",
+              "label": "NSError conversion"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "This edition uses Foundation\u2019s process facilities in addition to the Objective-C language.",
+          "approach": "NSTask relaunches the executable with --worker; NSPipe carries the row, and the parent checks terminationStatus before accepting it.",
+          "tradeoff": "Requires macOS Foundation or GNUstep and an Objective-C runtime; the build commands differ by platform.",
+          "references": [
+            {
+              "source": "bessel.m",
+              "match": "NSTask *child =",
+              "label": "NSTask launch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "smalltalk",
@@ -322,7 +567,42 @@
       "multiprocessing": "External GNU Smalltalk VMs via FileStream popen:",
       "memory": "Object references and indexed collection access. This edition does not expose raw pointers or pretend block fork creates OS processes.",
       "strings": "trimSeparators, stream-based parsing, character tests, copyReplaceAll: and comma-delimited output.",
-      "highlighted": "code/bessel.st.html"
+      "highlighted": "code/bessel.st.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "workaround",
+          "constraint": "Smalltalk block fork is a language-level process, not the separate OS worker required here.",
+          "approach": "FileStream popen: starts external GNU Smalltalk VMs, and a getpid C binding reports their OS identity. ensure: closes the process pipes.",
+          "tradeoff": "Requires GNU Smalltalk/POSIX and launch from the project directory because bessel.st is a relative worker path. Execution remains untested.",
+          "references": [
+            {
+              "source": "bessel.st",
+              "match": "Observatory class >> batch:",
+              "label": "batch:"
+            },
+            {
+              "source": "bessel.st",
+              "match": "Observatory class >> processId",
+              "label": "processId"
+            }
+          ]
+        },
+        {
+          "objective": "Portable numeric text",
+          "kind": "workaround",
+          "constraint": "GNU Smalltalk FloatD printing uses a d exponent marker instead of the shared e notation.",
+          "approach": "decimal: replaces d with e when serializing values for CSV and worker arguments.",
+          "tradeoff": "This adapts textual representation only; calculations still use FloatD. Runtime behavior awaits validation.",
+          "references": [
+            {
+              "source": "bessel.st",
+              "match": "Observatory class >> decimal:",
+              "label": "decimal:"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "cpp",
@@ -346,7 +626,28 @@
       "multiprocessing": "RAII-managed POSIX fork workers",
       "memory": "C++ references, unique_ptr ownership, raw pointer parameters/advancement and structured-binding references.",
       "strings": "std::string searches, substring position validation, stoi/stod and stream formatting.",
-      "highlighted": "code/bessel.cpp.html"
+      "highlighted": "code/bessel.cpp.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers with exception cleanup",
+          "kind": "platform",
+          "constraint": "The C++20 standard library has no subprocess-launch API; threads would share the parent OS process.",
+          "approach": "Worker wraps POSIX fork and pipes. unique_ptr ownership and the Worker destructor close descriptors and reap children during normal exit or exception unwinding.",
+          "tradeoff": "Requires POSIX. Exceptions and RAII are native C++ features; the OS binding is the portability dependency.",
+          "references": [
+            {
+              "source": "bessel.cpp",
+              "match": "explicit Worker(",
+              "label": "Worker constructor"
+            },
+            {
+              "source": "bessel.cpp",
+              "match": "~Worker()",
+              "label": "Worker destructor"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "rust",
@@ -368,7 +669,42 @@
       "multiprocessing": "std::process::Command child executables",
       "memory": "Borrowed &[f64] and as_ptr().add(i) dereferences in one documented, bounded unsafe helper.",
       "strings": "trim, starts_with, parse, String accumulation and UTF-8 validation.",
-      "highlighted": "code/bessel.rs.html"
+      "highlighted": "code/bessel.rs.html",
+      "adaptations": [
+        {
+          "objective": "Graceful errors and resource cleanup",
+          "kind": "native",
+          "constraint": "Rust represents ordinary recoverable failures with Result rather than throw/catch exceptions.",
+          "approach": "Use Result and ? to propagate errors, match to skip invalid lines, and main to emit a diagnostic/status 1. A Worker Drop implementation cleans up children it still owns.",
+          "tradeoff": "Errors remain explicit in signatures. The cleanup wrapper is needed because merely dropping a child-process handle does not reap it.",
+          "references": [
+            {
+              "source": "bessel.rs",
+              "match": "impl Drop for Worker",
+              "label": "Worker Drop"
+            },
+            {
+              "source": "bessel.rs",
+              "match": "fn run() ->",
+              "label": "run"
+            }
+          ]
+        },
+        {
+          "objective": "Raw-pointer traversal with ownership",
+          "kind": "native",
+          "constraint": "Dereferencing raw pointers is outside Rust\u2019s safe subset.",
+          "approach": "sum_buffer borrows an immutable slice and contains the educational as_ptr().add(i) dereference in one documented unsafe block.",
+          "tradeoff": "The caller retains live storage; each offset is bounded by the slice. Ordinary Rust would use safe iterator summation.",
+          "references": [
+            {
+              "source": "bessel.rs",
+              "match": "fn sum_buffer(",
+              "label": "sum_buffer"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "java",
@@ -391,7 +727,37 @@
       "multiprocessing": "Separate JVM worker processes",
       "memory": "Object references and a ByteBuffer with checked byte-offset reads. Java does not expose raw pointer arithmetic.",
       "strings": "strip, startsWith, numeric parsing, StringBuilder and Locale.ROOT CSV formatting.",
-      "highlighted": "code/Bessel.java.html"
+      "highlighted": "code/Bessel.java.html",
+      "adaptations": [
+        {
+          "objective": "Pointer and offset demonstration",
+          "kind": "native",
+          "constraint": "Java does not expose C-style raw pointer arithmetic.",
+          "approach": "observe stores samples in a ByteBuffer and reads them at checked k * Double.BYTES offsets through a shared object reference.",
+          "tradeoff": "Demonstrates byte offsets within managed storage, not addresses. The buffer is an educational alternative to a simple double array.",
+          "references": [
+            {
+              "source": "Bessel.java",
+              "match": "static Observation observe(",
+              "label": "observe"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "native",
+          "constraint": "Java threads alone would not provide independent worker OS PIDs.",
+          "approach": "ProcessBuilder starts a separate JVM in --worker mode with the current classpath. finally terminates and waits for outstanding children.",
+          "tradeoff": "Standard APIs suffice; a JVM starts for each observation, so startup can dominate the calculation.",
+          "references": [
+            {
+              "source": "Bessel.java",
+              "match": "String java = Path.of",
+              "label": "ProcessBuilder batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "ruby",
@@ -407,7 +773,37 @@
       "multiprocessing": "fork with IO.pipe",
       "memory": "Object references plus Fiddle::Pointer over a retained packed string; pointer + byte offset and native-double reads.",
       "strings": "strip, start_with?, pack/unpack, interpolation, numeric conversion and CSV serialization.",
-      "highlighted": "code/bessel.rb.html"
+      "highlighted": "code/bessel.rb.html",
+      "adaptations": [
+        {
+          "objective": "Raw-pointer demonstration",
+          "kind": "native",
+          "constraint": "Ordinary Ruby arrays and object references do not provide raw pointer arithmetic.",
+          "approach": "Pack samples into a retained native-double string and use Fiddle::Pointer plus byte offsets to read each value.",
+          "tradeoff": "Requires the Fiddle standard library. The packed storage must stay alive and unchanged; normal Ruby would simply sum the array.",
+          "references": [
+            {
+              "source": "bessel.rb",
+              "match": "def observe(",
+              "label": "observe"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS workers with cleanup",
+          "kind": "platform",
+          "constraint": "This edition relies on POSIX fork support.",
+          "approach": "fork and IO.pipe create numeric children; Process.wait2 checks status. rescue handles errors and ensure closes pipes and reaps outstanding children.",
+          "tradeoff": "Requires a fork-capable platform. Exceptions and ensure are native Ruby, so no exception emulation is needed.",
+          "references": [
+            {
+              "source": "bessel.rb",
+              "match": "def parallel_batch(",
+              "label": "parallel_batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "javascript",
@@ -423,7 +819,37 @@
       "multiprocessing": "child_process.fork with IPC messages, not worker threads",
       "memory": "ArrayBuffer/DataView references and checked byte-offset arithmetic. These are not raw addresses.",
       "strings": "trim, startsWith, regex validation, template strings and array joining.",
-      "highlighted": "code/bessel.mjs.html"
+      "highlighted": "code/bessel.mjs.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "The browser JavaScript execution model does not provide the required command-line OS workers.",
+          "approach": "Target Node.js and use child_process.fork with IPC. worker resolves its Promise only after receiving a result and a successful child close event.",
+          "tradeoff": "Requires Node.js, not a browser. Promise.all coordinates ordering; child processes perform the numerical work.",
+          "references": [
+            {
+              "source": "bessel.mjs",
+              "match": "function worker(",
+              "label": "worker"
+            }
+          ]
+        },
+        {
+          "objective": "Pointer and offset demonstration",
+          "kind": "native",
+          "constraint": "JavaScript references do not expose raw memory addresses.",
+          "approach": "An ArrayBuffer owns sample storage; DataView reads and writes Float64 values at explicit checked byte offsets.",
+          "tradeoff": "Shows shared-buffer views and offsets, with no raw-pointer arithmetic or foreign helper.",
+          "references": [
+            {
+              "source": "bessel.mjs",
+              "match": "function observe(",
+              "label": "observe"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "python",
@@ -439,7 +865,42 @@
       "multiprocessing": "ProcessPoolExecutor with spawn context",
       "memory": "ctypes array ownership, byref(array, byte_offset), POINTER(c_double) casts and contents dereference. math.fsum remains the reducer.",
       "strings": "strip, startswith, float parsing, f-strings and csv.writer serialization.",
-      "highlighted": "code/bessel.py.html"
+      "highlighted": "code/bessel.py.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers with safe startup",
+          "kind": "native",
+          "constraint": "Spawned Python processes import the module, so an unguarded CLI would start recursively.",
+          "approach": "ProcessPoolExecutor uses an explicit spawn context and ordered map. The __main__ guard separates importable worker definitions from the command-line entry point.",
+          "tradeoff": "Standard-library facilities suffice. Spawn incurs interpreter/import overhead and requires an importable worker function.",
+          "references": [
+            {
+              "source": "bessel.py",
+              "match": "with ProcessPoolExecutor(",
+              "label": "Process pool"
+            },
+            {
+              "source": "bessel.py",
+              "match": "if __name__ == \"__main__\":",
+              "label": "Entry guard"
+            }
+          ]
+        },
+        {
+          "objective": "Pointer and offset demonstration",
+          "kind": "native",
+          "constraint": "Ordinary Python objects provide references, not C-style pointer arithmetic.",
+          "approach": "A ctypes double array owns the samples. byref supplies byte offsets, cast provides typed pointers, and contents reads them while the array stays alive.",
+          "tradeoff": "This is an explicit ctypes example with manual bounds/lifetime reasoning; math.fsum remains the numerical reducer.",
+          "references": [
+            {
+              "source": "bessel.py",
+              "match": "def observe(",
+              "label": "observe"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "lua",
@@ -455,7 +916,42 @@
       "multiprocessing": "luaposix fork, pipes and wait",
       "memory": "Tables are passed by reference and process pipes are handles. Standard Lua 5.4 has no raw-pointer arithmetic; no LuaJIT FFI is assumed.",
       "strings": "Lua patterns trim whitespace, sub inspects prefixes, string.format and table.concat construct CSV.",
-      "highlighted": "code/bessel.lua.html"
+      "highlighted": "code/bessel.lua.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "Lua\u2019s standard library does not provide the fork/pipe/wait interfaces used here.",
+          "approach": "Load luaposix modules for process creation, pipe transfers, child PIDs and wait status; keep the numerical kernel in Lua.",
+          "tradeoff": "Requires Lua 5.4 plus luaposix on POSIX. Missing-module errors are caught by the protected entry call.",
+          "references": [
+            {
+              "source": "bessel.lua",
+              "match": "local unistd = require",
+              "label": "luaposix imports"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful errors and cleanup",
+          "kind": "native",
+          "constraint": "Lua provides protected calls rather than try/catch syntax.",
+          "approach": "pcall catches numeric, batch and top-level errors. Batch cleanup closes descriptors and waits before rethrowing; a to-be-closed local scopes the output file.",
+          "tradeoff": "Protected calls are native error handling. Child-resource cleanup is explicit, and the output scope requires Lua 5.4.",
+          "references": [
+            {
+              "source": "bessel.lua",
+              "match": "local success, failure = pcall",
+              "label": "Batch protection"
+            },
+            {
+              "source": "bessel.lua",
+              "match": "local output <close>",
+              "label": "Output lifetime"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "julia",
@@ -472,7 +968,42 @@
       "multiprocessing": "Distributed.addprocs / pmap on OS workers",
       "memory": "Ptr byte arithmetic and unsafe_load within GC.@preserve; the owning Float64 array stays alive and unmodified.",
       "strings": "strip, startswith, parse, interpolation and Printf output.",
-      "highlighted": "code/bessel.jl.html"
+      "highlighted": "code/bessel.jl.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers with definitions available",
+          "kind": "native",
+          "constraint": "Separate Julia processes need the observe definition loaded before they can execute it.",
+          "approach": "Distributed.addprocs creates workers; @everywhere includes the source there. The PROGRAM_FILE guard prevents recursive CLI execution, pmap preserves ordering, and finally removes workers.",
+          "tradeoff": "Uses the Distributed standard library and pays process/loading overhead. This design is source-reviewed; execution remains untested.",
+          "references": [
+            {
+              "source": "bessel.jl",
+              "match": "pids = addprocs(jobs)",
+              "label": "Worker setup"
+            },
+            {
+              "source": "bessel.jl",
+              "match": "if abspath(PROGRAM_FILE)",
+              "label": "Entry guard"
+            }
+          ]
+        },
+        {
+          "objective": "Raw-pointer lifetime",
+          "kind": "native",
+          "constraint": "A raw Ptr alone does not keep its owning array alive.",
+          "approach": "GC.@preserve retains samples while pointer arithmetic and unsafe_load read aligned Float64 elements.",
+          "tradeoff": "Bounds and lifetime are the programmer\u2019s responsibility in this demonstration; ordinary array iteration avoids these unsafe reads.",
+          "references": [
+            {
+              "source": "bessel.jl",
+              "match": "function observe(",
+              "label": "observe"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "perl",
@@ -488,7 +1019,23 @@
       "multiprocessing": "fork with pipe handles",
       "memory": "Scalar, array and filehandle references, including referenced child records. This edition uses portable Perl references, not fabricated raw addresses.",
       "strings": "Regex trimming, numeric-token recognition, interpolation, printf and string-length checks.",
-      "highlighted": "code/bessel.pl.html"
+      "highlighted": "code/bessel.pl.html",
+      "adaptations": [
+        {
+          "objective": "Exception-safe worker cleanup",
+          "kind": "native",
+          "constraint": "Perl 5.20 already supplies eval/die, but cleanup here is implemented explicitly around eval.",
+          "approach": "batch saves $@ immediately after eval, closes pipe handles and waits for tracked children, then rethrows the original error. The entry boundary prints it and exits nonzero.",
+          "tradeoff": "Cleanup must preserve the original exception; references to child records provide ownership without raw pointers.",
+          "references": [
+            {
+              "source": "bessel.pl",
+              "match": "sub batch {",
+              "label": "batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "swift",
@@ -508,7 +1055,37 @@
       "multiprocessing": "Foundation Process child executables",
       "memory": "Foundation class references plus withUnsafeBufferPointer, advanced(by:) and pointee inside the buffer lifetime.",
       "strings": "Trimming, hasPrefix, UTF-8 conversion, splitting lines and interpolation.",
-      "highlighted": "code/bessel.swift.html"
+      "highlighted": "code/bessel.swift.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers and graceful errors",
+          "kind": "native",
+          "constraint": "Swift concurrency tasks alone do not provide independent OS workers.",
+          "approach": "Foundation Process launches this executable in --worker mode. Typed thrown errors reach do/catch, while defer terminates and waits for outstanding children.",
+          "tradeoff": "Requires Foundation Process on the target platform; process startup occurs per observation. No exception emulation is needed; execution remains untested.",
+          "references": [
+            {
+              "source": "bessel.swift",
+              "match": "var children = [(Process, Pipe)]()",
+              "label": "Process batch and defer"
+            }
+          ]
+        },
+        {
+          "objective": "Scoped raw-pointer access",
+          "kind": "native",
+          "constraint": "An Array\u2019s unsafe buffer pointer is only valid within its borrowing scope.",
+          "approach": "withUnsafeBufferPointer contains every advanced(by:) and pointee read, with offsets bounded by buffer.count.",
+          "tradeoff": "The example relies on manual bounds reasoning but does not let the pointer escape; ordinary reduction could avoid unsafe access.",
+          "references": [
+            {
+              "source": "bessel.swift",
+              "match": "let sum = samples.withUnsafeBufferPointer",
+              "label": "Borrowed sample buffer"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "erlang",
@@ -524,7 +1101,47 @@
       "multiprocessing": "Ports start separate escript OS VMs; not just BEAM processes",
       "memory": "Immutable values and opaque port handles. BEAM terms do not expose raw memory pointers or pointer arithmetic.",
       "strings": "string:trim, string:to_float/to_integer, float_to_list and io:format.",
-      "highlighted": "code/bessel.erl.html"
+      "highlighted": "code/bessel.erl.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "workaround",
+          "constraint": "Erlang spawn creates a BEAM process, which does not satisfy the separate OS-process requirement.",
+          "approach": "open_port starts another escript VM per observation. Port messages carry output and exit status; each worker reports os:getpid().",
+          "tradeoff": "Starting a VM per value is expensive. Batches bound concurrency and collect imposes a 30-second receive timeout.",
+          "references": [
+            {
+              "source": "bessel.erl",
+              "match": "launch([X | Rest], Ports) ->",
+              "label": "launch"
+            },
+            {
+              "source": "bessel.erl",
+              "match": "collect(Port, Chunks) ->",
+              "label": "collect"
+            }
+          ]
+        },
+        {
+          "objective": "Memory-model comparison",
+          "kind": "native",
+          "constraint": "BEAM terms do not expose raw addresses or pointer arithmetic.",
+          "approach": "Use immutable lists for values, explicit recursion state for the sum, and opaque port handles for worker resources.",
+          "tradeoff": "This demonstrates Erlang value and handle semantics; it makes no raw-pointer claim.",
+          "references": [
+            {
+              "source": "bessel.erl",
+              "match": "j0(X, K, Sum) ->",
+              "label": "Recursive accumulation"
+            },
+            {
+              "source": "bessel.erl",
+              "match": "batch(Values) ->",
+              "label": "Port ownership"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "haskell",
@@ -547,7 +1164,37 @@
       "multiprocessing": "System.Process child executables",
       "memory": "withArray brackets a foreign allocation; plusPtr byte offsets and peek occur explicitly in IO. Numeric sample generation remains pure.",
       "strings": "Whitespace/prefix pattern matching, readMaybe, string concatenation, show and line streams.",
-      "highlighted": "code/bessel.hs.html"
+      "highlighted": "code/bessel.hs.html",
+      "adaptations": [
+        {
+          "objective": "Pointer demonstration with scoped effects",
+          "kind": "native",
+          "constraint": "Dereferencing foreign memory is an IO effect, while the sample sequence can remain pure.",
+          "approach": "withArray owns a temporary allocation; plusPtr advances by Double-sized byte offsets and peek reads within that scope.",
+          "tradeoff": "j0 returns IO Double and copies samples into foreign storage for the memory example; the sample-generation function remains pure.",
+          "references": [
+            {
+              "source": "bessel.hs",
+              "match": "j0 x = withArray",
+              "label": "j0"
+            }
+          ]
+        },
+        {
+          "objective": "Reliable collection of process output",
+          "kind": "native",
+          "constraint": "Lazy hGetContents output must be consumed while its pipe is still open.",
+          "approach": "Nested withCreateProcess scopes retain workers; evaluate (length row) forces each result before waiting and leaving its resource scope.",
+          "tradeoff": "Requires process and unix packages. Bracketed lifetimes and exceptions are native library facilities, not an emulated exception system.",
+          "references": [
+            {
+              "source": "bessel.hs",
+              "match": "batch executable =",
+              "label": "batch and collect"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "ocaml",
@@ -570,7 +1217,42 @@
       "multiprocessing": "Unix.fork and pipes",
       "memory": "ref cells, shared values and mutable array/channel handles. Portable OCaml does not expose raw address arithmetic.",
       "strings": "String.trim, prefix indexing, float_of_string, concatenation and Printf.",
-      "highlighted": "code/bessel.ml.html"
+      "highlighted": "code/bessel.ml.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "The selected process interface comes from the Unix library.",
+          "approach": "Unix.fork creates numeric children, pipes carry results, and waitpid is matched against WEXITED 0. Fun.protect closes channels and reaps children.",
+          "tradeoff": "Requires Unix library linkage and POSIX fork support. Exceptions and cleanup combinators are native OCaml facilities.",
+          "references": [
+            {
+              "source": "bessel.ml",
+              "match": "let batch values =",
+              "label": "batch"
+            }
+          ]
+        },
+        {
+          "objective": "Memory-model comparison",
+          "kind": "native",
+          "constraint": "Portable OCaml does not expose raw pointer arithmetic.",
+          "approach": "A ref cell holds the mutable sum; lists retain input values and referenced child records hold PIDs/channel handles.",
+          "tradeoff": "The comparison uses managed references and handles rather than claiming they are raw addresses.",
+          "references": [
+            {
+              "source": "bessel.ml",
+              "match": "let j0 x =",
+              "label": "Accumulator reference"
+            },
+            {
+              "source": "bessel.ml",
+              "match": "let batch values =",
+              "label": "Child references"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "lisp",
@@ -587,7 +1269,42 @@
       "multiprocessing": "SBCL run-program with asynchronous OS processes",
       "memory": "SBCL vector-sap, sap+ byte offsets and sap-ref-double within with-pinned-objects. This is an explicitly implementation-specific pointer example.",
       "strings": "STRING-TRIM, READ-FROM-STRING with reader evaluation disabled, SUBSEQ and FORMAT.",
-      "highlighted": "code/bessel.lisp.html"
+      "highlighted": "code/bessel.lisp.html",
+      "adaptations": [
+        {
+          "objective": "OS workers and raw-pointer access",
+          "kind": "platform",
+          "constraint": "These process and memory facilities are implementation-specific in this Common Lisp edition.",
+          "approach": "SBCL run-program starts asynchronous worker interpreters. vector-sap and sap+ traverse the sample vector while with-pinned-objects prevents GC relocation.",
+          "tradeoff": "Requires SBCL; the explicit pointer example and OS interfaces are not portable ANSI Common Lisp.",
+          "references": [
+            {
+              "source": "bessel.lisp",
+              "match": "(defun batch (",
+              "label": "batch"
+            },
+            {
+              "source": "bessel.lisp",
+              "match": "(defun j0 (",
+              "label": "Pinned sample storage"
+            }
+          ]
+        },
+        {
+          "objective": "Recoverable input errors",
+          "kind": "native",
+          "constraint": "Common Lisp already supplies conditions and restarts, allowing recovery without abandoning the input session.",
+          "approach": "read-values installs a handler that invokes skip-value; restart-case discards the malformed observation. Fatal conditions reach the outer handler-case.",
+          "tradeoff": "No exception workaround is needed. Recovery is deliberately limited to the numeric-input operation.",
+          "references": [
+            {
+              "source": "bessel.lisp",
+              "match": "(defun read-values (",
+              "label": "read-values"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "prolog",
@@ -606,7 +1323,42 @@
       "multiprocessing": "library(process) creates separate SWI-Prolog OS workers",
       "memory": "Logical variables and unification plus stream/process handles; no exposed raw addresses or pointer arithmetic.",
       "strings": "normalize_space, sub_string, number_string, atom/string conversion and format.",
-      "highlighted": "code/bessel.pro.html"
+      "highlighted": "code/bessel.pro.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "This edition needs SWI-Prolog\u2019s process library in addition to logical evaluation.",
+          "approach": "process_create starts a separate SWI executable per value; nested setup_call_cleanup scopes keep streams and PIDs available until collection or failure.",
+          "tradeoff": "Depends on SWI-Prolog library(process); each observation starts an interpreter. catch and cleanup are supplied facilities.",
+          "references": [
+            {
+              "source": "bessel.pro",
+              "match": "start_worker(X, worker(Pid, Stream)) :-",
+              "label": "start_worker"
+            },
+            {
+              "source": "bessel.pro",
+              "match": "launch([X|Xs], Pending, Rows) :-",
+              "label": "Scoped launch"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful failure and memory semantics",
+          "kind": "native",
+          "constraint": "A predicate may fail logically as well as throw an exception; logical variables are not raw memory pointers.",
+          "approach": "main converts unsuccessful run goals into a program_failed exception and catches it for a diagnostic/status 1. Results travel through unification and stream/worker terms.",
+          "tradeoff": "The interface accounts for both failure modes. Memory examples remain logical bindings and opaque handles.",
+          "references": [
+            {
+              "source": "bessel.pro",
+              "match": "main :- current_prolog_flag",
+              "label": "main"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "kotlin",
@@ -629,7 +1381,37 @@
       "multiprocessing": "ProcessBuilder starts separate JVMs",
       "memory": "JVM object references and ByteBuffer getDouble at checked byte offsets; raw pointers are not available on this target.",
       "strings": "trim, startsWith, conversions, string interpolation and Locale.ROOT formatting.",
-      "highlighted": "code/Bessel.kt.html"
+      "highlighted": "code/Bessel.kt.html",
+      "adaptations": [
+        {
+          "objective": "Pointer and offset demonstration",
+          "kind": "native",
+          "constraint": "This Kotlin/JVM target has managed references, not Kotlin/Native raw pointers.",
+          "approach": "Use Java ByteBuffer and checked getDouble byte offsets to traverse the shared sample allocation.",
+          "tradeoff": "The memory example describes JVM buffer semantics, not raw address arithmetic.",
+          "references": [
+            {
+              "source": "Bessel.kt",
+              "match": "fun observe(",
+              "label": "observe"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "native",
+          "constraint": "Threads or coroutines within the JVM would not satisfy the OS-process objective.",
+          "approach": "ProcessBuilder launches BesselKt in separate JVMs using the current classpath. Bounded batches collect rows in order and finally reaps children.",
+          "tradeoff": "Uses JVM interoperability; each observation pays JVM startup cost. use and finally provide native resource/error handling.",
+          "references": [
+            {
+              "source": "Bessel.kt",
+              "match": "fun batch(",
+              "label": "batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "go",
@@ -650,7 +1432,42 @@
       "multiprocessing": "os/exec child executables; goroutines only support pipe I/O",
       "memory": "A slice owns samples; unsafe.SliceData, unsafe.Add and typed dereference show byte arithmetic, with runtime.KeepAlive.",
       "strings": "TrimSpace, HasPrefix, ParseFloat, FormatFloat, bytes.Buffer and formatted CSV.",
-      "highlighted": "code/bessel.go.html"
+      "highlighted": "code/bessel.go.html",
+      "adaptations": [
+        {
+          "objective": "Graceful errors and resource cleanup",
+          "kind": "native",
+          "constraint": "Go uses explicit error values for ordinary failures; try/catch is not needed for this objective.",
+          "approach": "number, batch and run return errors. Callers propagate them, main prints a diagnostic, and deferred batch cleanup kills and waits for remaining children.",
+          "tradeoff": "Errors must be checked at each call; panic/recover is not used as the normal failure path.",
+          "references": [
+            {
+              "source": "bessel.go",
+              "match": "func batch(",
+              "label": "batch and defer"
+            },
+            {
+              "source": "bessel.go",
+              "match": "func main()",
+              "label": "Final error boundary"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "native",
+          "constraint": "Goroutines execute within the Go runtime and are not separate numerical worker processes.",
+          "approach": "os/exec launches this executable in --worker mode. Child PIDs identify numerical work; internal output-copying goroutines only support pipe I/O.",
+          "tradeoff": "Uses the standard library, with executable startup and buffering overhead for each observation.",
+          "references": [
+            {
+              "source": "bessel.go",
+              "match": "func batch(",
+              "label": "os/exec batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "sql",
@@ -670,7 +1487,47 @@
       "multiprocessing": "dblink_send_query dispatches to separate PostgreSQL backend OS processes",
       "memory": "Relational row keys and ordinal offsets are the native analogue. SQL has no raw pointers, object references or pointer arithmetic.",
       "strings": "btrim, regexp validation, replace, string_to_array, format and array operations.",
-      "highlighted": "code/bessel.sql.html"
+      "highlighted": "code/bessel.sql.html",
+      "adaptations": [
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "Portable SQL provides no standalone fork/exec interface for these workers.",
+          "approach": "PostgreSQL dblink_send_query dispatches asynchronous SQL aggregates on separate backend connections; pg_backend_pid supplies the worker PID.",
+          "tradeoff": "Requires PostgreSQL, dblink setup and authenticated connections. PL/pgSQL EXCEPTION handles failures natively; this edition remains untested.",
+          "references": [
+            {
+              "source": "bessel.sql",
+              "match": "IF dblink_send_query(",
+              "label": "Asynchronous dispatch"
+            },
+            {
+              "source": "bessel.sql",
+              "match": "-- Cancel and disconnect owned worker connections",
+              "label": "Failure cleanup"
+            }
+          ]
+        },
+        {
+          "objective": "File/console input and CSV output",
+          "kind": "platform",
+          "constraint": "A database script has a client/server boundary rather than a single executable\u2019s positional argv and local files.",
+          "approach": "psql variables supply options and a comma-separated prompt supplies interactive values. pg_read_file reads on the server; psql redirects ordered CSV output to a client-side file.",
+          "tradeoff": "Server input needs file-read privileges. The documented interface differs from line-at-a-time stdin and uses relational ordinals instead of pointers.",
+          "references": [
+            {
+              "source": "bessel.sql",
+              "match": "pg_read_file(config.input)",
+              "label": "Server input"
+            },
+            {
+              "source": "bessel.sql",
+              "match": "\\o :output",
+              "label": "Client output"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "oberon",
@@ -692,7 +1549,47 @@
         "bessel-oberon-posix.c",
         "tools/build_oberon.sh"
       ],
-      "highlighted": "code/Bessel.Mod.html"
+      "highlighted": "code/Bessel.Mod.html",
+      "adaptations": [
+        {
+          "objective": "Checked OS processes and I/O",
+          "kind": "workaround",
+          "constraint": "The core Oberon-2 language does not supply the POSIX/stdio services required by this executable.",
+          "approach": "Bessel.Mod imports the supplied C adapter for checked fork, pipes, complete transfers, waiting and file I/O. Scheduling, LONGREAL quadrature and address traversal stay in Oberon.",
+          "tradeoff": "Requires Oxford OBC, a C toolchain and POSIX. The adapter contains no Bessel kernel; input lines are bounded to 4095 bytes.",
+          "references": [
+            {
+              "source": "Bessel.Mod",
+              "match": "PROCEDURE Fork(",
+              "label": "Oberon imports"
+            },
+            {
+              "source": "bessel-oberon-posix.c",
+              "match": "int bo_fork(",
+              "label": "C adapter"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful error handling",
+          "kind": "workaround",
+          "constraint": "This Oberon-2 implementation uses explicit status checks rather than catchable exception unwinding.",
+          "approach": "The adapter returns checked statuses; Fail emits a diagnostic, calls Cleanup, and HALTs with status 1.",
+          "tradeoff": "Failure paths must call the cleanup procedure explicitly; the adapter tracks owned streams, descriptors and child PIDs.",
+          "references": [
+            {
+              "source": "Bessel.Mod",
+              "match": "PROCEDURE Fail(",
+              "label": "Fail"
+            },
+            {
+              "source": "bessel-oberon-posix.c",
+              "match": "void bo_cleanup(",
+              "label": "Adapter cleanup"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "rpg",
@@ -713,7 +1610,47 @@
         "rpg_setup.sql"
       ],
       "integration_required": "Requires an IBM i compiler, dedicated library, Db2 services and a configured batch queue; see rpg_setup.txt.",
-      "highlighted": "code/bessel.sqlrpgle.html"
+      "highlighted": "code/bessel.sqlrpgle.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers and result exchange",
+          "kind": "platform",
+          "constraint": "IBM i uses submitted jobs and job queues rather than this project\u2019s POSIX fork/pipe interface.",
+          "approach": "SBMJOB starts numeric batch jobs; Db2 WORK_ITEMS rows carry input, results and state. Bounded batches poll for completion and workers record getpid().",
+          "tradeoff": "Requires IBM i, configured queue/subsystem concurrency and database setup. Timeout is 600 seconds; failed rows remain and submitted jobs may finish after parent failure.",
+          "references": [
+            {
+              "source": "bessel.sqlrpgle",
+              "match": "commandText = 'SBMJOB",
+              "label": "Job submission"
+            },
+            {
+              "source": "rpg_setup.txt",
+              "match": "Create a dedicated job queue:",
+              "label": "IBM i setup"
+            }
+          ]
+        },
+        {
+          "objective": "Input/output and graceful errors",
+          "kind": "platform",
+          "constraint": "The IBM i CALL/5250 interface differs from Unix argv, stdin and stderr.",
+          "approach": "Use padded CALL parameters, DSPLY input, Db2 IFS services and MONITOR/ON-ERROR. CheckSql translates SQL status into escape messages through Die.",
+          "tradeoff": "Paths are limited to 32 characters and interactive input needs a 5250 job. Errors use native job messages; compilation and execution remain untested.",
+          "references": [
+            {
+              "source": "bessel.sqlrpgle",
+              "match": "dcl-proc CheckSql;",
+              "label": "CheckSql and Die"
+            },
+            {
+              "source": "rpg_setup.txt",
+              "match": "Public interface (",
+              "label": "Interface contract"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "bash",
@@ -729,7 +1666,42 @@
       "multiprocessing": "Background Bash workers exec awk; BASHPID remains the OS PID performing the numerical calculation.",
       "memory": "Bash namerefs modify caller variables; character substring offsets are used honestly, with no raw pointer arithmetic.",
       "strings": "Whitespace parameter expansion, substring offsets, regex validation and printf.",
-      "highlighted": "code/bessel.sh.html"
+      "highlighted": "code/bessel.sh.html",
+      "adaptations": [
+        {
+          "objective": "Floating-point Bessel computation",
+          "kind": "workaround",
+          "constraint": "Bash arithmetic is integer-only and supplies no floating-point trigonometric kernel.",
+          "approach": "Each background worker execs the embedded awk quadrature. BASHPID is passed before exec, which preserves the PID of the process doing the math.",
+          "tradeoff": "Requires awk. This edition explicitly delegates its numerical kernel; it is not an entirely Bash implementation.",
+          "references": [
+            {
+              "source": "bessel.sh",
+              "match": "observe() {",
+              "label": "observe"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful errors and resource cleanup",
+          "kind": "workaround",
+          "constraint": "Shell exit statuses and traps provide no structured try/catch/finally scope.",
+          "approach": "Check commands and wait results, route fatal errors through fail, and use an EXIT trap to kill/reap outstanding workers and remove private row files.",
+          "tradeoff": "Every fallible operation needs an explicit check; cleanup uses tracked PIDs and temporary storage.",
+          "references": [
+            {
+              "source": "bessel.sh",
+              "match": "cleanup() {",
+              "label": "cleanup and traps"
+            },
+            {
+              "source": "bessel.sh",
+              "match": "join_batch() {",
+              "label": "join_batch"
+            }
+          ]
+        }
+      ]
     },
     {
       "id": "perligata",
@@ -751,6 +1723,46 @@
       ],
       "validation_dependencies": [
         "BesselPerligata.pm"
+      ],
+      "adaptations": [
+        {
+          "objective": "Unchanged decimal input and validation",
+          "kind": "workaround",
+          "constraint": "Perligata 0.605 perlege converts Roman numerals, and its regex syntax is unimplemented.",
+          "approach": "BesselPerligata.pm exports accip for unchanged line reads and prob for complete finite-decimal validation. A line containing I stays invalid instead of becoming 1.",
+          "tradeoff": "Requires the disclosed Perl compatibility module. Native Latin file opening, writing and closing remain in the main listing.",
+          "references": [
+            {
+              "source": "BesselPerligata.pm",
+              "match": "sub accip {",
+              "label": "accip"
+            },
+            {
+              "source": "BesselPerligata.pm",
+              "match": "sub prob {",
+              "label": "prob"
+            }
+          ]
+        },
+        {
+          "objective": "Checked workers and error cleanup",
+          "kind": "workaround",
+          "constraint": "The restricted Latin syntax needs access to checked Perl OS services and an exception boundary.",
+          "approach": "gign registers forked children, collig checks waitpid, and teg wraps the Latin action in eval and parent-owned cleanup. Private per-observation files carry ordered rows.",
+          "tradeoff": "The adapter handles OS/error mechanics; the Latin listing retains quadrature and scheduling. The helper is included in validation hashes.",
+          "references": [
+            {
+              "source": "BesselPerligata.pm",
+              "match": "sub gign {",
+              "label": "gign"
+            },
+            {
+              "source": "BesselPerligata.pm",
+              "match": "sub teg {",
+              "label": "teg"
+            }
+          ]
+        }
       ]
     },
     {
@@ -772,7 +1784,66 @@
       "multiprocessing": "PostScript schedules bounded batches of separate Ghostscript interpreters through %pipe%; Linux /proc supplies real PIDs.",
       "memory": "Arrays and strings are reference objects; getinterval shares a bounded view. Input slices are copied before the line buffer is reused. No raw pointer arithmetic.",
       "strings": "ASCII trimming, decimal/e-notation scanning, integer decimal formatting, shell argument quoting, and ordered CSV serialization.",
-      "highlighted": "code/bessel.ps.html"
+      "highlighted": "code/bessel.ps.html",
+      "adaptations": [
+        {
+          "objective": "The shared 1e-10 numerical tolerance",
+          "kind": "workaround",
+          "constraint": "Ghostscript native real arithmetic has insufficient precision for the existing tolerance.",
+          "approach": "Implement decimal parsing, 52-bit fractional fixed-point multiplication, range-reduced trigonometry, accumulation and formatting entirely in PostScript using 64-bit integers.",
+          "tradeoff": "Requires a 64-bit integer Ghostscript build and more arithmetic code. The tolerance and 16,384-sample quadrature are preserved; no foreign numerical helper is used.",
+          "references": [
+            {
+              "source": "bessel.ps",
+              "match": "/fmul {",
+              "label": "fmul"
+            },
+            {
+              "source": "bessel.ps",
+              "match": "/cosine {",
+              "label": "cosine and observe"
+            }
+          ]
+        },
+        {
+          "objective": "Real OS worker processes",
+          "kind": "platform",
+          "constraint": "Portable PostScript does not specify the Linux process-launch and PID facilities used here.",
+          "approach": "Ghostscript %pipe% launches child interpreters and /proc supplies real PIDs. The internal POSIX shell only execs the interpreter; scheduling and result checks are PostScript.",
+          "tradeoff": "Requires Linux /proc and permitted %pipe% access. -dNOSAFER does not override OS restrictions such as AppArmor.",
+          "references": [
+            {
+              "source": "bessel.ps",
+              "match": "/processId {",
+              "label": "processId"
+            },
+            {
+              "source": "bessel.ps",
+              "match": "/launch {",
+              "label": "launch and collect"
+            }
+          ]
+        },
+        {
+          "objective": "Recovering after errors",
+          "kind": "native",
+          "constraint": "Native stop/stopped catches control transfer but does not restore operand and dictionary stacks automatically.",
+          "approach": "Record stack depths before parsing, restore them after a rejected token, and continue input. The top-level stopped boundary reports fatal errors and closes tracked files/pipes.",
+          "tradeoff": "Error handling is native; explicit stack restoration and resource cleanup are still required.",
+          "references": [
+            {
+              "source": "bessel.ps",
+              "match": "/readValues {",
+              "label": "readValues"
+            },
+            {
+              "source": "bessel.ps",
+              "match": "/cleanup {",
+              "label": "cleanup and error boundary"
+            }
+          ]
+        }
+      ]
     }
   ],
   "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics.",

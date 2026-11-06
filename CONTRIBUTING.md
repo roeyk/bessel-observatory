@@ -67,6 +67,15 @@ Pygments is pinned in `requirements-dev.txt` so generated pages are reproducible
 The HTML is committed for offline browsing; edit its generators or source files,
 then run `make docs`. Keep the index alphabetized.
 
+Maintain each language's `adaptations` in the manifest: objective, kind
+(`workaround`, `platform`, or `native`), constraint, approach, tradeoff, and
+source references. Each reference names a declared main/support source, a
+unique single-line `match` substring, and a readable label. The generator
+resolves highlighted line anchors on every rebuild and rejects stale or
+ambiguous matches; text-only support files link to the raw document.
+Describe actual implementation choices, without treating native error-handling
+or memory models as missing features. Keep execution status tied to the report.
+
 GitHub Pages publishes the root of `main` at
 https://roeyk.github.io/bessel-observatory/. Keep `.nojekyll` and commit regenerated
 HTML with source changes; the same relative links support online and offline use.

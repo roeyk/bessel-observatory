@@ -22,6 +22,10 @@ class Page(HTMLParser):
         self.digest = None
         self.raw = ''
         self.reading_raw = False
+        self.search = {}
+        self.adaptations = {}
+        self.current_edition = None
+        self.current_adaptation = None
 
     # Capture navigation and source-integrity metadata; input is one start tag.
     # Output: updated page fields. Called by HTMLParser while consuming HTML.
@@ -31,6 +35,18 @@ class Page(HTMLParser):
             self.ids.add(attrs['id'])
         if tag == 'tr' and 'data-search' in attrs:
             self.rows += 1
+            self.current_edition = attrs['id'].removeprefix('language-')
+            assert self.current_edition not in self.search, 'duplicate language row'
+            self.search[self.current_edition] = attrs['data-search']
+        if tag == 'details' and attrs.get('class') == 'adaptations':
+            edition = attrs['data-edition']
+            assert edition == self.current_edition, 'adaptations in the wrong row'
+            assert edition not in self.adaptations, 'duplicate adaptation panel'
+            self.current_adaptation = edition
+            self.adaptations[edition] = {'status': attrs['data-evidence'], 'count': 0, 'text': ''}
+        if tag == 'div' and attrs.get('class') == 'adaptation-note':
+            assert self.current_adaptation, 'adaptation outside an edition panel'
+            self.adaptations[self.current_adaptation]['count'] += 1
         if tag in ('a', 'link', 'script'):
             self.links.append(attrs.get('href', attrs.get('src', '')))
         if tag == 'meta' and attrs.get('name') == 'source-sha256':
@@ -43,12 +59,18 @@ class Page(HTMLParser):
     def handle_endtag(self, tag):
         if tag == 'textarea':
             self.reading_raw = False
+        if tag == 'details':
+            self.current_adaptation = None
+        if tag == 'tr':
+            self.current_edition = None
 
     # Retain exact raw text, including whitespace and decoded HTML entities.
     # Input: text node. Output: accumulated source. Called by HTMLParser.
     def handle_data(self, data):
         if self.reading_raw:
             self.raw += data
+        if self.current_adaptation:
+            self.adaptations[self.current_adaptation]['text'] += data
 
 
 # Parse a local HTML document for the integrity checks.
@@ -69,6 +91,7 @@ index = read_page(ROOT / 'index.html')
 assert index.rows == len(entries)
 evidence = {result['id']: result for result in report['results']}
 assert set(evidence) == {entry['id'] for entry in entries}
+assert set(index.adaptations) == set(evidence), 'missing or extra adaptation panels'
 sources = []
 for entry in entries:
     source = entry['source']
@@ -82,6 +105,16 @@ for entry in entries:
     }
     assert evidence[entry['id']].get('dependency_sha256', {}) == dependencies, \
         f'stale dependency evidence: {source}'
+    # Every declared note must be visible, searchable and tied to actual evidence.
+    notes = entry['adaptations']
+    panel = index.adaptations[entry['id']]
+    assert notes and panel['count'] == len(notes), f'missing adaptation notes: {source}'
+    assert panel['status'] == evidence[entry['id']]['status'], f'stale adaptation status: {source}'
+    for note in notes:
+        assert note['kind'] in {'workaround', 'platform', 'native'} and note['references']
+        for field in ('objective', 'constraint', 'approach', 'tradeoff'):
+            assert note[field] in panel['text'], f'missing adaptation {field}: {source}'
+            assert note[field].lower() in index.search[entry['id']], f'unsearchable note: {source}'
     sources.append(source)
     sources.extend(file for file in entry.get('support', []) if not file.endswith('.txt'))
 
@@ -103,4 +136,5 @@ for file in [ROOT / 'index.html', *sorted((ROOT / 'code').glob('*.html'))]:
         assert target.is_file(), f'broken local link: {file}: {link}'
         if url.fragment and target.suffix == '.html':
             assert url.fragment in read_page(target).ids, f'missing anchor: {link}'
-print(f'Catalog passed: {len(entries)} languages, {len(sources)} exact source views, all local links valid.')
+print(f'Catalog passed: {len(entries)} languages, {len(sources)} exact source views, '
+      f'{sum(len(entry["adaptations"]) for entry in entries)} adaptation notes, all local links valid.')

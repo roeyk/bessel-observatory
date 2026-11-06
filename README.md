@@ -8,6 +8,10 @@ separate operating-system processes, and writes ordered CSV results.
 
 Browse the alphabetical language table, highlighted code and raw sources,
 build instructions, memory and string examples, and validation status.
+Expand **Objectives & adaptations** in any language row to see its constraints,
+implementation choices, dependencies and links to the relevant procedures.
+The catalogue distinguishes workarounds, platform dependencies and native
+approaches; its filter searches these notes too.
 The site is hosted on GitHub Pages. For offline browsing, download or clone
 this repository and open [index.html](index.html) locally.
 
