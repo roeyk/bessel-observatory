@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 manifest = json.loads((ROOT / "manifest.json").read_text())
 target = ROOT / "code"
 target.mkdir(exist_ok=True)
-aliases = {"pascal": "pascal", "basic": "qbasic", "objc": "objective-c",
+aliases = {"visualbasic": "vb.net", "pascal": "pascal", "basic": "qbasic", "objc": "objective-c",
            "lisp": "common-lisp", "sql": "postgresql", "cobol": "cobolfree"}
 formatter = HtmlFormatter(style="native", linenos="table", lineanchors="L",
                           anchorlinenos=True, cssclass="highlight")
@@ -36,7 +36,7 @@ for parent in manifest["languages"]:
     for source in parent.get("support", []):
         if source.endswith(".txt"):
             continue
-        languages.append({"id": {".c":"c", ".sh":"bash", ".sql":"sql", ".pm":"perl"}[Path(source).suffix],
+        languages.append({"id": {".c":"c", ".sh":"bash", ".sql":"sql", ".pm":"perl", ".vbproj":"xml"}[Path(source).suffix],
                           "name": parent["name"]+" support", "source": source,
                           "runtime": parent["runtime"], "idioms": "Support interface for "+parent["source"],
                           "support_page": True})

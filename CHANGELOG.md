@@ -3,6 +3,15 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-15 — Modern Visual Basic
+
+- Added the 32nd edition as a strict, SDK-style VB.NET console project for .NET 11.
+  Its VB quadrature runs in bounded OS child processes, with asynchronous pipe
+  drainage, checked worker PIDs, deterministic resource cleanup and invariant CSV.
+- Added highlighted VB/project sources, objectives/adaptations and Linux build
+  instructions. All eleven shared checks passed; the previous evidence is retained.
+- Added required Linux Visual Basic execution to CI alongside the six core editions.
+
 ## 2026-11-06 — Objectives and adaptations
 
 - Added 61 expandable notes across all 31 languages, explaining objectives,

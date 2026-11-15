@@ -1,5 +1,5 @@
 {
-  "generated_utc": "2026-11-06T13:40:52.219999+00:00",
+  "generated_utc": "2026-11-15T17:43:17.067263+00:00",
   "method": "Black-box execution against stored 80-digit reference values; process IDs checked against parent PID. No assertion of bitwise equality or relative speed.",
   "toolchains": "Some toolchains may be unpacked into /tmp through --overrides; no global installations are required.",
   "results": [
@@ -842,6 +842,32 @@
         22,
         23,
         24
+      ]
+    },
+    {
+      "id": "visualbasic",
+      "language": "Visual Basic",
+      "status": "passed",
+      "checks": [
+        "help",
+        "reference values, order, CSV schema, child process IDs",
+        "single-worker invocation",
+        "invalid lines skipped with diagnostics",
+        "interactive/stdin and blank-line termination",
+        "invalid worker counts",
+        "missing input file",
+        "unwritable output target (directory)",
+        "no valid input",
+        "excess arguments",
+        "input size bound"
+      ],
+      "source_sha256": "a5e13bc31e748206cd15427c8eb8958b1fb78d88c5e1c3e3dbfa3f124f507842",
+      "dependency_sha256": {
+        "bessel.vbproj": "ec38017b4a6b5d3a3ba3a02a00de9f80c2c584a9a0f7791a4efa36a03cc99c5e"
+      },
+      "observed_worker_pids": [
+        53,
+        60
       ]
     }
   ],

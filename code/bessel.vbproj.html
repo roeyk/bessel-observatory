@@ -1,0 +1,99 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="ec38017b4a6b5d3a3ba3a02a00de9f80c2c584a9a0f7791a4efa36a03cc99c5e">
+<title>Visual Basic support — bessel.vbproj — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 32 languages</a>
+<a href="BesselPerligata.pm.html">← Lingua::Romana::Perligata support</a><a href="bessel.pas.html">Pascal →</a></nav>
+<h1>Visual Basic support <code>bessel.vbproj</code></h1>
+<p>Visual Basic .NET on .NET 11 SDK; portable console DLL (Linux baseline) · Support interface for bessel.vb</p>
+<p><strong>Memory:</strong> See the source for data references and process buffers.<br><strong>Strings:</strong> Input cleanup, parsing, and CSV formatting.</p>
+<div class="actions"><a href="../bessel.vbproj">Open raw source</a>
+<a href="../bessel.vbproj" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1"> 1</a></span>
+<span class="normal"><a href="#L-2"> 2</a></span>
+<span class="normal"><a href="#L-3"> 3</a></span>
+<span class="normal"><a href="#L-4"> 4</a></span>
+<span class="normal"><a href="#L-5"> 5</a></span>
+<span class="normal"><a href="#L-6"> 6</a></span>
+<span class="normal"><a href="#L-7"> 7</a></span>
+<span class="normal"><a href="#L-8"> 8</a></span>
+<span class="normal"><a href="#L-9"> 9</a></span>
+<span class="normal"><a href="#L-10">10</a></span>
+<span class="normal"><a href="#L-11">11</a></span>
+<span class="normal"><a href="#L-12">12</a></span>
+<span class="normal"><a href="#L-13">13</a></span>
+<span class="normal"><a href="#L-14">14</a></span>
+<span class="normal"><a href="#L-15">15</a></span>
+<span class="normal"><a href="#L-16">16</a></span>
+<span class="normal"><a href="#L-17">17</a></span>
+<span class="normal"><a href="#L-18">18</a></span>
+<span class="normal"><a href="#L-19">19</a></span>
+<span class="normal"><a href="#L-20">20</a></span>
+<span class="normal"><a href="#L-21">21</a></span>
+<span class="normal"><a href="#L-22">22</a></span>
+<span class="normal"><a href="#L-23">23</a></span>
+<span class="normal"><a href="#L-24">24</a></span>
+<span class="normal"><a href="#L-25">25</a></span>
+<span class="normal"><a href="#L-26">26</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="nt">&lt;Project&gt;</span>
+<a id="L-2" name="L-2"></a><span class="w">  </span><span class="cm">&lt;!-- Set the intermediate directory before SDK imports so restore stays in build/. --&gt;</span>
+<a id="L-3" name="L-3"></a><span class="w">  </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<a id="L-4" name="L-4"></a><span class="w">    </span><span class="nt">&lt;BaseIntermediateOutputPath&gt;</span>build/visual-basic/obj/<span class="nt">&lt;/BaseIntermediateOutputPath&gt;</span>
+<a id="L-5" name="L-5"></a><span class="w">  </span><span class="nt">&lt;/PropertyGroup&gt;</span>
+<a id="L-6" name="L-6"></a><span class="w">  </span><span class="nt">&lt;Import</span><span class="w"> </span><span class="na">Project=</span><span class="s">&quot;Sdk.props&quot;</span><span class="w"> </span><span class="na">Sdk=</span><span class="s">&quot;Microsoft.NET.Sdk&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="L-7" name="L-7"></a><span class="w">  </span><span class="nt">&lt;PropertyGroup&gt;</span>
+<a id="L-8" name="L-8"></a><span class="w">    </span><span class="nt">&lt;OutputType&gt;</span>Exe<span class="nt">&lt;/OutputType&gt;</span>
+<a id="L-9" name="L-9"></a><span class="w">    </span><span class="nt">&lt;TargetFramework&gt;</span>net11.0<span class="nt">&lt;/TargetFramework&gt;</span>
+<a id="L-10" name="L-10"></a><span class="w">    </span><span class="nt">&lt;RootNamespace&gt;</span>Bessel<span class="nt">&lt;/RootNamespace&gt;</span>
+<a id="L-11" name="L-11"></a><span class="w">    </span><span class="nt">&lt;AssemblyName&gt;</span>bessel-visual-basic<span class="nt">&lt;/AssemblyName&gt;</span>
+<a id="L-12" name="L-12"></a><span class="w">    </span><span class="nt">&lt;OutputPath&gt;</span>build/visual-basic/<span class="nt">&lt;/OutputPath&gt;</span>
+<a id="L-13" name="L-13"></a><span class="w">    </span><span class="nt">&lt;AppendTargetFrameworkToOutputPath&gt;</span>false<span class="nt">&lt;/AppendTargetFrameworkToOutputPath&gt;</span>
+<a id="L-14" name="L-14"></a><span class="w">    </span><span class="nt">&lt;UseAppHost&gt;</span>false<span class="nt">&lt;/UseAppHost&gt;</span>
+<a id="L-15" name="L-15"></a><span class="w">    </span><span class="nt">&lt;EnableDefaultCompileItems&gt;</span>false<span class="nt">&lt;/EnableDefaultCompileItems&gt;</span>
+<a id="L-16" name="L-16"></a><span class="w">    </span><span class="nt">&lt;OptionStrict&gt;</span>On<span class="nt">&lt;/OptionStrict&gt;</span>
+<a id="L-17" name="L-17"></a><span class="w">    </span><span class="nt">&lt;OptionExplicit&gt;</span>On<span class="nt">&lt;/OptionExplicit&gt;</span>
+<a id="L-18" name="L-18"></a><span class="w">    </span><span class="nt">&lt;OptionInfer&gt;</span>On<span class="nt">&lt;/OptionInfer&gt;</span>
+<a id="L-19" name="L-19"></a><span class="w">    </span><span class="nt">&lt;TreatWarningsAsErrors&gt;</span>true<span class="nt">&lt;/TreatWarningsAsErrors&gt;</span>
+<a id="L-20" name="L-20"></a><span class="w">    </span><span class="nt">&lt;Deterministic&gt;</span>true<span class="nt">&lt;/Deterministic&gt;</span>
+<a id="L-21" name="L-21"></a><span class="w">  </span><span class="nt">&lt;/PropertyGroup&gt;</span>
+<a id="L-22" name="L-22"></a><span class="w">  </span><span class="nt">&lt;ItemGroup&gt;</span>
+<a id="L-23" name="L-23"></a><span class="w">    </span><span class="nt">&lt;Compile</span><span class="w"> </span><span class="na">Include=</span><span class="s">&quot;bessel.vb&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="L-24" name="L-24"></a><span class="w">  </span><span class="nt">&lt;/ItemGroup&gt;</span>
+<a id="L-25" name="L-25"></a><span class="w">  </span><span class="nt">&lt;Import</span><span class="w"> </span><span class="na">Project=</span><span class="s">&quot;Sdk.targets&quot;</span><span class="w"> </span><span class="na">Sdk=</span><span class="s">&quot;Microsoft.NET.Sdk&quot;</span><span class="w"> </span><span class="nt">/&gt;</span>
+<a id="L-26" name="L-26"></a><span class="nt">&lt;/Project&gt;</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>&lt;Project&gt;
+  &lt;!-- Set the intermediate directory before SDK imports so restore stays in build/. --&gt;
+  &lt;PropertyGroup&gt;
+    &lt;BaseIntermediateOutputPath&gt;build/visual-basic/obj/&lt;/BaseIntermediateOutputPath&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;Import Project=&quot;Sdk.props&quot; Sdk=&quot;Microsoft.NET.Sdk&quot; /&gt;
+  &lt;PropertyGroup&gt;
+    &lt;OutputType&gt;Exe&lt;/OutputType&gt;
+    &lt;TargetFramework&gt;net11.0&lt;/TargetFramework&gt;
+    &lt;RootNamespace&gt;Bessel&lt;/RootNamespace&gt;
+    &lt;AssemblyName&gt;bessel-visual-basic&lt;/AssemblyName&gt;
+    &lt;OutputPath&gt;build/visual-basic/&lt;/OutputPath&gt;
+    &lt;AppendTargetFrameworkToOutputPath&gt;false&lt;/AppendTargetFrameworkToOutputPath&gt;
+    &lt;UseAppHost&gt;false&lt;/UseAppHost&gt;
+    &lt;EnableDefaultCompileItems&gt;false&lt;/EnableDefaultCompileItems&gt;
+    &lt;OptionStrict&gt;On&lt;/OptionStrict&gt;
+    &lt;OptionExplicit&gt;On&lt;/OptionExplicit&gt;
+    &lt;OptionInfer&gt;On&lt;/OptionInfer&gt;
+    &lt;TreatWarningsAsErrors&gt;true&lt;/TreatWarningsAsErrors&gt;
+    &lt;Deterministic&gt;true&lt;/Deterministic&gt;
+  &lt;/PropertyGroup&gt;
+  &lt;ItemGroup&gt;
+    &lt;Compile Include=&quot;bessel.vb&quot; /&gt;
+  &lt;/ItemGroup&gt;
+  &lt;Import Project=&quot;Sdk.targets&quot; Sdk=&quot;Microsoft.NET.Sdk&quot; /&gt;
+&lt;/Project&gt;
+</textarea>
+<footer>Highlighted with Pygments using the XML lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>ec38017b4a6b5d3a3ba3a02a00de9f80c2c584a9a0f7791a4efa36a03cc99c5e</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

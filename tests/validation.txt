@@ -1,6 +1,6 @@
 VALIDATION RECORD
 
-The current tests/report.json records 26 passed editions and five untested ones.
+The current tests/report.json records 27 passed editions and five untested ones.
 Each passed edition completed all 11 behavioral checks against the sources
 identified by SHA-256 in that report. The final Perligata comment pass was
 followed by another complete run of its 11 checks.
@@ -53,7 +53,7 @@ Untested:
 These are source implementations, not runtime-verified claims.
 
 Offline HTML checks:
-  python3 tests/verify_catalog.py verifies all 31 language entries, all 35
+  python3 tests/verify_catalog.py verifies all 32 language entries, all 37
   highlighted main/support source views, embedded raw source equality,
   SHA-256 hashes, report/source correspondence, and every local link/anchor.
   Pygments supplies bundled lexers; tools/catalog_lexers.py covers Oberon-2,
@@ -102,3 +102,21 @@ PostScript addition (2026-11-06):
   and 16 numeric workers for those requested limits and matched all 32 output
   PIDs in each run to actual child interpreters. This sampling supplements the
   common suite; it is not a proof of all possible scheduling/failure histories.
+
+Visual Basic addition (2026-11-15):
+  Passed all eleven shared checks on Linux x86-64 with .NET SDK 11.0.100,
+  runtime 11.0.0, Roslyn VB compiler 5.12.0-1.26529.118, language version 17.13.
+  The SDK-style project targets net11.0 and treats warnings as errors. No NuGet
+  packages or Windows-only UI APIs are required. The build emits a portable DLL
+  under build/visual-basic; launch it through dotnet as documented in the manifest.
+  Fresh evidence binds both bessel.vb and bessel.vbproj by SHA-256. All previous
+  31 report entries are retained unchanged. Windows/macOS remain unverified.
+  Focused Linux probes also passed: 101 independent 80-digit mpmath references
+  (maximum absolute error 6.478e-16), complete 4096-row runs at worker limits 1
+  and 16, observed peaks exactly 1 and 16, and every CSV PID matched a real child.
+  SIGKILL of a worker produced a nonzero parent exit, preserved existing output,
+  and left no observed children alive. Other probes covered German/French/Turkish
+  locales, filenames with spaces/metacharacters, another working directory,
+  default arguments, same input/output file, malformed decimals and /dev/full.
+  These focused probes supplement the eleven shared checks; they do not claim
+  Windows/macOS execution, parent-signal cleanup or transactional disk writes.

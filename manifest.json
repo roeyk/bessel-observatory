@@ -1,8 +1,8 @@
 {
   "title": "Bessel Observatory",
   "created": "2026-11-04",
-  "language_count": 31,
-  "description": "One numerical observatory, expressed independently and idiomatically in 31 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
+  "language_count": 32,
+  "description": "One numerical observatory, expressed independently and idiomatically in 32 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
   "goals": [
     "Make language differences visible through equivalent observable behavior.",
     "Exercise file and console I/O, interactive input, command-line arguments, graceful error handling, actual OS multiprocessing, and special-function mathematics.",
@@ -73,7 +73,7 @@
     "runner": "python3 tests/verify.py",
     "references": "tests/reference.json",
     "status": "See per-language report; source review is not a substitute for compilation/execution.",
-    "source_browser": "31 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
+    "source_browser": "32 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
   },
   "sources": [
     {
@@ -151,6 +151,18 @@
     {
       "title": "Ghostscript command-line and file permissions",
       "url": "https://ghostscript.readthedocs.io/en/latest/Use.html"
+    },
+    {
+      "title": "Microsoft Visual Basic coding conventions",
+      "url": "https://learn.microsoft.com/en-us/dotnet/visual-basic/programming-guide/program-structure/coding-conventions"
+    },
+    {
+      "title": ".NET Process redirected output and pipe deadlocks",
+      "url": "https://learn.microsoft.com/en-us/dotnet/api/system.diagnostics.process.standardoutput"
+    },
+    {
+      "title": ".NET 11 SDK and Visual Basic compiler",
+      "url": "https://dotnet.microsoft.com/en-us/download/dotnet/11.0"
     }
   ],
   "languages": [
@@ -1840,6 +1852,104 @@
               "source": "bessel.ps",
               "match": "/cleanup {",
               "label": "cleanup and error boundary"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "visualbasic",
+      "name": "Visual Basic",
+      "source": "bessel.vb",
+      "runtime": "Visual Basic .NET on .NET 11 SDK; portable console DLL (Linux baseline)",
+      "support": [
+        "bessel.vbproj"
+      ],
+      "validation_dependencies": [
+        "bessel.vbproj"
+      ],
+      "build": [
+        "dotnet",
+        "build",
+        "bessel.vbproj",
+        "-c",
+        "Release",
+        "--nologo"
+      ],
+      "run": [
+        "dotnet",
+        "build/visual-basic/bessel-visual-basic.dll"
+      ],
+      "idioms": "Option Strict/Explicit, typed collections, ByRef parsing, Using, structured exceptions, and asynchronous pipe I/O.",
+      "multiprocessing": "System.Diagnostics.Process launches a bounded number of VB worker processes; Tasks only move pipe data.",
+      "memory": "GC-managed Double arrays with checked element indexing; VB array bounds are inclusive. Lists/readers are managed references; ByRef returns the parsed Double. No native raw-pointer arithmetic.",
+      "strings": "Trim, ordinal StartsWith, decimal regex, invariant TryParse and round-trip formatting, StringBuilder, CSV Split/Join, and interpolation.",
+      "highlighted": "code/bessel.vb.html",
+      "adaptations": [
+        {
+          "objective": "Real OS workers with bounded resource ownership",
+          "kind": "platform",
+          "constraint": "Async Tasks do not provide the separate operating-system processes required for numerical work.",
+          "approach": "Launch the same portable VB assembly with Process and ArgumentList, split observations into contiguous partitions, drain both output pipes asynchronously, and verify every returned PID against its child. Finally kills unfinished children, reaps them and disposes handles.",
+          "tradeoff": "Requires the .NET 11 runtime and process creation permission. At most 16 children are launched; each child wait is limited to 60 seconds. The Linux behavior is tested; Windows and macOS are not yet validated.",
+          "references": [
+            {
+              "source": "bessel.vb",
+              "match": "Private Function StartWorker(",
+              "label": "Process launch and pipe drainage"
+            },
+            {
+              "source": "bessel.vb",
+              "match": "Private Function RunWorkers(",
+              "label": "Bounded partitions and cleanup"
+            }
+          ]
+        },
+        {
+          "objective": "Strict typing, managed memory and predictable cleanup",
+          "kind": "native",
+          "constraint": "Visual Basic has managed references and bounds-checked arrays rather than native raw-pointer arithmetic.",
+          "approach": "Option Strict and Option Explicit enforce compile-time typing; ByRef returns parsed values. The numerical kernel traverses a live Double array. Using scopes file/pipe ownership, while Try/Catch reports ordinary failures at the CLI boundary.",
+          "tradeoff": "The garbage collector owns array storage; file and process resources still need deterministic disposal. VB uses apostrophe line comments because it has no native block-comment delimiter.",
+          "references": [
+            {
+              "source": "bessel.vb",
+              "match": "Private Function Observe(",
+              "label": "Managed array and compensated sum"
+            },
+            {
+              "source": "bessel.vb",
+              "match": "Private Function TryNumber(",
+              "label": "Typed ByRef parsing"
+            },
+            {
+              "source": "bessel.vbproj",
+              "match": "<TreatWarningsAsErrors>",
+              "label": "SDK project and strict build"
+            }
+          ]
+        },
+        {
+          "objective": "Stable decimal input and CSV across locale settings",
+          "kind": "native",
+          "constraint": "Current-culture numeric conversion can change decimal separators and corrupt portable CSV.",
+          "approach": "Validate decimal tokens, parse with InvariantCulture and NumberStyles.Float, reject nonfinite/out-of-domain values, and format with round-trip R and invariant culture in parent and workers.",
+          "tradeoff": "Input and output always use a decimal point, including under comma-decimal locales. CSV is opened only after all workers succeed; an output-device failure can still leave a partial file.",
+          "references": [
+            {
+              "source": "bessel.vb",
+              "match": "Private Function TryNumber(",
+              "label": "Decimal grammar and invariant parsing"
+            },
+            {
+              "source": "bessel.vb",
+              "match": "Private Sub WorkerMain()",
+              "label": "Invariant CSV serialization"
+            },
+            {
+              "source": "bessel.vb",
+              "match": "Public Function Main(",
+              "label": "Input and output ownership"
             }
           ]
         }

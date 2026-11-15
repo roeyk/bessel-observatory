@@ -1,6 +1,6 @@
 # Bessel Observatory
 
-The same numerical program in **31 languages**, with an offline, syntax-highlighted
+The same numerical program in **32 languages**, with an offline, syntax-highlighted
 source catalogue. Each edition reads observations, calculates Bessel J₀ in
 separate operating-system processes, and writes ordered CSV results.
 
@@ -38,7 +38,8 @@ build/run commands. Build products belong under `build/`.
 
 Ada, Bash, BASIC, C, C++, COBOL, Erlang, Fortran, Go, Haskell, Java, JavaScript,
 Julia, Kotlin, Lingua::Romana::Perligata, Lisp, Lua, Oberon-2, Objective-C, OCaml,
-Pascal, Perl, PostScript, Prolog, Python, RPG, Ruby, Rust, Smalltalk, SQL, and Swift.
+Pascal, Perl, PostScript, Prolog, Python, RPG, Ruby, Rust, Smalltalk, SQL, Swift,
+and Visual Basic.
 
 The editions use their language's idioms and comment conventions. Function
 comments explain purpose, inputs, outputs, and callers. Pointer arithmetic is
@@ -69,6 +70,14 @@ buffer-offset, or relational model. All editions manipulate input/output strings
 - RPG targets IBM i. Read [rpg_setup.txt](rpg_setup.txt) before compiling or
   configuring its batch queue. Its CALL parameters and job-message errors are
   native IBM i interfaces.
+- Visual Basic uses modern VB.NET practices with the .NET 11 SDK, strict typing,
+  managed arrays, `Using`, structured exceptions and culture-independent decimals.
+  The portable console project builds and runs directly on Linux:
+  `dotnet build bessel.vbproj -c Release`, then
+  `dotnet build/visual-basic/bessel-visual-basic.dll examples/values.txt results.csv 2`.
+  The same VB assembly runs in bounded child processes; asynchronous Tasks only
+  transport pipe data. Windows and macOS execution remains unverified. See the
+  [VB source](bessel.vb) and [SDK project](bessel.vbproj).
 
 Use `tools/build_basic.sh` for FreeBASIC: compiling `bessel.bas` directly can
 create and remove a C intermediate named `bessel.c`, damaging the C edition.
@@ -82,10 +91,10 @@ See the [NIST DLMF Bessel integral](https://dlmf.nist.gov/10.9#E1).
 This is a special-function and language comparison, not a speed ranking or
 certified numerical library.
 
-The recorded baseline has **26 editions passing all 11 behavioral checks**.
+The recorded baseline has **27 editions passing all 11 behavioral checks**.
 Smalltalk, Julia, Swift, SQL, and RPG are explicitly untested in that baseline.
 [tests/report.json](tests/report.json) ties the evidence to source hashes
-(and the declared Perligata helper dependency);
+(and the declared Perligata helper and VB project dependencies);
 [tests/validation.txt](tests/validation.txt) explains toolchains, test scope,
 limitations, and independent 80-digit reference values.
 
@@ -100,7 +109,9 @@ make check
 
 `make check` verifies the catalogue, lints Python tooling, and runs the C, C++,
 Python, Bash, Perl, and Ruby editions. Install their toolchains first. It writes
-fresh evidence under `build/` and preserves the committed 31-language baseline.
+fresh evidence under `build/` and preserves the committed 32-language baseline.
+CI also installs .NET 11 and runs all eleven checks for Visual Basic; locally,
+use `make test EDITIONS=visualbasic` with `dotnet` on your PATH.
 GitHub Actions runs the same checks and verifies reproducible generated HTML.
 GitHub Pages publishes the committed static catalogue from the root of `main`;
 `.nojekyll` keeps the generated HTML and linked source files intact.
