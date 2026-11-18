@@ -3,6 +3,15 @@
 Changes are recorded by date until a versioned release is intentionally made.
 No package or release tag is implied by this initial publication.
 
+## 2026-11-18 — Standalone Awk
+
+- Added the 33rd edition in GNU Awk, including input handling, compensated
+  quadrature, bounded persistent OS workers and ordered CSV output.
+- Documented GNU coprocess/PID/error-handling extensions and the POSIX shell
+  launch/termination boundary. Added highlighted source and adaptation notes.
+- Verified all eleven shared checks and added explicit GNU Awk execution to CI.
+  Retained every earlier edition's hash-bound evidence.
+
 ## 2026-11-15 — Modern Visual Basic
 
 - Added the 32nd edition as a strict, SDK-style VB.NET console project for .NET 11.

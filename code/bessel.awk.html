@@ -1,0 +1,798 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1"><meta name="source-sha256" content="7494e3f6ce0c93e1901bcf372c38ab49387d30e8c3309b2b796200e761630dae">
+<title>Awk — bessel.awk — Bessel Observatory</title><link rel="stylesheet" href="code.css"></head>
+<body><header><nav><a href="../index.html#languages">← All 33 languages</a>
+<a href="bessel.vb.html">← Visual Basic</a><a href="bessel-oberon-posix.c.html">Oberon-2 support →</a></nav>
+<h1>Awk <code>bessel.awk</code></h1>
+<p>GNU Awk (gawk) 5.2+ on POSIX; Linux validation baseline · Associative arrays, record parsing, regexes, sub/split, explicit getline, formatted output, and GNU coprocess pipes.</p>
+<p><strong>Memory:</strong> Awk owns associative arrays with ordered numeric keys. Array arguments share caller storage; scalars are passed by value. No native raw pointers or pointer arithmetic.<br><strong>Strings:</strong> Whitespace trimming, decimal regex validation, sub/split, shell argument quoting, string concatenation and %.17g round-trip CSV formatting.</p>
+<div class="actions"><a href="../bessel.awk">Open raw source</a>
+<a href="../bessel.awk" download>Download source</a><button id="copy" type="button">Copy code</button>
+<button id="wrap" type="button" aria-pressed="false">Wrap long lines</button><span id="notice" role="status"></span></div></header>
+<main id="listing"><div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"><a href="#L-1">  1</a></span>
+<span class="normal"><a href="#L-2">  2</a></span>
+<span class="normal"><a href="#L-3">  3</a></span>
+<span class="normal"><a href="#L-4">  4</a></span>
+<span class="normal"><a href="#L-5">  5</a></span>
+<span class="normal"><a href="#L-6">  6</a></span>
+<span class="normal"><a href="#L-7">  7</a></span>
+<span class="normal"><a href="#L-8">  8</a></span>
+<span class="normal"><a href="#L-9">  9</a></span>
+<span class="normal"><a href="#L-10"> 10</a></span>
+<span class="normal"><a href="#L-11"> 11</a></span>
+<span class="normal"><a href="#L-12"> 12</a></span>
+<span class="normal"><a href="#L-13"> 13</a></span>
+<span class="normal"><a href="#L-14"> 14</a></span>
+<span class="normal"><a href="#L-15"> 15</a></span>
+<span class="normal"><a href="#L-16"> 16</a></span>
+<span class="normal"><a href="#L-17"> 17</a></span>
+<span class="normal"><a href="#L-18"> 18</a></span>
+<span class="normal"><a href="#L-19"> 19</a></span>
+<span class="normal"><a href="#L-20"> 20</a></span>
+<span class="normal"><a href="#L-21"> 21</a></span>
+<span class="normal"><a href="#L-22"> 22</a></span>
+<span class="normal"><a href="#L-23"> 23</a></span>
+<span class="normal"><a href="#L-24"> 24</a></span>
+<span class="normal"><a href="#L-25"> 25</a></span>
+<span class="normal"><a href="#L-26"> 26</a></span>
+<span class="normal"><a href="#L-27"> 27</a></span>
+<span class="normal"><a href="#L-28"> 28</a></span>
+<span class="normal"><a href="#L-29"> 29</a></span>
+<span class="normal"><a href="#L-30"> 30</a></span>
+<span class="normal"><a href="#L-31"> 31</a></span>
+<span class="normal"><a href="#L-32"> 32</a></span>
+<span class="normal"><a href="#L-33"> 33</a></span>
+<span class="normal"><a href="#L-34"> 34</a></span>
+<span class="normal"><a href="#L-35"> 35</a></span>
+<span class="normal"><a href="#L-36"> 36</a></span>
+<span class="normal"><a href="#L-37"> 37</a></span>
+<span class="normal"><a href="#L-38"> 38</a></span>
+<span class="normal"><a href="#L-39"> 39</a></span>
+<span class="normal"><a href="#L-40"> 40</a></span>
+<span class="normal"><a href="#L-41"> 41</a></span>
+<span class="normal"><a href="#L-42"> 42</a></span>
+<span class="normal"><a href="#L-43"> 43</a></span>
+<span class="normal"><a href="#L-44"> 44</a></span>
+<span class="normal"><a href="#L-45"> 45</a></span>
+<span class="normal"><a href="#L-46"> 46</a></span>
+<span class="normal"><a href="#L-47"> 47</a></span>
+<span class="normal"><a href="#L-48"> 48</a></span>
+<span class="normal"><a href="#L-49"> 49</a></span>
+<span class="normal"><a href="#L-50"> 50</a></span>
+<span class="normal"><a href="#L-51"> 51</a></span>
+<span class="normal"><a href="#L-52"> 52</a></span>
+<span class="normal"><a href="#L-53"> 53</a></span>
+<span class="normal"><a href="#L-54"> 54</a></span>
+<span class="normal"><a href="#L-55"> 55</a></span>
+<span class="normal"><a href="#L-56"> 56</a></span>
+<span class="normal"><a href="#L-57"> 57</a></span>
+<span class="normal"><a href="#L-58"> 58</a></span>
+<span class="normal"><a href="#L-59"> 59</a></span>
+<span class="normal"><a href="#L-60"> 60</a></span>
+<span class="normal"><a href="#L-61"> 61</a></span>
+<span class="normal"><a href="#L-62"> 62</a></span>
+<span class="normal"><a href="#L-63"> 63</a></span>
+<span class="normal"><a href="#L-64"> 64</a></span>
+<span class="normal"><a href="#L-65"> 65</a></span>
+<span class="normal"><a href="#L-66"> 66</a></span>
+<span class="normal"><a href="#L-67"> 67</a></span>
+<span class="normal"><a href="#L-68"> 68</a></span>
+<span class="normal"><a href="#L-69"> 69</a></span>
+<span class="normal"><a href="#L-70"> 70</a></span>
+<span class="normal"><a href="#L-71"> 71</a></span>
+<span class="normal"><a href="#L-72"> 72</a></span>
+<span class="normal"><a href="#L-73"> 73</a></span>
+<span class="normal"><a href="#L-74"> 74</a></span>
+<span class="normal"><a href="#L-75"> 75</a></span>
+<span class="normal"><a href="#L-76"> 76</a></span>
+<span class="normal"><a href="#L-77"> 77</a></span>
+<span class="normal"><a href="#L-78"> 78</a></span>
+<span class="normal"><a href="#L-79"> 79</a></span>
+<span class="normal"><a href="#L-80"> 80</a></span>
+<span class="normal"><a href="#L-81"> 81</a></span>
+<span class="normal"><a href="#L-82"> 82</a></span>
+<span class="normal"><a href="#L-83"> 83</a></span>
+<span class="normal"><a href="#L-84"> 84</a></span>
+<span class="normal"><a href="#L-85"> 85</a></span>
+<span class="normal"><a href="#L-86"> 86</a></span>
+<span class="normal"><a href="#L-87"> 87</a></span>
+<span class="normal"><a href="#L-88"> 88</a></span>
+<span class="normal"><a href="#L-89"> 89</a></span>
+<span class="normal"><a href="#L-90"> 90</a></span>
+<span class="normal"><a href="#L-91"> 91</a></span>
+<span class="normal"><a href="#L-92"> 92</a></span>
+<span class="normal"><a href="#L-93"> 93</a></span>
+<span class="normal"><a href="#L-94"> 94</a></span>
+<span class="normal"><a href="#L-95"> 95</a></span>
+<span class="normal"><a href="#L-96"> 96</a></span>
+<span class="normal"><a href="#L-97"> 97</a></span>
+<span class="normal"><a href="#L-98"> 98</a></span>
+<span class="normal"><a href="#L-99"> 99</a></span>
+<span class="normal"><a href="#L-100">100</a></span>
+<span class="normal"><a href="#L-101">101</a></span>
+<span class="normal"><a href="#L-102">102</a></span>
+<span class="normal"><a href="#L-103">103</a></span>
+<span class="normal"><a href="#L-104">104</a></span>
+<span class="normal"><a href="#L-105">105</a></span>
+<span class="normal"><a href="#L-106">106</a></span>
+<span class="normal"><a href="#L-107">107</a></span>
+<span class="normal"><a href="#L-108">108</a></span>
+<span class="normal"><a href="#L-109">109</a></span>
+<span class="normal"><a href="#L-110">110</a></span>
+<span class="normal"><a href="#L-111">111</a></span>
+<span class="normal"><a href="#L-112">112</a></span>
+<span class="normal"><a href="#L-113">113</a></span>
+<span class="normal"><a href="#L-114">114</a></span>
+<span class="normal"><a href="#L-115">115</a></span>
+<span class="normal"><a href="#L-116">116</a></span>
+<span class="normal"><a href="#L-117">117</a></span>
+<span class="normal"><a href="#L-118">118</a></span>
+<span class="normal"><a href="#L-119">119</a></span>
+<span class="normal"><a href="#L-120">120</a></span>
+<span class="normal"><a href="#L-121">121</a></span>
+<span class="normal"><a href="#L-122">122</a></span>
+<span class="normal"><a href="#L-123">123</a></span>
+<span class="normal"><a href="#L-124">124</a></span>
+<span class="normal"><a href="#L-125">125</a></span>
+<span class="normal"><a href="#L-126">126</a></span>
+<span class="normal"><a href="#L-127">127</a></span>
+<span class="normal"><a href="#L-128">128</a></span>
+<span class="normal"><a href="#L-129">129</a></span>
+<span class="normal"><a href="#L-130">130</a></span>
+<span class="normal"><a href="#L-131">131</a></span>
+<span class="normal"><a href="#L-132">132</a></span>
+<span class="normal"><a href="#L-133">133</a></span>
+<span class="normal"><a href="#L-134">134</a></span>
+<span class="normal"><a href="#L-135">135</a></span>
+<span class="normal"><a href="#L-136">136</a></span>
+<span class="normal"><a href="#L-137">137</a></span>
+<span class="normal"><a href="#L-138">138</a></span>
+<span class="normal"><a href="#L-139">139</a></span>
+<span class="normal"><a href="#L-140">140</a></span>
+<span class="normal"><a href="#L-141">141</a></span>
+<span class="normal"><a href="#L-142">142</a></span>
+<span class="normal"><a href="#L-143">143</a></span>
+<span class="normal"><a href="#L-144">144</a></span>
+<span class="normal"><a href="#L-145">145</a></span>
+<span class="normal"><a href="#L-146">146</a></span>
+<span class="normal"><a href="#L-147">147</a></span>
+<span class="normal"><a href="#L-148">148</a></span>
+<span class="normal"><a href="#L-149">149</a></span>
+<span class="normal"><a href="#L-150">150</a></span>
+<span class="normal"><a href="#L-151">151</a></span>
+<span class="normal"><a href="#L-152">152</a></span>
+<span class="normal"><a href="#L-153">153</a></span>
+<span class="normal"><a href="#L-154">154</a></span>
+<span class="normal"><a href="#L-155">155</a></span>
+<span class="normal"><a href="#L-156">156</a></span>
+<span class="normal"><a href="#L-157">157</a></span>
+<span class="normal"><a href="#L-158">158</a></span>
+<span class="normal"><a href="#L-159">159</a></span>
+<span class="normal"><a href="#L-160">160</a></span>
+<span class="normal"><a href="#L-161">161</a></span>
+<span class="normal"><a href="#L-162">162</a></span>
+<span class="normal"><a href="#L-163">163</a></span>
+<span class="normal"><a href="#L-164">164</a></span>
+<span class="normal"><a href="#L-165">165</a></span>
+<span class="normal"><a href="#L-166">166</a></span>
+<span class="normal"><a href="#L-167">167</a></span>
+<span class="normal"><a href="#L-168">168</a></span>
+<span class="normal"><a href="#L-169">169</a></span>
+<span class="normal"><a href="#L-170">170</a></span>
+<span class="normal"><a href="#L-171">171</a></span>
+<span class="normal"><a href="#L-172">172</a></span>
+<span class="normal"><a href="#L-173">173</a></span>
+<span class="normal"><a href="#L-174">174</a></span>
+<span class="normal"><a href="#L-175">175</a></span>
+<span class="normal"><a href="#L-176">176</a></span>
+<span class="normal"><a href="#L-177">177</a></span>
+<span class="normal"><a href="#L-178">178</a></span>
+<span class="normal"><a href="#L-179">179</a></span>
+<span class="normal"><a href="#L-180">180</a></span>
+<span class="normal"><a href="#L-181">181</a></span>
+<span class="normal"><a href="#L-182">182</a></span>
+<span class="normal"><a href="#L-183">183</a></span>
+<span class="normal"><a href="#L-184">184</a></span>
+<span class="normal"><a href="#L-185">185</a></span>
+<span class="normal"><a href="#L-186">186</a></span>
+<span class="normal"><a href="#L-187">187</a></span>
+<span class="normal"><a href="#L-188">188</a></span>
+<span class="normal"><a href="#L-189">189</a></span>
+<span class="normal"><a href="#L-190">190</a></span>
+<span class="normal"><a href="#L-191">191</a></span>
+<span class="normal"><a href="#L-192">192</a></span>
+<span class="normal"><a href="#L-193">193</a></span>
+<span class="normal"><a href="#L-194">194</a></span>
+<span class="normal"><a href="#L-195">195</a></span>
+<span class="normal"><a href="#L-196">196</a></span>
+<span class="normal"><a href="#L-197">197</a></span>
+<span class="normal"><a href="#L-198">198</a></span>
+<span class="normal"><a href="#L-199">199</a></span>
+<span class="normal"><a href="#L-200">200</a></span>
+<span class="normal"><a href="#L-201">201</a></span>
+<span class="normal"><a href="#L-202">202</a></span>
+<span class="normal"><a href="#L-203">203</a></span>
+<span class="normal"><a href="#L-204">204</a></span>
+<span class="normal"><a href="#L-205">205</a></span>
+<span class="normal"><a href="#L-206">206</a></span>
+<span class="normal"><a href="#L-207">207</a></span>
+<span class="normal"><a href="#L-208">208</a></span>
+<span class="normal"><a href="#L-209">209</a></span>
+<span class="normal"><a href="#L-210">210</a></span>
+<span class="normal"><a href="#L-211">211</a></span>
+<span class="normal"><a href="#L-212">212</a></span>
+<span class="normal"><a href="#L-213">213</a></span>
+<span class="normal"><a href="#L-214">214</a></span>
+<span class="normal"><a href="#L-215">215</a></span>
+<span class="normal"><a href="#L-216">216</a></span>
+<span class="normal"><a href="#L-217">217</a></span>
+<span class="normal"><a href="#L-218">218</a></span>
+<span class="normal"><a href="#L-219">219</a></span>
+<span class="normal"><a href="#L-220">220</a></span>
+<span class="normal"><a href="#L-221">221</a></span>
+<span class="normal"><a href="#L-222">222</a></span>
+<span class="normal"><a href="#L-223">223</a></span>
+<span class="normal"><a href="#L-224">224</a></span>
+<span class="normal"><a href="#L-225">225</a></span>
+<span class="normal"><a href="#L-226">226</a></span>
+<span class="normal"><a href="#L-227">227</a></span>
+<span class="normal"><a href="#L-228">228</a></span>
+<span class="normal"><a href="#L-229">229</a></span>
+<span class="normal"><a href="#L-230">230</a></span>
+<span class="normal"><a href="#L-231">231</a></span>
+<span class="normal"><a href="#L-232">232</a></span>
+<span class="normal"><a href="#L-233">233</a></span>
+<span class="normal"><a href="#L-234">234</a></span>
+<span class="normal"><a href="#L-235">235</a></span>
+<span class="normal"><a href="#L-236">236</a></span>
+<span class="normal"><a href="#L-237">237</a></span>
+<span class="normal"><a href="#L-238">238</a></span>
+<span class="normal"><a href="#L-239">239</a></span>
+<span class="normal"><a href="#L-240">240</a></span>
+<span class="normal"><a href="#L-241">241</a></span>
+<span class="normal"><a href="#L-242">242</a></span>
+<span class="normal"><a href="#L-243">243</a></span>
+<span class="normal"><a href="#L-244">244</a></span>
+<span class="normal"><a href="#L-245">245</a></span>
+<span class="normal"><a href="#L-246">246</a></span>
+<span class="normal"><a href="#L-247">247</a></span>
+<span class="normal"><a href="#L-248">248</a></span>
+<span class="normal"><a href="#L-249">249</a></span>
+<span class="normal"><a href="#L-250">250</a></span>
+<span class="normal"><a href="#L-251">251</a></span>
+<span class="normal"><a href="#L-252">252</a></span>
+<span class="normal"><a href="#L-253">253</a></span>
+<span class="normal"><a href="#L-254">254</a></span>
+<span class="normal"><a href="#L-255">255</a></span>
+<span class="normal"><a href="#L-256">256</a></span>
+<span class="normal"><a href="#L-257">257</a></span>
+<span class="normal"><a href="#L-258">258</a></span>
+<span class="normal"><a href="#L-259">259</a></span></pre></div></td><td class="code"><div><pre><span></span><a id="L-1" name="L-1"></a><span class="c1">#!/usr/bin/gawk -f</span>
+<a id="L-2" name="L-2"></a><span class="c1"># Bessel Observatory — GNU Awk 5.2+ on POSIX, with real coprocess workers.</span>
+<a id="L-3" name="L-3"></a><span class="c1"># Run: gawk -f bessel.awk -- [INPUT|- [OUTPUT [WORKERS]]]</span>
+<a id="L-4" name="L-4"></a><span class="c1"># GNU |&amp;, PROCINFO, nonfatal output and read timeouts are explicit dependencies.</span>
+<a id="L-5" name="L-5"></a><span class="c1"># The shell only launches/terminates workers; mathematics and scheduling are Awk.</span>
+<a id="L-6" name="L-6"></a>
+<a id="L-7" name="L-7"></a><span class="c1"># Validate decimal input before Awk&#39;s otherwise permissive numeric coercion.</span>
+<a id="L-8" name="L-8"></a><span class="c1"># Input: trimmed text. Output: true for a finite number in [-1000,1000].</span>
+<a id="L-9" name="L-9"></a><span class="c1"># Callers: read_values, worker_main and collect check input/protocol numbers.</span>
+<a id="L-10" name="L-10"></a><span class="kd">function</span> <span class="nx">number</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span>    <span class="nx">value</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-11" name="L-11"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">text</span> <span class="o">!~</span> <span class="sr">/^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$/</span><span class="p">)</span>
+<a id="L-12" name="L-12"></a>        <span class="k">return</span> <span class="mi">0</span>
+<a id="L-13" name="L-13"></a>    <span class="nx">value</span> <span class="o">=</span> <span class="nx">text</span> <span class="o">+</span> <span class="mi">0</span>
+<a id="L-14" name="L-14"></a>    <span class="k">return</span> <span class="nx">value</span> <span class="o">&gt;=</span> <span class="o">-</span><span class="mi">1000</span> <span class="o">&amp;&amp;</span> <span class="nx">value</span> <span class="o">&lt;=</span> <span class="mi">1000</span>
+<a id="L-15" name="L-15"></a><span class="p">}</span>
+<a id="L-16" name="L-16"></a>
+<a id="L-17" name="L-17"></a><span class="c1"># Quote one POSIX shell argument, including literal single quotes in filenames.</span>
+<a id="L-18" name="L-18"></a><span class="c1"># Input: arbitrary text. Output: a single shell word. Caller: start_workers.</span>
+<a id="L-19" name="L-19"></a><span class="kd">function</span> <span class="nx">shell_quote</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span>    <span class="nx">quoted</span><span class="p">,</span> <span class="nx">position</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-20" name="L-20"></a>    <span class="nx">quoted</span> <span class="o">=</span> <span class="s2">&quot;&#39;&quot;</span>
+<a id="L-21" name="L-21"></a>    <span class="k">while</span> <span class="p">((</span><span class="nx">position</span> <span class="o">=</span> <span class="kr">index</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="s2">&quot;&#39;&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-22" name="L-22"></a>        <span class="nx">quoted</span> <span class="o">=</span> <span class="nx">quoted</span> <span class="kr">substr</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">position</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="s2">&quot;&#39;\\&#39;&#39;&quot;</span>
+<a id="L-23" name="L-23"></a>        <span class="nx">text</span> <span class="o">=</span> <span class="kr">substr</span><span class="p">(</span><span class="nx">text</span><span class="p">,</span> <span class="nx">position</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+<a id="L-24" name="L-24"></a>    <span class="p">}</span>
+<a id="L-25" name="L-25"></a>    <span class="k">return</span> <span class="nx">quoted</span> <span class="nx">text</span> <span class="s2">&quot;&#39;&quot;</span>
+<a id="L-26" name="L-26"></a><span class="p">}</span>
+<a id="L-27" name="L-27"></a>
+<a id="L-28" name="L-28"></a><span class="c1"># Locate the source file in the interpreter&#39;s original arguments before ARGV edits.</span>
+<a id="L-29" name="L-29"></a><span class="c1"># Input: PROCINFO argv. Output: one -f/--file source path, or a diagnostic exit.</span>
+<a id="L-30" name="L-30"></a><span class="c1"># Caller: main before launching the same source, including from another directory.</span>
+<a id="L-31" name="L-31"></a><span class="kd">function</span> <span class="nx">program_file</span><span class="p">(</span>    <span class="nx">idx</span><span class="p">,</span> <span class="nx">arg</span><span class="p">,</span> <span class="nx">path</span><span class="p">,</span> <span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-32" name="L-32"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">in</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;argv&quot;</span><span class="p">];</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-33" name="L-33"></a>        <span class="nx">arg</span> <span class="o">=</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;argv&quot;</span><span class="p">][</span><span class="nx">idx</span><span class="p">]</span>
+<a id="L-34" name="L-34"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">arg</span> <span class="o">==</span> <span class="s2">&quot;--&quot;</span><span class="p">)</span> <span class="k">break</span>
+<a id="L-35" name="L-35"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">arg</span> <span class="o">==</span> <span class="s2">&quot;-f&quot;</span> <span class="o">||</span> <span class="nx">arg</span> <span class="o">==</span> <span class="s2">&quot;--file&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-36" name="L-36"></a>            <span class="nx">path</span> <span class="o">=</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;argv&quot;</span><span class="p">][</span><span class="o">++</span><span class="nx">idx</span><span class="p">]</span>
+<a id="L-37" name="L-37"></a>            <span class="nx">count</span><span class="o">++</span>
+<a id="L-38" name="L-38"></a>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">arg</span> <span class="o">~</span> <span class="sr">/^--file=/</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-39" name="L-39"></a>            <span class="nx">path</span> <span class="o">=</span> <span class="kr">substr</span><span class="p">(</span><span class="nx">arg</span><span class="p">,</span> <span class="mi">8</span><span class="p">)</span>
+<a id="L-40" name="L-40"></a>            <span class="nx">count</span><span class="o">++</span>
+<a id="L-41" name="L-41"></a>        <span class="p">}</span> <span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="nx">arg</span> <span class="o">~</span> <span class="sr">/^-f./</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-42" name="L-42"></a>            <span class="nx">path</span> <span class="o">=</span> <span class="kr">substr</span><span class="p">(</span><span class="nx">arg</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<a id="L-43" name="L-43"></a>            <span class="nx">count</span><span class="o">++</span>
+<a id="L-44" name="L-44"></a>        <span class="p">}</span>
+<a id="L-45" name="L-45"></a>    <span class="p">}</span>
+<a id="L-46" name="L-46"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">count</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">path</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="o">||</span> <span class="nx">path</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<a id="L-47" name="L-47"></a>        <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;launch with one source file: gawk -f bessel.awk -- [arguments]&quot;</span><span class="p">)</span>
+<a id="L-48" name="L-48"></a>    <span class="k">return</span> <span class="nx">path</span>
+<a id="L-49" name="L-49"></a><span class="p">}</span>
+<a id="L-50" name="L-50"></a>
+<a id="L-51" name="L-51"></a><span class="c1"># Report a fatal contract/I/O/protocol problem; END releases remaining workers.</span>
+<a id="L-52" name="L-52"></a><span class="c1"># Input: message. Output: stderr diagnostic and status 1. Callers: checked operations.</span>
+<a id="L-53" name="L-53"></a><span class="kd">function</span> <span class="nx">fail</span><span class="p">(</span><span class="nx">message</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-54" name="L-54"></a>    <span class="kr">print</span> <span class="s2">&quot;error: &quot;</span> <span class="nx">message</span> <span class="o">&gt;</span> <span class="s2">&quot;/dev/stderr&quot;</span>
+<a id="L-55" name="L-55"></a>    <span class="k">exit</span> <span class="mi">1</span>
+<a id="L-56" name="L-56"></a><span class="p">}</span>
+<a id="L-57" name="L-57"></a>
+<a id="L-58" name="L-58"></a><span class="c1"># Read observations into an Awk-owned associative array with ordered numeric keys.</span>
+<a id="L-59" name="L-59"></a><span class="c1"># Inputs: filename or -, borrowed array. Output: accepted count; fatal errors exit.</span>
+<a id="L-60" name="L-60"></a><span class="c1"># Caller: main. Array parameters alias caller storage; scalars are passed by value.</span>
+<a id="L-61" name="L-61"></a><span class="kd">function</span> <span class="nx">read_values</span><span class="p">(</span><span class="nx">source</span><span class="p">,</span> <span class="nx">values</span><span class="p">,</span>    <span class="nx">input</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">rc</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">line_number</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-62" name="L-62"></a>    <span class="nx">input</span> <span class="o">=</span> <span class="nx">source</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span> <span class="o">?</span> <span class="s2">&quot;/dev/stdin&quot;</span> <span class="o">:</span> <span class="nx">source</span>
+<a id="L-63" name="L-63"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">source</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+<a id="L-64" name="L-64"></a>        <span class="kr">print</span> <span class="s2">&quot;Enter one x per line; blank line or EOF finishes:&quot;</span> <span class="o">&gt;</span> <span class="s2">&quot;/dev/stderr&quot;</span>
+<a id="L-65" name="L-65"></a>    <span class="k">while</span> <span class="p">((</span><span class="nx">rc</span> <span class="o">=</span> <span class="p">(</span><span class="kr">getline</span> <span class="nx">line</span> <span class="o">&lt;</span> <span class="nx">input</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-66" name="L-66"></a>        <span class="nx">line_number</span><span class="o">++</span>
+<a id="L-67" name="L-67"></a>        <span class="kr">sub</span><span class="p">(</span><span class="sr">/^[[:space:]]+/</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-68" name="L-68"></a>        <span class="kr">sub</span><span class="p">(</span><span class="sr">/[[:space:]]+$/</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-69" name="L-69"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">line</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">break</span>
+<a id="L-70" name="L-70"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">line</span> <span class="o">~</span> <span class="sr">/^#/</span><span class="p">)</span> <span class="k">continue</span>
+<a id="L-71" name="L-71"></a>        <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">number</span><span class="p">(</span><span class="nx">line</span><span class="p">))</span> <span class="p">{</span>
+<a id="L-72" name="L-72"></a>            <span class="kr">printf</span> <span class="s2">&quot;warning: line %d: invalid value; skipped\n&quot;</span><span class="p">,</span> <span class="nx">line_number</span> <span class="o">&gt;</span> <span class="s2">&quot;/dev/stderr&quot;</span>
+<a id="L-73" name="L-73"></a>            <span class="k">continue</span>
+<a id="L-74" name="L-74"></a>        <span class="p">}</span>
+<a id="L-75" name="L-75"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">count</span> <span class="o">==</span> <span class="mi">4096</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;at most 4096 values are allowed&quot;</span><span class="p">)</span>
+<a id="L-76" name="L-76"></a>        <span class="nx">values</span><span class="p">[</span><span class="o">++</span><span class="nx">count</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span> <span class="o">+</span> <span class="mi">0</span>
+<a id="L-77" name="L-77"></a>    <span class="p">}</span>
+<a id="L-78" name="L-78"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot read input: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-79" name="L-79"></a>    <span class="k">if</span> <span class="p">(</span><span class="kr">close</span><span class="p">(</span><span class="nx">input</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot close input: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-80" name="L-80"></a>    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">count</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;no valid input values&quot;</span><span class="p">)</span>
+<a id="L-81" name="L-81"></a>    <span class="k">return</span> <span class="nx">count</span>
+<a id="L-82" name="L-82"></a><span class="p">}</span>
+<a id="L-83" name="L-83"></a>
+<a id="L-84" name="L-84"></a><span class="c1"># Approximate J0 using 16384 midpoint terms and compensated summation.</span>
+<a id="L-85" name="L-85"></a><span class="c1"># Input: validated x. Output: numeric J0. Caller: worker_main in each OS child.</span>
+<a id="L-86" name="L-86"></a><span class="c1"># Local scalars/indices are Awk-managed values; there is no raw-pointer arithmetic.</span>
+<a id="L-87" name="L-87"></a><span class="kd">function</span> <span class="nx">observe</span><span class="p">(</span><span class="nx">x</span><span class="p">,</span>    <span class="nx">idx</span><span class="p">,</span> <span class="nx">term</span><span class="p">,</span> <span class="nx">adjusted</span><span class="p">,</span> <span class="nx">updated</span><span class="p">,</span> <span class="nx">total</span><span class="p">,</span> <span class="nx">correction</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-88" name="L-88"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;</span> <span class="nx">samples</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-89" name="L-89"></a>        <span class="nx">term</span> <span class="o">=</span> <span class="kr">cos</span><span class="p">(</span><span class="nx">x</span> <span class="o">*</span> <span class="kr">sin</span><span class="p">(</span><span class="nx">pi</span> <span class="o">*</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">+</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="nx">samples</span><span class="p">))</span>
+<a id="L-90" name="L-90"></a>        <span class="nx">adjusted</span> <span class="o">=</span> <span class="nx">term</span> <span class="o">-</span> <span class="nx">correction</span>
+<a id="L-91" name="L-91"></a>        <span class="nx">updated</span> <span class="o">=</span> <span class="nx">total</span> <span class="o">+</span> <span class="nx">adjusted</span>
+<a id="L-92" name="L-92"></a>        <span class="nx">correction</span> <span class="o">=</span> <span class="p">(</span><span class="nx">updated</span> <span class="o">-</span> <span class="nx">total</span><span class="p">)</span> <span class="o">-</span> <span class="nx">adjusted</span>
+<a id="L-93" name="L-93"></a>        <span class="nx">total</span> <span class="o">=</span> <span class="nx">updated</span>
+<a id="L-94" name="L-94"></a>    <span class="p">}</span>
+<a id="L-95" name="L-95"></a>    <span class="k">return</span> <span class="nx">total</span> <span class="o">/</span> <span class="nx">samples</span>
+<a id="L-96" name="L-96"></a><span class="p">}</span>
+<a id="L-97" name="L-97"></a>
+<a id="L-98" name="L-98"></a><span class="c1"># Run the child protocol and flush each result before reading another request.</span>
+<a id="L-99" name="L-99"></a><span class="c1"># Input: index TAB x on stdin. Output: READY, indexed CSV rows, then DONE at EOF.</span>
+<a id="L-100" name="L-100"></a><span class="c1"># Caller: BEGIN&#39;s --worker mode; PROCINFO supplies the actual child/parent PIDs.</span>
+<a id="L-101" name="L-101"></a><span class="kd">function</span> <span class="nx">worker_main</span><span class="p">(</span>    <span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">rc</span><span class="p">,</span> <span class="nx">count</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-102" name="L-102"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-103" name="L-103"></a>    <span class="kr">printf</span> <span class="s2">&quot;READY %d %d\n&quot;</span><span class="p">,</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;pid&quot;</span><span class="p">],</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;ppid&quot;</span><span class="p">]</span>
+<a id="L-104" name="L-104"></a>    <span class="k">if</span> <span class="p">(</span><span class="kr">fflush</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot send worker greeting&quot;</span><span class="p">)</span>
+<a id="L-105" name="L-105"></a>    <span class="k">while</span> <span class="p">((</span><span class="nx">rc</span> <span class="o">=</span> <span class="p">(</span><span class="kr">getline</span> <span class="nx">line</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-106" name="L-106"></a>        <span class="k">if</span> <span class="p">(</span><span class="kr">split</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="s2">&quot;\t&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[1-9][0-9]*$/</span> <span class="o">||</span>
+<a id="L-107" name="L-107"></a>            <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="mi">4096</span> <span class="o">||</span> <span class="o">!</span><span class="nx">number</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">||</span> <span class="o">++</span><span class="nx">count</span> <span class="o">&gt;</span> <span class="mi">4096</span><span class="p">)</span>
+<a id="L-108" name="L-108"></a>            <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;invalid worker request&quot;</span><span class="p">)</span>
+<a id="L-109" name="L-109"></a>        <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-110" name="L-110"></a>        <span class="kr">printf</span> <span class="s2">&quot;%d,%.17g,%.17g,%d\n&quot;</span><span class="p">,</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span><span class="p">,</span>
+<a id="L-111" name="L-111"></a>            <span class="nx">observe</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span><span class="p">),</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;pid&quot;</span><span class="p">]</span>
+<a id="L-112" name="L-112"></a>        <span class="k">if</span> <span class="p">(</span><span class="kr">fflush</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot send worker result&quot;</span><span class="p">)</span>
+<a id="L-113" name="L-113"></a>    <span class="p">}</span>
+<a id="L-114" name="L-114"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot read worker input: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-115" name="L-115"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-116" name="L-116"></a>    <span class="kr">printf</span> <span class="s2">&quot;DONE %d\n&quot;</span><span class="p">,</span> <span class="nx">count</span>
+<a id="L-117" name="L-117"></a>    <span class="k">if</span> <span class="p">(</span><span class="kr">fflush</span><span class="p">()</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot send worker completion&quot;</span><span class="p">)</span>
+<a id="L-118" name="L-118"></a><span class="p">}</span>
+<a id="L-119" name="L-119"></a>
+<a id="L-120" name="L-120"></a><span class="c1"># Launch distinct two-way pipes to the same interpreter/source, using shell exec.</span>
+<a id="L-121" name="L-121"></a><span class="c1"># Inputs: worker count and source. Output: global ownership maps of commands/PIDs.</span>
+<a id="L-122" name="L-122"></a><span class="c1"># Caller: main. The shell becomes the Awk child; it performs no numerical work.</span>
+<a id="L-123" name="L-123"></a><span class="kd">function</span> <span class="nx">start_workers</span><span class="p">(</span><span class="nx">count</span><span class="p">,</span> <span class="nx">source</span><span class="p">,</span>    <span class="nx">slot</span><span class="p">,</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">rc</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-124" name="L-124"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">slot</span> <span class="o">&lt;=</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">slot</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-125" name="L-125"></a>        <span class="nx">command</span> <span class="o">=</span> <span class="s2">&quot;LC_ALL=C exec &quot;</span> <span class="nx">shell_quote</span><span class="p">(</span><span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;argv&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span> <span class="err">\</span>
+<a id="L-126" name="L-126"></a>            <span class="s2">&quot; -f &quot;</span> <span class="nx">shell_quote</span><span class="p">(</span><span class="nx">source</span><span class="p">)</span> <span class="s2">&quot; -- --worker &quot;</span> <span class="nx">slot</span>
+<a id="L-127" name="L-127"></a>        <span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span> <span class="o">=</span> <span class="nx">command</span>
+<a id="L-128" name="L-128"></a>        <span class="nx">PROCINFO</span><span class="p">[</span><span class="nx">command</span><span class="p">,</span> <span class="s2">&quot;NONFATAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="L-129" name="L-129"></a>        <span class="nx">PROCINFO</span><span class="p">[</span><span class="nx">command</span><span class="p">,</span> <span class="s2">&quot;READ_TIMEOUT&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">60000</span>
+<a id="L-130" name="L-130"></a>        <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-131" name="L-131"></a>        <span class="nx">rc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">command</span> <span class="o">|</span><span class="err">&amp;</span> <span class="kr">getline</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-132" name="L-132"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="kr">split</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;READY&quot;</span> <span class="o">||</span>
+<a id="L-133" name="L-133"></a>            <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[1-9][0-9]*$/</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="mi">2147483647</span> <span class="o">||</span>
+<a id="L-134" name="L-134"></a>            <span class="nx">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[1-9][0-9]*$/</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">!=</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;pid&quot;</span><span class="p">]</span> <span class="o">||</span>
+<a id="L-135" name="L-135"></a>            <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">==</span> <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;pid&quot;</span><span class="p">])</span>
+<a id="L-136" name="L-136"></a>            <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;worker startup failed: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-137" name="L-137"></a>        <span class="nx">pids</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span> <span class="o">=</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span>
+<a id="L-138" name="L-138"></a>    <span class="p">}</span>
+<a id="L-139" name="L-139"></a><span class="p">}</span>
+<a id="L-140" name="L-140"></a>
+<a id="L-141" name="L-141"></a><span class="c1"># Validate a child&#39;s indexed response and retain its public CSV record in order.</span>
+<a id="L-142" name="L-142"></a><span class="c1"># Inputs: slot/idx, values and rows arrays. Output: one result entry, or fatal exit.</span>
+<a id="L-143" name="L-143"></a><span class="c1"># Caller: calculate after dispatching one outstanding observation per worker.</span>
+<a id="L-144" name="L-144"></a><span class="kd">function</span> <span class="nx">collect</span><span class="p">(</span><span class="nx">slot</span><span class="p">,</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">rows</span><span class="p">,</span>    <span class="nx">command</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">rc</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-145" name="L-145"></a>    <span class="nx">command</span> <span class="o">=</span> <span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span>
+<a id="L-146" name="L-146"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-147" name="L-147"></a>    <span class="nx">rc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">command</span> <span class="o">|</span><span class="err">&amp;</span> <span class="kr">getline</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-148" name="L-148"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="kr">split</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="s2">&quot;,&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">4</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[1-9][0-9]*$/</span> <span class="o">||</span>
+<a id="L-149" name="L-149"></a>        <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">!=</span> <span class="nx">idx</span> <span class="o">||</span> <span class="o">!</span><span class="nx">number</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">!=</span> <span class="nx">values</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">||</span>
+<a id="L-150" name="L-150"></a>        <span class="o">!</span><span class="nx">number</span><span class="p">(</span><span class="nx">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="o">-</span><span class="mf">1.0000000001</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="mf">1.0000000001</span> <span class="o">||</span>
+<a id="L-151" name="L-151"></a>        <span class="nx">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[1-9][0-9]*$/</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">!=</span> <span class="nx">pids</span><span class="p">[</span><span class="nx">slot</span><span class="p">])</span>
+<a id="L-152" name="L-152"></a>        <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;missing or invalid result from worker &quot;</span> <span class="nx">slot</span> <span class="s2">&quot;: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-153" name="L-153"></a>    <span class="c1"># Remove only the private index, preserving round-trip decimal precision.</span>
+<a id="L-154" name="L-154"></a>    <span class="kr">sub</span><span class="p">(</span><span class="sr">/^[^,]*,/</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-155" name="L-155"></a>    <span class="nx">rows</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">=</span> <span class="nx">line</span>
+<a id="L-156" name="L-156"></a><span class="p">}</span>
+<a id="L-157" name="L-157"></a>
+<a id="L-158" name="L-158"></a><span class="c1"># Dispatch bounded rounds with one request in flight per child to prevent deadlock.</span>
+<a id="L-159" name="L-159"></a><span class="c1"># Inputs: values/count/worker bound and rows array. Output: all ordered CSV rows.</span>
+<a id="L-160" name="L-160"></a><span class="c1"># Caller: main; Awk owns these arrays and reclaims their storage at process exit.</span>
+<a id="L-161" name="L-161"></a><span class="kd">function</span> <span class="nx">calculate</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">workers</span><span class="p">,</span> <span class="nx">rows</span><span class="p">,</span>    <span class="nx">first</span><span class="p">,</span> <span class="nx">slot</span><span class="p">,</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">command</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-162" name="L-162"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">first</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">first</span> <span class="o">&lt;=</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">first</span> <span class="o">+=</span> <span class="nx">workers</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-163" name="L-163"></a>        <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">slot</span> <span class="o">&lt;=</span> <span class="nx">workers</span> <span class="o">&amp;&amp;</span> <span class="nx">first</span> <span class="o">+</span> <span class="nx">slot</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">slot</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-164" name="L-164"></a>            <span class="nx">idx</span> <span class="o">=</span> <span class="nx">first</span> <span class="o">+</span> <span class="nx">slot</span> <span class="o">-</span> <span class="mi">1</span>
+<a id="L-165" name="L-165"></a>            <span class="nx">command</span> <span class="o">=</span> <span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span>
+<a id="L-166" name="L-166"></a>            <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-167" name="L-167"></a>            <span class="kr">printf</span> <span class="s2">&quot;%d\t%.17g\n&quot;</span><span class="p">,</span> <span class="nx">idx</span><span class="p">,</span> <span class="nx">values</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">|</span><span class="err">&amp;</span> <span class="nx">command</span>
+<a id="L-168" name="L-168"></a>            <span class="k">if</span> <span class="p">(</span><span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot send worker request: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-169" name="L-169"></a>            <span class="nx">sent</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span><span class="o">++</span>
+<a id="L-170" name="L-170"></a>        <span class="p">}</span>
+<a id="L-171" name="L-171"></a>        <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">slot</span> <span class="o">&lt;=</span> <span class="nx">workers</span> <span class="o">&amp;&amp;</span> <span class="nx">first</span> <span class="o">+</span> <span class="nx">slot</span> <span class="o">-</span> <span class="mi">1</span> <span class="o">&lt;=</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">slot</span><span class="o">++</span><span class="p">)</span>
+<a id="L-172" name="L-172"></a>            <span class="nx">collect</span><span class="p">(</span><span class="nx">slot</span><span class="p">,</span> <span class="nx">first</span> <span class="o">+</span> <span class="nx">slot</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="nx">values</span><span class="p">,</span> <span class="nx">rows</span><span class="p">)</span>
+<a id="L-173" name="L-173"></a>    <span class="p">}</span>
+<a id="L-174" name="L-174"></a><span class="p">}</span>
+<a id="L-175" name="L-175"></a>
+<a id="L-176" name="L-176"></a><span class="c1"># Send EOF, validate completion/counts and child exit statuses, and reap workers.</span>
+<a id="L-177" name="L-177"></a><span class="c1"># Input: command map. Output: no live children on success, or a diagnostic exit.</span>
+<a id="L-178" name="L-178"></a><span class="c1"># Caller: main before output creation. close waits for the child&#39;s exit status.</span>
+<a id="L-179" name="L-179"></a><span class="kd">function</span> <span class="nx">finish_workers</span><span class="p">(</span>    <span class="nx">slot</span><span class="p">,</span> <span class="nx">command</span><span class="p">,</span> <span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="nx">rc</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-180" name="L-180"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">in</span> <span class="nx">commands</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-181" name="L-181"></a>        <span class="nx">command</span> <span class="o">=</span> <span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span>
+<a id="L-182" name="L-182"></a>        <span class="k">if</span> <span class="p">(</span><span class="kr">close</span><span class="p">(</span><span class="nx">command</span><span class="p">,</span> <span class="s2">&quot;to&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot close worker input&quot;</span><span class="p">)</span>
+<a id="L-183" name="L-183"></a>        <span class="nx">rc</span> <span class="o">=</span> <span class="p">(</span><span class="nx">command</span> <span class="o">|</span><span class="err">&amp;</span> <span class="kr">getline</span> <span class="nx">line</span><span class="p">)</span>
+<a id="L-184" name="L-184"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">!=</span> <span class="mi">1</span> <span class="o">||</span> <span class="kr">split</span><span class="p">(</span><span class="nx">line</span><span class="p">,</span> <span class="nx">fields</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">2</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">!=</span> <span class="s2">&quot;DONE&quot;</span> <span class="o">||</span>
+<a id="L-185" name="L-185"></a>            <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">!~</span> <span class="sr">/^[0-9]+$/</span> <span class="o">||</span> <span class="nx">fields</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">!=</span> <span class="nx">sent</span><span class="p">[</span><span class="nx">slot</span><span class="p">])</span>
+<a id="L-186" name="L-186"></a>            <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;invalid worker completion&quot;</span><span class="p">)</span>
+<a id="L-187" name="L-187"></a>        <span class="k">if</span> <span class="p">((</span><span class="nx">command</span> <span class="o">|</span><span class="err">&amp;</span> <span class="kr">getline</span> <span class="nx">line</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;extra worker output or read error&quot;</span><span class="p">)</span>
+<a id="L-188" name="L-188"></a>        <span class="nx">rc</span> <span class="o">=</span> <span class="kr">close</span><span class="p">(</span><span class="nx">command</span><span class="p">)</span>
+<a id="L-189" name="L-189"></a>        <span class="kr">delete</span> <span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span>
+<a id="L-190" name="L-190"></a>        <span class="kr">delete</span> <span class="nx">pids</span><span class="p">[</span><span class="nx">slot</span><span class="p">]</span>
+<a id="L-191" name="L-191"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">rc</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;worker exited unsuccessfully: &quot;</span> <span class="nx">rc</span><span class="p">)</span>
+<a id="L-192" name="L-192"></a>    <span class="p">}</span>
+<a id="L-193" name="L-193"></a><span class="p">}</span>
+<a id="L-194" name="L-194"></a>
+<a id="L-195" name="L-195"></a><span class="c1"># Write completed results, checking immediate writes and delayed close errors.</span>
+<a id="L-196" name="L-196"></a><span class="c1"># Inputs: target, rows/count. Output: CSV or a diagnostic; output is not transactional.</span>
+<a id="L-197" name="L-197"></a><span class="c1"># Caller: main after all successful child exits. Earlier failures preserve output.</span>
+<a id="L-198" name="L-198"></a><span class="kd">function</span> <span class="nx">write_results</span><span class="p">(</span><span class="nx">target</span><span class="p">,</span> <span class="nx">rows</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span>    <span class="nx">idx</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-199" name="L-199"></a>    <span class="c1"># Make a bare &#39;-&#39; an ordinary filename rather than an interpreter stream alias.</span>
+<a id="L-200" name="L-200"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">target</span> <span class="o">!~</span> <span class="sr">/\//</span><span class="p">)</span> <span class="nx">target</span> <span class="o">=</span> <span class="s2">&quot;./&quot;</span> <span class="nx">target</span>
+<a id="L-201" name="L-201"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-202" name="L-202"></a>    <span class="kr">print</span> <span class="s2">&quot;x,j0,worker_pid&quot;</span> <span class="o">&gt;</span> <span class="nx">target</span>
+<a id="L-203" name="L-203"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot open output: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-204" name="L-204"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">idx</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span> <span class="nx">idx</span> <span class="o">&lt;=</span> <span class="nx">count</span><span class="p">;</span> <span class="nx">idx</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-205" name="L-205"></a>        <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-206" name="L-206"></a>        <span class="kr">print</span> <span class="nx">rows</span><span class="p">[</span><span class="nx">idx</span><span class="p">]</span> <span class="o">&gt;</span> <span class="nx">target</span>
+<a id="L-207" name="L-207"></a>        <span class="k">if</span> <span class="p">(</span><span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot write output: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-208" name="L-208"></a>    <span class="p">}</span>
+<a id="L-209" name="L-209"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-210" name="L-210"></a>    <span class="k">if</span> <span class="p">(</span><span class="kr">fflush</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot flush output: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-211" name="L-211"></a>    <span class="nb">ERRNO</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a id="L-212" name="L-212"></a>    <span class="k">if</span> <span class="p">(</span><span class="kr">close</span><span class="p">(</span><span class="nx">target</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span> <span class="o">||</span> <span class="nb">ERRNO</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;cannot close output: &quot;</span> <span class="nb">ERRNO</span><span class="p">)</span>
+<a id="L-213" name="L-213"></a><span class="p">}</span>
+<a id="L-214" name="L-214"></a>
+<a id="L-215" name="L-215"></a><span class="c1"># Perform the entire CLI in BEGIN, avoiding implicit filename/assignment processing.</span>
+<a id="L-216" name="L-216"></a><span class="c1"># Inputs: ARGV and optional stdin. Output: CSV, messages and exit status.</span>
+<a id="L-217" name="L-217"></a><span class="c1"># Caller: gawk at startup; the private worker mode never creates more workers.</span>
+<a id="L-218" name="L-218"></a><span class="nb">BEGIN</span> <span class="p">{</span>
+<a id="L-219" name="L-219"></a>    <span class="nx">samples</span> <span class="o">=</span> <span class="mi">16384</span>
+<a id="L-220" name="L-220"></a>    <span class="nx">pi</span> <span class="o">=</span> <span class="kr">atan2</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+<a id="L-221" name="L-221"></a>    <span class="nx">PROCINFO</span><span class="p">[</span><span class="s2">&quot;NONFATAL&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="L-222" name="L-222"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">ARGC</span> <span class="o">==</span> <span class="mi">3</span> <span class="o">&amp;&amp;</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--worker&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-223" name="L-223"></a>        <span class="nb">ARGC</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="L-224" name="L-224"></a>        <span class="nx">worker_main</span><span class="p">()</span>
+<a id="L-225" name="L-225"></a>        <span class="k">exit</span> <span class="mi">0</span>
+<a id="L-226" name="L-226"></a>    <span class="p">}</span>
+<a id="L-227" name="L-227"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">ARGC</span> <span class="o">==</span> <span class="mi">2</span> <span class="o">&amp;&amp;</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;--help&quot;</span><span class="p">)</span> <span class="p">{</span>
+<a id="L-228" name="L-228"></a>        <span class="kr">print</span> <span class="s2">&quot;Usage: gawk -f bessel.awk -- [INPUT|- [OUTPUT [WORKERS]]]&quot;</span>
+<a id="L-229" name="L-229"></a>        <span class="kr">print</span> <span class="s2">&quot;Defaults: stdin, results.csv, 2 workers (range 1-16).&quot;</span>
+<a id="L-230" name="L-230"></a>        <span class="k">exit</span> <span class="mi">0</span>
+<a id="L-231" name="L-231"></a>    <span class="p">}</span>
+<a id="L-232" name="L-232"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">ARGC</span> <span class="o">&gt;</span> <span class="mi">4</span><span class="p">)</span> <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;too many arguments; use --help&quot;</span><span class="p">)</span>
+<a id="L-233" name="L-233"></a>    <span class="nx">input_path</span> <span class="o">=</span> <span class="nb">ARGC</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="o">?</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;-&quot;</span>
+<a id="L-234" name="L-234"></a>    <span class="nx">output_path</span> <span class="o">=</span> <span class="nb">ARGC</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">?</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;results.csv&quot;</span>
+<a id="L-235" name="L-235"></a>    <span class="nx">workers</span> <span class="o">=</span> <span class="nb">ARGC</span> <span class="o">&gt;</span> <span class="mi">3</span> <span class="o">?</span> <span class="nb">ARGV</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">:</span> <span class="s2">&quot;2&quot;</span>
+<a id="L-236" name="L-236"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">workers</span> <span class="o">!~</span> <span class="sr">/^[0-9]+$/</span> <span class="o">||</span> <span class="nx">workers</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&lt;</span> <span class="mi">1</span> <span class="o">||</span> <span class="nx">workers</span> <span class="o">+</span> <span class="mi">0</span> <span class="o">&gt;</span> <span class="mi">16</span><span class="p">)</span>
+<a id="L-237" name="L-237"></a>        <span class="nx">fail</span><span class="p">(</span><span class="s2">&quot;workers must be an integer from 1 through 16&quot;</span><span class="p">)</span>
+<a id="L-238" name="L-238"></a>    <span class="nx">source_path</span> <span class="o">=</span> <span class="nx">program_file</span><span class="p">()</span>
+<a id="L-239" name="L-239"></a>    <span class="nb">ARGC</span> <span class="o">=</span> <span class="mi">1</span>
+<a id="L-240" name="L-240"></a>    <span class="nx">count</span> <span class="o">=</span> <span class="nx">read_values</span><span class="p">(</span><span class="nx">input_path</span><span class="p">,</span> <span class="nx">values</span><span class="p">)</span>
+<a id="L-241" name="L-241"></a>    <span class="k">if</span> <span class="p">(</span><span class="nx">workers</span> <span class="o">&gt;</span> <span class="nx">count</span><span class="p">)</span> <span class="nx">workers</span> <span class="o">=</span> <span class="nx">count</span>
+<a id="L-242" name="L-242"></a>    <span class="nx">start_workers</span><span class="p">(</span><span class="nx">workers</span><span class="p">,</span> <span class="nx">source_path</span><span class="p">)</span>
+<a id="L-243" name="L-243"></a>    <span class="nx">calculate</span><span class="p">(</span><span class="nx">values</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">workers</span><span class="p">,</span> <span class="nx">rows</span><span class="p">)</span>
+<a id="L-244" name="L-244"></a>    <span class="nx">finish_workers</span><span class="p">()</span>
+<a id="L-245" name="L-245"></a>    <span class="nx">write_results</span><span class="p">(</span><span class="nx">output_path</span><span class="p">,</span> <span class="nx">rows</span><span class="p">,</span> <span class="nx">count</span><span class="p">)</span>
+<a id="L-246" name="L-246"></a>    <span class="kr">printf</span> <span class="s2">&quot;Wrote %d observations to %s\n&quot;</span><span class="p">,</span> <span class="nx">count</span><span class="p">,</span> <span class="nx">output_path</span>
+<a id="L-247" name="L-247"></a>    <span class="k">exit</span> <span class="mi">0</span>
+<a id="L-248" name="L-248"></a><span class="p">}</span>
+<a id="L-249" name="L-249"></a>
+<a id="L-250" name="L-250"></a><span class="c1"># Stop/reap remaining children after ordinary failures; success empties the maps.</span>
+<a id="L-251" name="L-251"></a><span class="c1"># Input: owned commands/PIDs. Output: child termination and reaping.</span>
+<a id="L-252" name="L-252"></a><span class="c1"># Caller: gawk on exit. Parent signals/fatal interpreter errors are not intercepted.</span>
+<a id="L-253" name="L-253"></a><span class="nb">END</span> <span class="p">{</span>
+<a id="L-254" name="L-254"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">in</span> <span class="nx">commands</span><span class="p">)</span>
+<a id="L-255" name="L-255"></a>        <span class="k">if</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">in</span> <span class="nx">pids</span><span class="p">)</span>
+<a id="L-256" name="L-256"></a>            <span class="kr">system</span><span class="p">(</span><span class="s2">&quot;kill -KILL &quot;</span> <span class="kr">sprintf</span><span class="p">(</span><span class="s2">&quot;%d&quot;</span><span class="p">,</span> <span class="nx">pids</span><span class="p">[</span><span class="nx">slot</span><span class="p">])</span> <span class="s2">&quot; 2&gt;/dev/null&quot;</span><span class="p">)</span>
+<a id="L-257" name="L-257"></a>    <span class="k">for</span> <span class="p">(</span><span class="nx">slot</span> <span class="o">in</span> <span class="nx">commands</span><span class="p">)</span>
+<a id="L-258" name="L-258"></a>        <span class="kr">close</span><span class="p">(</span><span class="nx">commands</span><span class="p">[</span><span class="nx">slot</span><span class="p">])</span>
+<a id="L-259" name="L-259"></a><span class="p">}</span>
+</pre></div></td></tr></table></div>
+</main><textarea id="raw" hidden>#!/usr/bin/gawk -f
+# Bessel Observatory — GNU Awk 5.2+ on POSIX, with real coprocess workers.
+# Run: gawk -f bessel.awk -- [INPUT|- [OUTPUT [WORKERS]]]
+# GNU |&amp;, PROCINFO, nonfatal output and read timeouts are explicit dependencies.
+# The shell only launches/terminates workers; mathematics and scheduling are Awk.
+
+# Validate decimal input before Awk&#x27;s otherwise permissive numeric coercion.
+# Input: trimmed text. Output: true for a finite number in [-1000,1000].
+# Callers: read_values, worker_main and collect check input/protocol numbers.
+function number(text,    value) {
+    if (text !~ /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$/)
+        return 0
+    value = text + 0
+    return value &gt;= -1000 &amp;&amp; value &lt;= 1000
+}
+
+# Quote one POSIX shell argument, including literal single quotes in filenames.
+# Input: arbitrary text. Output: a single shell word. Caller: start_workers.
+function shell_quote(text,    quoted, position) {
+    quoted = &quot;&#x27;&quot;
+    while ((position = index(text, &quot;&#x27;&quot;)) &gt; 0) {
+        quoted = quoted substr(text, 1, position - 1) &quot;&#x27;\\&#x27;&#x27;&quot;
+        text = substr(text, position + 1)
+    }
+    return quoted text &quot;&#x27;&quot;
+}
+
+# Locate the source file in the interpreter&#x27;s original arguments before ARGV edits.
+# Input: PROCINFO argv. Output: one -f/--file source path, or a diagnostic exit.
+# Caller: main before launching the same source, including from another directory.
+function program_file(    idx, arg, path, count) {
+    for (idx = 1; idx in PROCINFO[&quot;argv&quot;]; idx++) {
+        arg = PROCINFO[&quot;argv&quot;][idx]
+        if (arg == &quot;--&quot;) break
+        if (arg == &quot;-f&quot; || arg == &quot;--file&quot;) {
+            path = PROCINFO[&quot;argv&quot;][++idx]
+            count++
+        } else if (arg ~ /^--file=/) {
+            path = substr(arg, 8)
+            count++
+        } else if (arg ~ /^-f./) {
+            path = substr(arg, 3)
+            count++
+        }
+    }
+    if (count != 1 || path == &quot;&quot; || path == &quot;-&quot;)
+        fail(&quot;launch with one source file: gawk -f bessel.awk -- [arguments]&quot;)
+    return path
+}
+
+# Report a fatal contract/I/O/protocol problem; END releases remaining workers.
+# Input: message. Output: stderr diagnostic and status 1. Callers: checked operations.
+function fail(message) {
+    print &quot;error: &quot; message &gt; &quot;/dev/stderr&quot;
+    exit 1
+}
+
+# Read observations into an Awk-owned associative array with ordered numeric keys.
+# Inputs: filename or -, borrowed array. Output: accepted count; fatal errors exit.
+# Caller: main. Array parameters alias caller storage; scalars are passed by value.
+function read_values(source, values,    input, line, rc, count, line_number) {
+    input = source == &quot;-&quot; ? &quot;/dev/stdin&quot; : source
+    if (source == &quot;-&quot;)
+        print &quot;Enter one x per line; blank line or EOF finishes:&quot; &gt; &quot;/dev/stderr&quot;
+    while ((rc = (getline line &lt; input)) &gt; 0) {
+        line_number++
+        sub(/^[[:space:]]+/, &quot;&quot;, line)
+        sub(/[[:space:]]+$/, &quot;&quot;, line)
+        if (line == &quot;&quot;) break
+        if (line ~ /^#/) continue
+        if (!number(line)) {
+            printf &quot;warning: line %d: invalid value; skipped\n&quot;, line_number &gt; &quot;/dev/stderr&quot;
+            continue
+        }
+        if (count == 4096) fail(&quot;at most 4096 values are allowed&quot;)
+        values[++count] = line + 0
+    }
+    if (rc &lt; 0) fail(&quot;cannot read input: &quot; ERRNO)
+    if (close(input) != 0) fail(&quot;cannot close input: &quot; ERRNO)
+    if (!count) fail(&quot;no valid input values&quot;)
+    return count
+}
+
+# Approximate J0 using 16384 midpoint terms and compensated summation.
+# Input: validated x. Output: numeric J0. Caller: worker_main in each OS child.
+# Local scalars/indices are Awk-managed values; there is no raw-pointer arithmetic.
+function observe(x,    idx, term, adjusted, updated, total, correction) {
+    for (idx = 0; idx &lt; samples; idx++) {
+        term = cos(x * sin(pi * (idx + 0.5) / samples))
+        adjusted = term - correction
+        updated = total + adjusted
+        correction = (updated - total) - adjusted
+        total = updated
+    }
+    return total / samples
+}
+
+# Run the child protocol and flush each result before reading another request.
+# Input: index TAB x on stdin. Output: READY, indexed CSV rows, then DONE at EOF.
+# Caller: BEGIN&#x27;s --worker mode; PROCINFO supplies the actual child/parent PIDs.
+function worker_main(    line, fields, rc, count) {
+    ERRNO = &quot;&quot;
+    printf &quot;READY %d %d\n&quot;, PROCINFO[&quot;pid&quot;], PROCINFO[&quot;ppid&quot;]
+    if (fflush() != 0 || ERRNO != &quot;&quot;) fail(&quot;cannot send worker greeting&quot;)
+    while ((rc = (getline line)) &gt; 0) {
+        if (split(line, fields, &quot;\t&quot;) != 2 || fields[1] !~ /^[1-9][0-9]*$/ ||
+            fields[1] + 0 &gt; 4096 || !number(fields[2]) || ++count &gt; 4096)
+            fail(&quot;invalid worker request&quot;)
+        ERRNO = &quot;&quot;
+        printf &quot;%d,%.17g,%.17g,%d\n&quot;, fields[1], fields[2] + 0,
+            observe(fields[2] + 0), PROCINFO[&quot;pid&quot;]
+        if (fflush() != 0 || ERRNO != &quot;&quot;) fail(&quot;cannot send worker result&quot;)
+    }
+    if (rc &lt; 0) fail(&quot;cannot read worker input: &quot; ERRNO)
+    ERRNO = &quot;&quot;
+    printf &quot;DONE %d\n&quot;, count
+    if (fflush() != 0 || ERRNO != &quot;&quot;) fail(&quot;cannot send worker completion&quot;)
+}
+
+# Launch distinct two-way pipes to the same interpreter/source, using shell exec.
+# Inputs: worker count and source. Output: global ownership maps of commands/PIDs.
+# Caller: main. The shell becomes the Awk child; it performs no numerical work.
+function start_workers(count, source,    slot, command, line, fields, rc) {
+    for (slot = 1; slot &lt;= count; slot++) {
+        command = &quot;LC_ALL=C exec &quot; shell_quote(PROCINFO[&quot;argv&quot;][0]) \
+            &quot; -f &quot; shell_quote(source) &quot; -- --worker &quot; slot
+        commands[slot] = command
+        PROCINFO[command, &quot;NONFATAL&quot;] = 1
+        PROCINFO[command, &quot;READ_TIMEOUT&quot;] = 60000
+        ERRNO = &quot;&quot;
+        rc = (command |&amp; getline line)
+        if (rc != 1 || split(line, fields, &quot; &quot;) != 3 || fields[1] != &quot;READY&quot; ||
+            fields[2] !~ /^[1-9][0-9]*$/ || fields[2] + 0 &gt; 2147483647 ||
+            fields[3] !~ /^[1-9][0-9]*$/ || fields[3] + 0 != PROCINFO[&quot;pid&quot;] ||
+            fields[2] + 0 == PROCINFO[&quot;pid&quot;])
+            fail(&quot;worker startup failed: &quot; ERRNO)
+        pids[slot] = fields[2] + 0
+    }
+}
+
+# Validate a child&#x27;s indexed response and retain its public CSV record in order.
+# Inputs: slot/idx, values and rows arrays. Output: one result entry, or fatal exit.
+# Caller: calculate after dispatching one outstanding observation per worker.
+function collect(slot, idx, values, rows,    command, line, fields, rc) {
+    command = commands[slot]
+    ERRNO = &quot;&quot;
+    rc = (command |&amp; getline line)
+    if (rc != 1 || split(line, fields, &quot;,&quot;) != 4 || fields[1] !~ /^[1-9][0-9]*$/ ||
+        fields[1] + 0 != idx || !number(fields[2]) || fields[2] + 0 != values[idx] ||
+        !number(fields[3]) || fields[3] + 0 &lt; -1.0000000001 || fields[3] + 0 &gt; 1.0000000001 ||
+        fields[4] !~ /^[1-9][0-9]*$/ || fields[4] + 0 != pids[slot])
+        fail(&quot;missing or invalid result from worker &quot; slot &quot;: &quot; ERRNO)
+    # Remove only the private index, preserving round-trip decimal precision.
+    sub(/^[^,]*,/, &quot;&quot;, line)
+    rows[idx] = line
+}
+
+# Dispatch bounded rounds with one request in flight per child to prevent deadlock.
+# Inputs: values/count/worker bound and rows array. Output: all ordered CSV rows.
+# Caller: main; Awk owns these arrays and reclaims their storage at process exit.
+function calculate(values, count, workers, rows,    first, slot, idx, command) {
+    for (first = 1; first &lt;= count; first += workers) {
+        for (slot = 1; slot &lt;= workers &amp;&amp; first + slot - 1 &lt;= count; slot++) {
+            idx = first + slot - 1
+            command = commands[slot]
+            ERRNO = &quot;&quot;
+            printf &quot;%d\t%.17g\n&quot;, idx, values[idx] |&amp; command
+            if (ERRNO != &quot;&quot;) fail(&quot;cannot send worker request: &quot; ERRNO)
+            sent[slot]++
+        }
+        for (slot = 1; slot &lt;= workers &amp;&amp; first + slot - 1 &lt;= count; slot++)
+            collect(slot, first + slot - 1, values, rows)
+    }
+}
+
+# Send EOF, validate completion/counts and child exit statuses, and reap workers.
+# Input: command map. Output: no live children on success, or a diagnostic exit.
+# Caller: main before output creation. close waits for the child&#x27;s exit status.
+function finish_workers(    slot, command, line, fields, rc) {
+    for (slot in commands) {
+        command = commands[slot]
+        if (close(command, &quot;to&quot;) != 0) fail(&quot;cannot close worker input&quot;)
+        rc = (command |&amp; getline line)
+        if (rc != 1 || split(line, fields, &quot; &quot;) != 2 || fields[1] != &quot;DONE&quot; ||
+            fields[2] !~ /^[0-9]+$/ || fields[2] + 0 != sent[slot])
+            fail(&quot;invalid worker completion&quot;)
+        if ((command |&amp; getline line) != 0) fail(&quot;extra worker output or read error&quot;)
+        rc = close(command)
+        delete commands[slot]
+        delete pids[slot]
+        if (rc != 0) fail(&quot;worker exited unsuccessfully: &quot; rc)
+    }
+}
+
+# Write completed results, checking immediate writes and delayed close errors.
+# Inputs: target, rows/count. Output: CSV or a diagnostic; output is not transactional.
+# Caller: main after all successful child exits. Earlier failures preserve output.
+function write_results(target, rows, count,    idx) {
+    # Make a bare &#x27;-&#x27; an ordinary filename rather than an interpreter stream alias.
+    if (target !~ /\//) target = &quot;./&quot; target
+    ERRNO = &quot;&quot;
+    print &quot;x,j0,worker_pid&quot; &gt; target
+    if (ERRNO != &quot;&quot;) fail(&quot;cannot open output: &quot; ERRNO)
+    for (idx = 1; idx &lt;= count; idx++) {
+        ERRNO = &quot;&quot;
+        print rows[idx] &gt; target
+        if (ERRNO != &quot;&quot;) fail(&quot;cannot write output: &quot; ERRNO)
+    }
+    ERRNO = &quot;&quot;
+    if (fflush(target) != 0 || ERRNO != &quot;&quot;) fail(&quot;cannot flush output: &quot; ERRNO)
+    ERRNO = &quot;&quot;
+    if (close(target) != 0 || ERRNO != &quot;&quot;) fail(&quot;cannot close output: &quot; ERRNO)
+}
+
+# Perform the entire CLI in BEGIN, avoiding implicit filename/assignment processing.
+# Inputs: ARGV and optional stdin. Output: CSV, messages and exit status.
+# Caller: gawk at startup; the private worker mode never creates more workers.
+BEGIN {
+    samples = 16384
+    pi = atan2(0, -1)
+    PROCINFO[&quot;NONFATAL&quot;] = 1
+    if (ARGC == 3 &amp;&amp; ARGV[1] == &quot;--worker&quot;) {
+        ARGC = 1
+        worker_main()
+        exit 0
+    }
+    if (ARGC == 2 &amp;&amp; ARGV[1] == &quot;--help&quot;) {
+        print &quot;Usage: gawk -f bessel.awk -- [INPUT|- [OUTPUT [WORKERS]]]&quot;
+        print &quot;Defaults: stdin, results.csv, 2 workers (range 1-16).&quot;
+        exit 0
+    }
+    if (ARGC &gt; 4) fail(&quot;too many arguments; use --help&quot;)
+    input_path = ARGC &gt; 1 ? ARGV[1] : &quot;-&quot;
+    output_path = ARGC &gt; 2 ? ARGV[2] : &quot;results.csv&quot;
+    workers = ARGC &gt; 3 ? ARGV[3] : &quot;2&quot;
+    if (workers !~ /^[0-9]+$/ || workers + 0 &lt; 1 || workers + 0 &gt; 16)
+        fail(&quot;workers must be an integer from 1 through 16&quot;)
+    source_path = program_file()
+    ARGC = 1
+    count = read_values(input_path, values)
+    if (workers &gt; count) workers = count
+    start_workers(workers, source_path)
+    calculate(values, count, workers, rows)
+    finish_workers()
+    write_results(output_path, rows, count)
+    printf &quot;Wrote %d observations to %s\n&quot;, count, output_path
+    exit 0
+}
+
+# Stop/reap remaining children after ordinary failures; success empties the maps.
+# Input: owned commands/PIDs. Output: child termination and reaping.
+# Caller: gawk on exit. Parent signals/fatal interpreter errors are not intercepted.
+END {
+    for (slot in commands)
+        if (slot in pids)
+            system(&quot;kill -KILL &quot; sprintf(&quot;%d&quot;, pids[slot]) &quot; 2&gt;/dev/null&quot;)
+    for (slot in commands)
+        close(commands[slot])
+}
+</textarea>
+<footer>Highlighted with Pygments using the Awk lexer. All assets are local. <a href="../LICENSE">GPL-3.0-only</a>. SHA-256: <code>7494e3f6ce0c93e1901bcf372c38ab49387d30e8c3309b2b796200e761630dae</code></footer>
+<script>
+document.querySelector('#wrap').addEventListener('click',event=>{const on=document.querySelector('#listing').classList.toggle('wrap');event.currentTarget.setAttribute('aria-pressed',String(on));});
+document.querySelector('#copy').addEventListener('click',async()=>{
+const text=document.querySelector('#raw').value,notice=document.querySelector('#notice');
+try{await navigator.clipboard.writeText(text);notice.textContent='Copied.';}
+catch{notice.textContent='Clipboard unavailable here; use Open raw source to select and copy.';}
+});
+</script></body></html>

@@ -1,8 +1,8 @@
 {
   "title": "Bessel Observatory",
   "created": "2026-11-04",
-  "language_count": 32,
-  "description": "One numerical observatory, expressed independently and idiomatically in 32 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
+  "language_count": 33,
+  "description": "One numerical observatory, expressed independently and idiomatically in 33 programming languages. Read x values, approximate the Bessel function J0 in separate OS processes, and export ordered CSV observations.",
   "goals": [
     "Make language differences visible through equivalent observable behavior.",
     "Exercise file and console I/O, interactive input, command-line arguments, graceful error handling, actual OS multiprocessing, and special-function mathematics.",
@@ -73,7 +73,7 @@
     "runner": "python3 tests/verify.py",
     "references": "tests/reference.json",
     "status": "See per-language report; source review is not a substitute for compilation/execution.",
-    "source_browser": "32 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
+    "source_browser": "33 offline highlighted program pages, plus highlighted support code; embedded raw text and hashes match the source files."
   },
   "sources": [
     {
@@ -163,6 +163,10 @@
     {
       "title": ".NET 11 SDK and Visual Basic compiler",
       "url": "https://dotnet.microsoft.com/en-us/download/dotnet/11.0"
+    },
+    {
+      "title": "GNU Awk two-way coprocess I/O",
+      "url": "https://www.gnu.org/software/gawk/manual/html_node/Two_002dway-I_002fO.html"
     }
   ],
   "languages": [
@@ -1954,6 +1958,98 @@
           ]
         }
       ]
+    },
+    {
+      "id": "awk",
+      "name": "Awk",
+      "source": "bessel.awk",
+      "runtime": "GNU Awk (gawk) 5.2+ on POSIX; Linux validation baseline",
+      "run": [
+        "gawk",
+        "-f",
+        "bessel.awk",
+        "--"
+      ],
+      "idioms": "Associative arrays, record parsing, regexes, sub/split, explicit getline, formatted output, and GNU coprocess pipes.",
+      "multiprocessing": "Persistent gawk OS children through |&; bounded rounds with one outstanding observation per worker.",
+      "memory": "Awk owns associative arrays with ordered numeric keys. Array arguments share caller storage; scalars are passed by value. No native raw pointers or pointer arithmetic.",
+      "strings": "Whitespace trimming, decimal regex validation, sub/split, shell argument quoting, string concatenation and %.17g round-trip CSV formatting.",
+      "highlighted": "code/bessel.awk.html",
+      "adaptations": [
+        {
+          "objective": "Real bounded OS workers without a foreign numerical helper",
+          "kind": "platform",
+          "constraint": "Portable POSIX awk does not expose the bidirectional coprocess pipes, PID metadata and nonfatal I/O used by this edition.",
+          "approach": "GNU Awk |& launches persistent copies of this source through a POSIX shell exec. Awk schedules one outstanding observation per worker, explicitly flushes responses, validates PIDs/parentage and checks completion plus child exit status.",
+          "tradeoff": "Requires GNU Awk 5.2+ and POSIX process/pipe facilities. The shell launches or terminates children only; all parsing, quadrature and scheduling remain Awk. Ordered rounds can wait for the slowest worker.",
+          "references": [
+            {
+              "source": "bessel.awk",
+              "match": "function start_workers(",
+              "label": "Coprocess launch and PID greeting"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "function calculate(",
+              "label": "Bounded dispatch without pipe backlog"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "function finish_workers(",
+              "label": "Completion and child exit checks"
+            }
+          ]
+        },
+        {
+          "objective": "Graceful failures and resource cleanup",
+          "kind": "native",
+          "constraint": "Awk uses status returns and ERRNO rather than exception syntax; default fatal output errors would bypass explicit handling.",
+          "approach": "Enable GNU nonfatal I/O, check getline/write/flush/close outcomes, and report failures with exit status 1. END terminates known remaining workers and closes pipes to reap them. Open output only after all workers succeed.",
+          "tradeoff": "Read operations have a 60-second timeout; process startup/close are not guaranteed bounded against arbitrary OS hangs. Parent signals/fatal interpreter failures are not intercepted, and output-device failure can leave partial CSV.",
+          "references": [
+            {
+              "source": "bessel.awk",
+              "match": "function fail(",
+              "label": "Checked diagnostic exit"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "function write_results(",
+              "label": "Deferred checked output"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "END {",
+              "label": "Worker cleanup"
+            }
+          ]
+        },
+        {
+          "objective": "Native memory and precise decimal behavior",
+          "kind": "native",
+          "constraint": "Awk has automatic associative-array storage and permissive scalar coercion, not pointer arithmetic or static numeric types.",
+          "approach": "Validate decimal syntax and finite bounds before numeric coercion. Preserve order with numeric array keys, use local compensated-sum scalars, and serialize round-trip decimals with %.17g. Array arguments reference the caller-owned arrays.",
+          "tradeoff": "Input and results remain in memory, bounded to 4096 observations. This edition uses ordinary floating-point gawk mode and no arbitrary-precision extension; GNU locale defaults and child LC_ALL=C keep decimal points stable.",
+          "references": [
+            {
+              "source": "bessel.awk",
+              "match": "function number(",
+              "label": "Checked numeric coercion"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "function read_values(",
+              "label": "Array ownership and record parsing"
+            },
+            {
+              "source": "bessel.awk",
+              "match": "function observe(",
+              "label": "Awk numerical kernel"
+            }
+          ]
+        }
+      ],
+      "build": null
     }
   ],
   "memory_policy": "Explicit raw-pointer examples are small, bounds-limited demonstrations over storage whose owner stays alive. In safe or relational languages, document the absence of raw-pointer arithmetic and show native references, views or ordinal access instead. No shared native helper performs the mathematics.",

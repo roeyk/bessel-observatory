@@ -1,4 +1,4 @@
-BESSEL OBSERVATORY — 32 languages
+BESSEL OBSERVATORY — 33 languages
 
 Project guide: README.md. Development workflow: CONTRIBUTING.md.
 Change history: CHANGELOG.md and Git. License: GPL-3.0-only (see LICENSE).

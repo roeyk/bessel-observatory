@@ -1,6 +1,6 @@
 VALIDATION RECORD
 
-The current tests/report.json records 27 passed editions and five untested ones.
+The current tests/report.json records 28 passed editions and five untested ones.
 Each passed edition completed all 11 behavioral checks against the sources
 identified by SHA-256 in that report. The final Perligata comment pass was
 followed by another complete run of its 11 checks.
@@ -53,7 +53,7 @@ Untested:
 These are source implementations, not runtime-verified claims.
 
 Offline HTML checks:
-  python3 tests/verify_catalog.py verifies all 32 language entries, all 37
+  python3 tests/verify_catalog.py verifies all 33 language entries, all 38
   highlighted main/support source views, embedded raw source equality,
   SHA-256 hashes, report/source correspondence, and every local link/anchor.
   Pygments supplies bundled lexers; tools/catalog_lexers.py covers Oberon-2,
@@ -120,3 +120,20 @@ Visual Basic addition (2026-11-15):
   default arguments, same input/output file, malformed decimals and /dev/full.
   These focused probes supplement the eleven shared checks; they do not claim
   Windows/macOS execution, parent-signal cleanup or transactional disk writes.
+
+Awk addition (2026-11-18):
+  Passed all eleven shared checks on Linux x86-64 with GNU Awk 5.3.2. This is
+  a standalone edition; its parser, scheduler, numerical kernel and CSV output
+  are Awk. GNU coprocess pipes, PID metadata, nonfatal I/O and read timeouts
+  require gawk; the POSIX shell only launches/terminates child interpreters.
+  Fresh evidence binds bessel.awk by SHA-256. All prior 32 entries are unchanged.
+  One outstanding request per worker and explicit response flushing avoid pipe
+  backlog deadlocks. Output flush errors are checked explicitly before close.
+  Only Linux was exercised; POSIX/macOS portability is not execution evidence.
+  Focused probes passed 101 independent 80-digit numerical references (maximum
+  absolute error 6.478e-16); 4096-value runs at limits 1 and 16 matched every CSV
+  PID to an observed OS child and observed peaks of exactly 1 and 16. Locale,
+  quoted source paths, malformed input, same-file I/O and /dev/full probes passed.
+  Invalid result PIDs, extra child output and failure after valid DONE records
+  are rejected without overwriting existing output. Parent signal handling and
+  arbitrary OS startup/close hangs remain outside the ordinary-error contract.

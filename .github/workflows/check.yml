@@ -23,6 +23,8 @@ jobs:
           cache: pip
       - name: Install catalogue and lint tooling
         run: python -m pip install -r requirements-dev.txt
+      - name: Install GNU Awk
+        run: sudo apt-get update && sudo apt-get install --yes gawk
       - name: Set up .NET for Visual Basic
         uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5
         with:
@@ -31,6 +33,8 @@ jobs:
         run: make check PYTHON=python
       - name: Execute the Visual Basic edition on Linux
         run: python tests/verify.py --only visualbasic --require-all --report build/visual-basic-report.json
+      - name: Execute the standalone Awk edition on Linux
+        run: python tests/verify.py --only awk --require-all --report build/awk-report.json
       - name: Require reproducible generated HTML
         run: |
           make docs PYTHON=python
@@ -43,5 +47,6 @@ jobs:
           path: |
             build/check-report.json
             build/visual-basic-report.json
+            build/awk-report.json
           if-no-files-found: warn
           retention-days: 14

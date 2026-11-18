@@ -1,6 +1,6 @@
 # Bessel Observatory
 
-The same numerical program in **32 languages**, with an offline, syntax-highlighted
+The same numerical program in **33 languages**, with an offline, syntax-highlighted
 source catalogue. Each edition reads observations, calculates Bessel J₀ in
 separate operating-system processes, and writes ordered CSV results.
 
@@ -36,7 +36,7 @@ build/run commands. Build products belong under `build/`.
 
 ## Languages and adaptations
 
-Ada, Bash, BASIC, C, C++, COBOL, Erlang, Fortran, Go, Haskell, Java, JavaScript,
+Ada, Awk, Bash, BASIC, C, C++, COBOL, Erlang, Fortran, Go, Haskell, Java, JavaScript,
 Julia, Kotlin, Lingua::Romana::Perligata, Lisp, Lua, Oberon-2, Objective-C, OCaml,
 Pascal, Perl, PostScript, Prolog, Python, RPG, Ruby, Rust, Smalltalk, SQL, Swift,
 and Visual Basic.
@@ -46,6 +46,13 @@ comments explain purpose, inputs, outputs, and callers. Pointer arithmetic is
 demonstrated where supported; other editions describe their actual reference,
 buffer-offset, or relational model. All editions manipulate input/output strings.
 
+- Awk is a standalone GNU Awk 5.2+ program on POSIX:
+  `gawk -f bessel.awk -- examples/values.txt results.csv 2`.
+  Parsing, scheduling, quadrature and CSV are all Awk. GNU two-way pipes launch
+  persistent Awk OS workers through shell `exec`; the shell also terminates
+  workers during failure cleanup. One outstanding request per worker and explicit
+  flushing avoid pipe deadlocks. Use ordinary gawk mode, with one source file;
+  `mawk` and POSIX compatibility mode do not supply the required GNU features.
 - Bash embeds an `awk` floating-point kernel because shell arithmetic is integer-only.
 - Oberon-2 uses the supplied C adapter for checked POSIX and stdio interfaces;
   its quadrature and address traversal remain Oberon.
@@ -91,7 +98,7 @@ See the [NIST DLMF Bessel integral](https://dlmf.nist.gov/10.9#E1).
 This is a special-function and language comparison, not a speed ranking or
 certified numerical library.
 
-The recorded baseline has **27 editions passing all 11 behavioral checks**.
+The recorded baseline has **28 editions passing all 11 behavioral checks**.
 Smalltalk, Julia, Swift, SQL, and RPG are explicitly untested in that baseline.
 [tests/report.json](tests/report.json) ties the evidence to source hashes
 (and the declared Perligata helper and VB project dependencies);
@@ -109,9 +116,11 @@ make check
 
 `make check` verifies the catalogue, lints Python tooling, and runs the C, C++,
 Python, Bash, Perl, and Ruby editions. Install their toolchains first. It writes
-fresh evidence under `build/` and preserves the committed 32-language baseline.
+fresh evidence under `build/` and preserves the committed 33-language baseline.
 CI also installs .NET 11 and runs all eleven checks for Visual Basic; locally,
 use `make test EDITIONS=visualbasic` with `dotnet` on your PATH.
+CI installs GNU Awk and checks the standalone edition too; locally use
+`make test EDITIONS=awk` with `gawk` on your PATH.
 GitHub Actions runs the same checks and verifies reproducible generated HTML.
 GitHub Pages publishes the committed static catalogue from the root of `main`;
 `.nojekyll` keeps the generated HTML and linked source files intact.
